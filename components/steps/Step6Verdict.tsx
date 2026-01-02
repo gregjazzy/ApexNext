@@ -2,19 +2,23 @@
 
 import { motion } from 'framer-motion';
 import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
 import { ScoreRing } from '@/components/ui/ScoreRing';
 import { cn, getResilienceColor } from '@/lib/utils';
+import { verdictLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
 export function Step6Verdict() {
   const t = useTranslations('step6');
   const tStep5 = useTranslations('step5');
+  const locale = useLocale();
   const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep } = useAuditStore();
   
   const resilienceScore = getResilienceScore();
   const talentScore = getTalentScore();
   const selectedTalents = getSelectedTalents();
+  const persona = context.persona || 'salarie';
+  const l = locale === 'en' ? 'en' : 'fr';
   
   // Calculate overall score (weighted average)
   const overallScore = Math.round((resilienceScore * 0.6) + (talentScore * 0.4));
@@ -53,23 +57,30 @@ export function Step6Verdict() {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-8"
     >
-      {/* Header */}
+      {/* Header with Dynamic Title */}
       <div className="text-center space-y-4">
-        <motion.h1
-          className="apex-title text-4xl md:text-5xl"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {t('title')}
-        </motion.h1>
+          {/* Mode Badge */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Mode Diagnostic : {personaLabels[persona][l]}
+          </span>
+          
+          <h1 className="apex-title text-4xl md:text-5xl">
+            {getLexiconValue(verdictLexicon.title, persona, locale)}
+          </h1>
+        </motion.div>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {t('subtitle')}
+          {getLexiconValue(verdictLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
 

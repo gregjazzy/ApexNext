@@ -3,22 +3,26 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Clock, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { cn, getResilienceColor } from '@/lib/utils';
+import { tasksLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
 const TEMPORALITIES: Temporality[] = ['quotidien', 'hebdomadaire', 'mensuel', 'strategique'];
 
 export function Step3Tasks() {
   const t = useTranslations('step3');
-  const { tasks, addTask, removeTask, updateTask, nextStep, prevStep } = useAuditStore();
+  const locale = useLocale();
+  const { context, tasks, addTask, removeTask, updateTask, nextStep, prevStep } = useAuditStore();
   
   const [newTaskName, setNewTaskName] = useState('');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const canProceed = tasks.length > 0;
+  const persona = context.persona || 'salarie';
+  const l = locale === 'en' ? 'en' : 'fr';
 
   const temporalityLabels: Record<Temporality, string> = {
     quotidien: t('temporality.daily'),
@@ -62,23 +66,30 @@ export function Step3Tasks() {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-10"
     >
-      {/* Header */}
+      {/* Header with Dynamic Title */}
       <div className="text-center space-y-4">
-        <motion.h1
-          className="apex-title text-4xl md:text-5xl"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {t('title')}
-        </motion.h1>
+          {/* Mode Badge */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            Mode Diagnostic : {personaLabels[persona][l]}
+          </span>
+          
+          <h1 className="apex-title text-4xl md:text-5xl">
+            {getLexiconValue(tasksLexicon.title, persona, locale)}
+          </h1>
+        </motion.div>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {t('subtitle')}
+          {getLexiconValue(tasksLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
 
@@ -89,14 +100,16 @@ export function Step3Tasks() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <label className="apex-label">{t('addTask')}</label>
+        <label className="apex-label">
+          {getLexiconValue(tasksLexicon.addTaskLabel, persona, locale)}
+        </label>
         <div className="flex gap-3">
           <input
             type="text"
             value={newTaskName}
             onChange={(e) => setNewTaskName(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={t('taskPlaceholder')}
+            placeholder={getLexiconValue(tasksLexicon.taskPlaceholder, persona, locale)}
             className="apex-input flex-1"
           />
           <motion.button
@@ -123,7 +136,9 @@ export function Step3Tasks() {
               className="apex-card p-8 text-center"
             >
               <Clock className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400">{t('noTasks')}</p>
+              <p className="text-slate-400">
+                {getLexiconValue(tasksLexicon.noTasksMessage, persona, locale)}
+              </p>
             </motion.div>
           ) : (
             tasks.map((task, index) => {
@@ -264,7 +279,7 @@ export function Step3Tasks() {
               {tasks.length}
             </div>
             <span className="text-slate-300">
-              {tasks.length === 1 ? t('taskRegistered') : t('tasksRegistered')}
+              {getLexiconValue(tasksLexicon.registeredLabel, persona, locale)}
             </span>
           </div>
           

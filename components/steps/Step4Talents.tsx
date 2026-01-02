@@ -2,17 +2,21 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Star } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { cn } from '@/lib/utils';
+import { talentsLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
 export function Step4Talents() {
   const t = useTranslations('step4');
-  const { talents, toggleTalent, setTalentLevel, getSelectedTalents, nextStep, prevStep } = useAuditStore();
+  const locale = useLocale();
+  const { context, talents, toggleTalent, setTalentLevel, getSelectedTalents, nextStep, prevStep } = useAuditStore();
 
   const selectedTalents = getSelectedTalents();
   const canProceed = selectedTalents.length === 5;
+  const persona = context.persona || 'salarie';
+  const l = locale === 'en' ? 'en' : 'fr';
 
   // Group talents by category
   const talentsByCategory = talents.reduce((acc, talent) => {
@@ -24,15 +28,14 @@ export function Step4Talents() {
   }, {} as Record<string, typeof talents>);
 
   const categoryLabels: Record<string, string> = {
-    analytique: t('categories.analytical'),
-    relationnel: t('categories.relational'),
-    creatif: t('categories.creative'),
-    operationnel: t('categories.operational'),
-    technique: t('categories.technical'),
+    Analytique: t('categories.analytical'),
+    Relationnel: t('categories.relational'),
+    Créatif: t('categories.creative'),
+    Opérationnel: t('categories.operational'),
+    Technique: t('categories.technical'),
   };
 
   const getTalentLabel = (talentId: string): string => {
-    const talentKey = talentId as keyof ReturnType<typeof t>;
     try {
       return t(`talents.${talentId}` as any) || talentId;
     } catch {
@@ -47,23 +50,30 @@ export function Step4Talents() {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-10"
     >
-      {/* Header */}
+      {/* Header with Dynamic Title */}
       <div className="text-center space-y-4">
-        <motion.h1
-          className="apex-title text-4xl md:text-5xl"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {t('title')}
-        </motion.h1>
+          {/* Mode Badge */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+            Mode Diagnostic : {personaLabels[persona][l]}
+          </span>
+          
+          <h1 className="apex-title text-4xl md:text-5xl">
+            {getLexiconValue(talentsLexicon.title, persona, locale)}
+          </h1>
+        </motion.div>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {t('subtitle')}
+          {getLexiconValue(talentsLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
 
@@ -128,7 +138,7 @@ export function Step4Talents() {
                       'text-sm font-medium',
                       isSelected ? 'text-amber-300' : 'text-slate-300'
                     )}>
-                      {getTalentLabel(talent.id)}
+                      {talent.name}
                     </p>
 
                     {/* Level Selector */}
@@ -182,7 +192,9 @@ export function Step4Talents() {
             exit={{ opacity: 0, y: -20 }}
             className="apex-card p-6"
           >
-            <h4 className="text-sm font-medium text-slate-400 mb-4">{t('yourSignature')}</h4>
+            <h4 className="text-sm font-medium text-slate-400 mb-4">
+              {l === 'fr' ? 'Votre Signature' : 'Your Signature'}
+            </h4>
             <div className="flex flex-wrap gap-2">
               {selectedTalents.map((talent) => (
                 <motion.div
@@ -190,7 +202,7 @@ export function Step4Talents() {
                   layout
                   className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30"
                 >
-                  <span className="text-amber-300 text-sm">{getTalentLabel(talent.id)}</span>
+                  <span className="text-amber-300 text-sm">{talent.name}</span>
                   <div className="flex gap-0.5">
                     {[...Array(talent.level)].map((_, i) => (
                       <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />

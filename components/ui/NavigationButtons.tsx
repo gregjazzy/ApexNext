@@ -15,6 +15,7 @@ interface NavigationButtonsProps {
   showPrev?: boolean;
   showNext?: boolean;
   nextVariant?: 'primary' | 'success';
+  nextIcon?: React.ReactNode;
 }
 
 export function NavigationButtons({
@@ -27,6 +28,7 @@ export function NavigationButtons({
   showPrev = true,
   showNext = true,
   nextVariant = 'primary',
+  nextIcon,
 }: NavigationButtonsProps) {
   const t = useTranslations('common');
   
@@ -64,7 +66,7 @@ export function NavigationButtons({
           whileTap={{ scale: 0.98 }}
         >
           {finalNextLabel}
-          <ChevronRight className="w-4 h-4" />
+          {nextIcon || <ChevronRight className="w-4 h-4" />}
         </motion.button>
       )}
     </div>

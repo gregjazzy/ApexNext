@@ -3,21 +3,25 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Monitor, Trash2, Star, CheckCircle } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, SkillLevel } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { cn } from '@/lib/utils';
+import { softwareLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
 const LEVELS: SkillLevel[] = ['debutant', 'avance', 'expert'];
 const COMMON_TOOLS = ['Excel', 'PowerPoint', 'Figma', 'Notion', 'Slack', 'Python', 'ChatGPT', 'Salesforce', 'Jira', 'Tableau'];
 
 export function Step5Software() {
   const t = useTranslations('step5');
-  const { software, addSoftware, removeSoftware, updateSoftware, nextStep, prevStep } = useAuditStore();
+  const locale = useLocale();
+  const { context, software, addSoftware, removeSoftware, updateSoftware, nextStep, prevStep } = useAuditStore();
   
   const [newToolName, setNewToolName] = useState('');
 
   const canProceed = software.length >= 3;
+  const persona = context.persona || 'salarie';
+  const l = locale === 'en' ? 'en' : 'fr';
 
   const levelLabels: Record<SkillLevel, string> = {
     debutant: t('levels.beginner'),
@@ -48,23 +52,30 @@ export function Step5Software() {
       exit={{ opacity: 0, y: -20 }}
       className="space-y-10"
     >
-      {/* Header */}
+      {/* Header with Dynamic Title */}
       <div className="text-center space-y-4">
-        <motion.h1
-          className="apex-title text-4xl md:text-5xl"
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {t('title')}
-        </motion.h1>
+          {/* Mode Badge */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            Mode Diagnostic : {personaLabels[persona][l]}
+          </span>
+          
+          <h1 className="apex-title text-4xl md:text-5xl">
+            {getLexiconValue(softwareLexicon.title, persona, locale)}
+          </h1>
+        </motion.div>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {t('subtitle')}
+          {getLexiconValue(softwareLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
 

@@ -1,52 +1,65 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Users, TrendingUp, Shuffle } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { User, Briefcase, Users, Zap, Shuffle, Rocket } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { useAuditStore, Persona, Goal } from '@/lib/store';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
+import { matrixLexicon, personaLabels, getGoalDescription } from '@/lib/lexicon';
 
 export function Step1Matrix() {
-  const t = useTranslations('step1');
-  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const { context, setPersona, setGoal, nextStep } = useAuditStore();
   const { persona, goal } = context;
 
   const canProceed = persona && goal;
+  const l = locale === 'en' ? 'en' : 'fr';
 
+  // Personas with expert vocabulary
   const personas = [
     {
       id: 'salarie' as Persona,
-      title: t('personas.salarie.title'),
-      description: t('personas.salarie.description'),
+      title: personaLabels.salarie[l],
+      description: l === 'fr' 
+        ? "En poste, vous souhaitez évoluer et sécuriser votre trajectoire." 
+        : "Employed, you want to evolve and secure your trajectory.",
       icon: <User className="w-6 h-6" />,
     },
     {
       id: 'freelance' as Persona,
-      title: t('personas.freelance.title'),
-      description: t('personas.freelance.description'),
+      title: personaLabels.freelance[l],
+      description: l === 'fr'
+        ? "Indépendant, vous cherchez à scaler et optimiser votre activité."
+        : "Independent, you're looking to scale and optimize your business.",
       icon: <Briefcase className="w-6 h-6" />,
     },
     {
       id: 'leader' as Persona,
-      title: t('personas.leader.title'),
-      description: t('personas.leader.description'),
+      title: personaLabels.leader[l],
+      description: l === 'fr'
+        ? "Vous pilotez une équipe et anticipez les transformations."
+        : "You lead a team and anticipate transformations.",
       icon: <Users className="w-6 h-6" />,
     },
   ];
 
-  const goals = [
+  // Goals with dynamic descriptions based on persona
+  const getGoals = () => [
     {
       id: 'augmentation' as Goal,
-      title: t('goals.augmentation.title'),
-      description: t('goals.augmentation.description'),
-      icon: <TrendingUp className="w-6 h-6" />,
+      title: matrixLexicon.goals.augmentation.title[l],
+      description: persona 
+        ? getGoalDescription('augmentation', persona, locale)
+        : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
+      icon: <Zap className="w-6 h-6" />,
     },
     {
       id: 'pivot' as Goal,
-      title: t('goals.pivot.title'),
-      description: t('goals.pivot.description'),
+      title: matrixLexicon.goals.pivot.title[l],
+      description: persona 
+        ? getGoalDescription('pivot', persona, locale)
+        : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
       icon: <Shuffle className="w-6 h-6" />,
     },
   ];
@@ -66,7 +79,7 @@ export function Step1Matrix() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          {t('title')}
+          {matrixLexicon.title[l]}
         </motion.h1>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
@@ -74,7 +87,7 @@ export function Step1Matrix() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {t('subtitle')}
+          {matrixLexicon.subtitle[l]}
         </motion.p>
       </div>
 
@@ -89,7 +102,7 @@ export function Step1Matrix() {
           <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">
             1
           </span>
-          {t('whoAreYou')}
+          {l === 'fr' ? 'Quel est votre profil ?' : 'What is your profile?'}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {personas.map((p) => (
@@ -119,10 +132,10 @@ export function Step1Matrix() {
               <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">
                 2
               </span>
-              {t('whatGoal')}
+              {l === 'fr' ? 'Quel est votre objectif stratégique ?' : 'What is your strategic objective?'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {goals.map((g) => (
+              {getGoals().map((g) => (
                 <SelectionCard
                   key={g.id}
                   title={g.title}
@@ -130,6 +143,7 @@ export function Step1Matrix() {
                   icon={g.icon}
                   selected={goal === g.id}
                   onClick={() => setGoal(g.id)}
+                  accentColor={g.id === 'augmentation' ? 'blue' : 'emerald'}
                 />
               ))}
             </div>
@@ -137,21 +151,33 @@ export function Step1Matrix() {
         )}
       </AnimatePresence>
 
-      {/* Selection Summary */}
+      {/* Selection Summary with Badge */}
       <AnimatePresence mode="wait">
         {canProceed && (
           <motion.div
-            className="apex-card p-6 text-center"
+            className="apex-card p-6 relative"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
           >
-            <p className="text-slate-400 mb-2">{t('yourConfig')}</p>
-            <p className="text-xl font-serif text-slate-100">
-              <span className="text-blue-400">{personas.find(p => p.id === persona)?.title}</span>
-              {' '}{t('inMode')}{' '}
-              <span className="text-emerald-400">{goals.find(g => g.id === goal)?.title}</span>
-            </p>
+            {/* Mode Badge */}
+            <div className="absolute top-3 right-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                Mode Diagnostic : {personas.find(p => p.id === persona)?.title}
+              </span>
+            </div>
+
+            <div className="text-center pt-4">
+              <p className="text-slate-400 mb-2">
+                {l === 'fr' ? 'Configuration validée' : 'Configuration validated'}
+              </p>
+              <p className="text-xl font-serif text-slate-100">
+                <span className="text-blue-400">{personas.find(p => p.id === persona)?.title}</span>
+                {' '}{l === 'fr' ? 'en mode' : 'in'}{' '}
+                <span className="text-emerald-400">{getGoals().find(g => g.id === goal)?.title}</span>
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -160,7 +186,8 @@ export function Step1Matrix() {
         showPrev={false}
         onNext={nextStep}
         nextDisabled={!canProceed}
-        nextLabel={t('nextButton')}
+        nextLabel={matrixLexicon.launchButton[l]}
+        nextIcon={<Rocket className="w-4 h-4" />}
       />
     </motion.div>
   );

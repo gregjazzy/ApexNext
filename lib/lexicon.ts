@@ -1,0 +1,263 @@
+import { Persona, Goal } from './store';
+
+// Dynamic UI Lexicon based on Persona
+export interface LexiconEntry {
+  salarie: string;
+  freelance: string;
+  leader: string;
+}
+
+export interface GoalDescription {
+  salarie: string;
+  freelance: string;
+  leader: string;
+}
+
+// Step 1 - Matrix Expert Wording
+export const matrixLexicon = {
+  title: {
+    fr: "Initialisation Stratégique",
+    en: "Strategic Initialization"
+  },
+  subtitle: {
+    fr: "Configurez votre prisme d'analyse pour un audit de précision.",
+    en: "Configure your analysis prism for a precision audit."
+  },
+  goals: {
+    augmentation: {
+      title: {
+        fr: "Accélération IA",
+        en: "AI Acceleration"
+      },
+      description: {
+        salarie: {
+          fr: "Déléguer l'exécution pour libérer votre valeur stratégique.",
+          en: "Delegate execution to unlock your strategic value."
+        },
+        freelance: {
+          fr: "Optimiser votre rentabilité horaire et automatiser votre back-office.",
+          en: "Optimize your hourly profitability and automate your back-office."
+        },
+        leader: {
+          fr: "Amplifier l'impact de votre équipe via l'automatisation intelligente.",
+          en: "Amplify your team's impact through intelligent automation."
+        }
+      }
+    },
+    pivot: {
+      title: {
+        fr: "Mutation Stratégique",
+        en: "Strategic Mutation"
+      },
+      description: {
+        salarie: {
+          fr: "Identifier une trajectoire résiliente basée sur vos talents.",
+          en: "Identify a resilient trajectory based on your talents."
+        },
+        freelance: {
+          fr: "Repositionner votre offre vers des prestations à haute valeur ajoutée.",
+          en: "Reposition your offering toward high-value services."
+        },
+        leader: {
+          fr: "Planifier la transition des postes à risque vers de nouvelles fonctions.",
+          en: "Plan the transition of at-risk positions to new functions."
+        }
+      }
+    }
+  },
+  launchButton: {
+    fr: "Lancer le Deep Audit →",
+    en: "Launch Deep Audit →"
+  }
+};
+
+// Step 2 - Context Mapping Lexicon
+export const contextLexicon = {
+  title: {
+    salarie: { fr: "Analyse du Poste", en: "Position Analysis" },
+    freelance: { fr: "Audit d'Activité", en: "Activity Audit" },
+    leader: { fr: "Mapping de Structure", en: "Structure Mapping" }
+  },
+  subtitle: {
+    salarie: { 
+      fr: "Décrivez votre environnement professionnel pour calibrer l'analyse.", 
+      en: "Describe your professional environment to calibrate the analysis." 
+    },
+    freelance: { 
+      fr: "Cartographiez votre activité pour identifier les leviers d'optimisation.", 
+      en: "Map your activity to identify optimization levers." 
+    },
+    leader: { 
+      fr: "Modélisez votre périmètre managérial pour un audit systémique.", 
+      en: "Model your managerial scope for a systemic audit." 
+    }
+  },
+  jobLabel: {
+    salarie: { fr: "Intitulé du Poste", en: "Job Title" },
+    freelance: { fr: "Cœur de Métier / Offre", en: "Core Business / Offering" },
+    leader: { fr: "Périmètre Managérial", en: "Managerial Scope" }
+  },
+  jobPlaceholder: {
+    salarie: { fr: "ex: Analyste financier, Chef de projet...", en: "e.g.: Financial Analyst, Project Manager..." },
+    freelance: { fr: "ex: Consultant Growth, Coach Agile...", en: "e.g.: Growth Consultant, Agile Coach..." },
+    leader: { fr: "ex: Direction Marketing, DRH...", en: "e.g.: Marketing Director, HR Director..." }
+  },
+  descriptionLabel: {
+    salarie: { fr: "Mes Missions", en: "My Missions" },
+    freelance: { fr: "Mes Prestations", en: "My Services" },
+    leader: { fr: "Responsabilités Équipe", en: "Team Responsibilities" }
+  },
+  industryLabel: {
+    salarie: { fr: "Secteur d'activité", en: "Industry" },
+    freelance: { fr: "Marché cible", en: "Target Market" },
+    leader: { fr: "Secteur & Taille", en: "Sector & Size" }
+  }
+};
+
+// Step 3 - Tasks Audit Lexicon
+export const tasksLexicon = {
+  title: {
+    salarie: { fr: "Audit Temporel", en: "Temporal Audit" },
+    freelance: { fr: "Décomposition Opérationnelle", en: "Operational Breakdown" },
+    leader: { fr: "Revue des Processus", en: "Process Review" }
+  },
+  subtitle: {
+    salarie: { 
+      fr: "Listez vos tâches quotidiennes et évaluez leur vulnérabilité.", 
+      en: "List your daily tasks and assess their vulnerability." 
+    },
+    freelance: { 
+      fr: "Décomposez vos livrables pour identifier les zones d'automatisation.", 
+      en: "Break down your deliverables to identify automation zones." 
+    },
+    leader: { 
+      fr: "Cartographiez les flux de travail de votre équipe.", 
+      en: "Map your team's workflows." 
+    }
+  },
+  taskLabel: {
+    salarie: { fr: "Tâche", en: "Task" },
+    freelance: { fr: "Opération / Livrable", en: "Operation / Deliverable" },
+    leader: { fr: "Flux de Travail", en: "Workflow" }
+  },
+  addTaskLabel: {
+    salarie: { fr: "Ajouter une tâche", en: "Add a task" },
+    freelance: { fr: "Ajouter une opération", en: "Add an operation" },
+    leader: { fr: "Ajouter un flux", en: "Add a workflow" }
+  },
+  taskPlaceholder: {
+    salarie: { fr: "ex: Rédaction de rapports, Réunions...", en: "e.g.: Report writing, Meetings..." },
+    freelance: { fr: "ex: Audit client, Livrable mensuel...", en: "e.g.: Client audit, Monthly deliverable..." },
+    leader: { fr: "ex: Validation budgets, Recrutement...", en: "e.g.: Budget validation, Recruitment..." }
+  },
+  noTasksMessage: {
+    salarie: { fr: "Ajoutez au moins une tâche pour continuer", en: "Add at least one task to continue" },
+    freelance: { fr: "Ajoutez au moins une opération pour continuer", en: "Add at least one operation to continue" },
+    leader: { fr: "Ajoutez au moins un flux pour continuer", en: "Add at least one workflow to continue" }
+  },
+  registeredLabel: {
+    salarie: { fr: "tâche(s) enregistrée(s)", en: "task(s) registered" },
+    freelance: { fr: "opération(s) enregistrée(s)", en: "operation(s) registered" },
+    leader: { fr: "flux enregistré(s)", en: "workflow(s) registered" }
+  }
+};
+
+// Step 4 - Talents Lexicon
+export const talentsLexicon = {
+  title: {
+    salarie: { fr: "Signature des Talents", en: "Talent Signature" },
+    freelance: { fr: "Capital Compétences", en: "Skills Capital" },
+    leader: { fr: "Profil Leadership", en: "Leadership Profile" }
+  },
+  subtitle: {
+    salarie: { 
+      fr: "Identifiez vos 5 talents majeurs qui font votre valeur unique.", 
+      en: "Identify your 5 major talents that make your unique value." 
+    },
+    freelance: { 
+      fr: "Définissez les compétences différenciantes de votre offre.", 
+      en: "Define the differentiating skills of your offering." 
+    },
+    leader: { 
+      fr: "Cartographiez vos atouts pour piloter le changement.", 
+      en: "Map your assets to drive change." 
+    }
+  }
+};
+
+// Step 5 - Software Lexicon
+export const softwareLexicon = {
+  title: {
+    salarie: { fr: "Tech Scan", en: "Tech Scan" },
+    freelance: { fr: "Stack Professionnel", en: "Professional Stack" },
+    leader: { fr: "Écosystème Outils", en: "Tools Ecosystem" }
+  },
+  subtitle: {
+    salarie: { 
+      fr: "Identifiez vos 3 outils principaux et votre niveau de maîtrise.", 
+      en: "Identify your 3 main tools and your mastery level." 
+    },
+    freelance: { 
+      fr: "Listez les outils clés de votre activité et votre expertise.", 
+      en: "List the key tools of your business and your expertise." 
+    },
+    leader: { 
+      fr: "Évaluez l'adoption technologique de votre périmètre.", 
+      en: "Assess the technological adoption of your scope." 
+    }
+  }
+};
+
+// Step 6 - Verdict Lexicon
+export const verdictLexicon = {
+  title: {
+    salarie: { fr: "Le Verdict", en: "The Verdict" },
+    freelance: { fr: "Bilan Stratégique", en: "Strategic Assessment" },
+    leader: { fr: "Diagnostic Global", en: "Global Diagnostic" }
+  },
+  subtitle: {
+    salarie: { 
+      fr: "Votre diagnostic de résilience face à l'IA.", 
+      en: "Your AI resilience diagnostic." 
+    },
+    freelance: { 
+      fr: "Analyse de votre positionnement et potentiel d'optimisation.", 
+      en: "Analysis of your positioning and optimization potential." 
+    },
+    leader: { 
+      fr: "Vision systémique de la résilience de votre périmètre.", 
+      en: "Systemic vision of your scope's resilience." 
+    }
+  }
+};
+
+// Persona Labels
+export const personaLabels = {
+  salarie: { fr: "Salarié", en: "Employee" },
+  freelance: { fr: "Freelance", en: "Freelance" },
+  leader: { fr: "Leader / RH", en: "Leader / HR" }
+};
+
+// Helper function to get lexicon value based on persona and locale
+export function getLexiconValue(
+  lexiconEntry: { salarie: { fr: string; en: string }; freelance: { fr: string; en: string }; leader: { fr: string; en: string } },
+  persona: Persona,
+  locale: string
+): string {
+  const personaKey = persona || 'salarie';
+  const localeKey = locale === 'en' ? 'en' : 'fr';
+  return lexiconEntry[personaKey as keyof typeof lexiconEntry][localeKey];
+}
+
+// Helper for goal descriptions
+export function getGoalDescription(
+  goal: Goal,
+  persona: Persona,
+  locale: string
+): string {
+  if (!goal || !persona) return '';
+  const localeKey = locale === 'en' ? 'en' : 'fr';
+  const personaKey = persona as 'salarie' | 'freelance' | 'leader';
+  return matrixLexicon.goals[goal].description[personaKey][localeKey];
+}
+
