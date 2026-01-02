@@ -13,7 +13,7 @@ export interface GoalDescription {
   leader: string;
 }
 
-// Step 1 - Matrix Expert Wording
+// Step 1 - Matrix Expert Wording (Strategy Consulting Level)
 export const matrixLexicon = {
   title: {
     fr: "Initialisation Stratégique",
@@ -26,41 +26,43 @@ export const matrixLexicon = {
   goals: {
     augmentation: {
       title: {
-        fr: "Accélération IA",
-        en: "AI Acceleration"
+        salarie: { fr: "Ingénierie de l'Employabilité", en: "Employability Engineering" },
+        freelance: { fr: "Scalabilité de la Valeur", en: "Value Scalability" },
+        leader: { fr: "Audit d'Efficience Opérationnelle", en: "Operational Efficiency Audit" }
       },
       description: {
         salarie: {
-          fr: "Déléguer l'exécution pour libérer votre valeur stratégique.",
-          en: "Delegate execution to unlock your strategic value."
+          fr: "Devenir l'expert augmenté capable de piloter l'IA sur votre périmètre stratégique.",
+          en: "Become the augmented expert capable of driving AI within your strategic scope."
         },
         freelance: {
-          fr: "Optimiser votre rentabilité horaire et automatiser votre back-office.",
-          en: "Optimize your hourly profitability and automate your back-office."
+          fr: "Passer de l'exécution concurrencée à une offre de conseil expert à haute marge.",
+          en: "Move from competitive execution to a high-margin expert consulting offering."
         },
         leader: {
-          fr: "Amplifier l'impact de votre équipe via l'automatisation intelligente.",
-          en: "Amplify your team's impact through intelligent automation."
+          fr: "Redéfinir l'architecture des postes pour maximiser la performance globale.",
+          en: "Redefine position architecture to maximize overall performance."
         }
       }
     },
     pivot: {
       title: {
-        fr: "Mutation Stratégique",
-        en: "Strategic Mutation"
+        salarie: { fr: "Pivot Stratégique Haute-Valeur", en: "High-Value Strategic Pivot" },
+        freelance: { fr: "Mutation du Modèle d'Affaires", en: "Business Model Transformation" },
+        leader: { fr: "Ingénierie de la Transition (GPEC)", en: "Transition Engineering (GPEC)" }
       },
       description: {
         salarie: {
-          fr: "Identifier une trajectoire résiliente basée sur vos talents.",
-          en: "Identify a resilient trajectory based on your talents."
+          fr: "Identifier une reconversion vers des fonctions critiques non-automatisables.",
+          en: "Identify a reconversion toward critical non-automatable functions."
         },
         freelance: {
-          fr: "Repositionner votre offre vers des prestations à haute valeur ajoutée.",
-          en: "Reposition your offering toward high-value services."
+          fr: "Réaligner votre structure sur les besoins critiques d'un marché transformé.",
+          en: "Realign your structure with the critical needs of a transformed market."
         },
         leader: {
-          fr: "Planifier la transition des postes à risque vers de nouvelles fonctions.",
-          en: "Plan the transition of at-risk positions to new functions."
+          fr: "Piloter le redéploiement stratégique des effectifs et la mutation des compétences.",
+          en: "Drive the strategic redeployment of workforce and skills transformation."
         }
       }
     }
@@ -247,6 +249,18 @@ export function getLexiconValue(
   const personaKey = persona || 'salarie';
   const localeKey = locale === 'en' ? 'en' : 'fr';
   return lexiconEntry[personaKey as keyof typeof lexiconEntry][localeKey];
+}
+
+// Helper for goal title (now dynamic per persona)
+export function getGoalTitle(
+  goal: Goal,
+  persona: Persona,
+  locale: string
+): string {
+  if (!goal) return '';
+  const localeKey = locale === 'en' ? 'en' : 'fr';
+  const personaKey = persona || 'salarie';
+  return matrixLexicon.goals[goal].title[personaKey as 'salarie' | 'freelance' | 'leader'][localeKey];
 }
 
 // Helper for goal descriptions

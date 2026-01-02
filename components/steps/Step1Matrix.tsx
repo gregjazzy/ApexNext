@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import { useAuditStore, Persona, Goal } from '@/lib/store';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
-import { matrixLexicon, personaLabels, getGoalDescription } from '@/lib/lexicon';
+import { matrixLexicon, personaLabels, getGoalTitle, getGoalDescription } from '@/lib/lexicon';
 
 export function Step1Matrix() {
   const locale = useLocale();
@@ -44,11 +44,13 @@ export function Step1Matrix() {
     },
   ];
 
-  // Goals with dynamic descriptions based on persona
+  // Goals with dynamic titles AND descriptions based on persona
   const getGoals = () => [
     {
       id: 'augmentation' as Goal,
-      title: matrixLexicon.goals.augmentation.title[l],
+      title: persona 
+        ? getGoalTitle('augmentation', persona, locale)
+        : (l === 'fr' ? "Axe Augmentation" : "Augmentation Axis"),
       description: persona 
         ? getGoalDescription('augmentation', persona, locale)
         : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
@@ -56,7 +58,9 @@ export function Step1Matrix() {
     },
     {
       id: 'pivot' as Goal,
-      title: matrixLexicon.goals.pivot.title[l],
+      title: persona 
+        ? getGoalTitle('pivot', persona, locale)
+        : (l === 'fr' ? "Axe Pivot" : "Pivot Axis"),
       description: persona 
         ? getGoalDescription('pivot', persona, locale)
         : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
