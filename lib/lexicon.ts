@@ -105,9 +105,9 @@ export const contextLexicon = {
     leader: { fr: "ex: Direction Marketing, DRH...", en: "e.g.: Marketing Director, HR Director..." }
   },
   descriptionLabel: {
-    salarie: { fr: "Mes Missions", en: "My Missions" },
-    freelance: { fr: "Mes Prestations", en: "My Services" },
-    leader: { fr: "Responsabilités Équipe", en: "Team Responsibilities" }
+    salarie: { fr: "Fiche de poste", en: "Job Description" },
+    freelance: { fr: "Catalogue de services", en: "Services Catalog" },
+    leader: { fr: "Périmètre de la Business Unit", en: "Business Unit Scope" }
   },
   industryLabel: {
     salarie: { fr: "Secteur d'activité", en: "Industry" },
@@ -125,8 +125,8 @@ export const tasksLexicon = {
   },
   subtitle: {
     salarie: { 
-      fr: "Listez vos tâches quotidiennes et évaluez leur vulnérabilité.", 
-      en: "List your daily tasks and assess their vulnerability." 
+      fr: "Listez vos tâches principales et évaluez leur vulnérabilité.", 
+      en: "List your main tasks and assess their vulnerability." 
     },
     freelance: { 
       fr: "Décomposez vos livrables pour identifier les zones d'automatisation.", 
@@ -164,25 +164,25 @@ export const tasksLexicon = {
   }
 };
 
-// Step 4 - Talents Lexicon
+// Step 4 - Strategic Assets Lexicon (12 Actifs Stratégiques)
 export const talentsLexicon = {
   title: {
-    salarie: { fr: "Signature des Talents", en: "Talent Signature" },
-    freelance: { fr: "Capital Compétences", en: "Skills Capital" },
-    leader: { fr: "Profil Leadership", en: "Leadership Profile" }
+    salarie: { fr: "Inventaire des Actifs Stratégiques", en: "Strategic Assets Inventory" },
+    freelance: { fr: "Capital Stratégique", en: "Strategic Capital" },
+    leader: { fr: "Profil de Leadership Stratégique", en: "Strategic Leadership Profile" }
   },
   subtitle: {
     salarie: { 
-      fr: "Identifiez vos 5 talents majeurs qui font votre valeur unique.", 
-      en: "Identify your 5 major talents that make your unique value." 
+      fr: "Sélectionnez vos 5 actifs majeurs parmi les 12 compétences critiques non-automatisables.", 
+      en: "Select your 5 major assets from the 12 critical non-automatable skills." 
     },
     freelance: { 
-      fr: "Définissez les compétences différenciantes de votre offre.", 
-      en: "Define the differentiating skills of your offering." 
+      fr: "Identifiez les 5 actifs stratégiques qui différencient votre offre.", 
+      en: "Identify the 5 strategic assets that differentiate your offering." 
     },
     leader: { 
-      fr: "Cartographiez vos atouts pour piloter le changement.", 
-      en: "Map your assets to drive change." 
+      fr: "Définissez vos 5 actifs clés pour piloter la transformation.", 
+      en: "Define your 5 key assets to drive transformation." 
     }
   }
 };

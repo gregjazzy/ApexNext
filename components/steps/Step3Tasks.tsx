@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Clock, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Clock, Trash2, ChevronDown, ChevronUp, Cpu, Users, Lightbulb, Brain, Cog, Timer } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
@@ -33,8 +33,10 @@ export function Step3Tasks() {
 
   const handleAddTask = () => {
     if (newTaskName.trim()) {
-      addTask(newTaskName.trim());
+      const newTaskId = addTask(newTaskName.trim());
       setNewTaskName('');
+      // Auto-déplier la nouvelle tâche pour montrer les curseurs à renseigner
+      setExpandedTaskId(newTaskId);
     }
   };
 
@@ -48,15 +50,27 @@ export function Step3Tasks() {
     setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
+  // Calcul sur 5 dimensions maintenant
   const getTaskAverage = (task: Task): number => {
-    const { donnees, decision, relationnel, creativite } = task.resilience;
-    return Math.round((donnees + decision + relationnel + creativite) / 4);
+    const { donnees, decision, relationnel, creativite, execution } = task.resilience;
+    return Math.round((donnees + decision + relationnel + creativite + execution) / 5);
   };
 
+  // Moyenne pondérée par les heures/semaine
   const getOverallAverage = (): number => {
     if (tasks.length === 0) return 0;
-    const sum = tasks.reduce((acc, task) => acc + getTaskAverage(task), 0);
-    return Math.round(sum / tasks.length);
+    const totalHours = tasks.reduce((acc, task) => acc + (task.hoursPerWeek || 4), 0);
+    if (totalHours === 0) return 0;
+    const weightedSum = tasks.reduce((acc, task) => {
+      const weight = (task.hoursPerWeek || 4) / totalHours;
+      return acc + getTaskAverage(task) * weight;
+    }, 0);
+    return Math.round(weightedSum);
+  };
+
+  // Total des heures/semaine (pour affichage)
+  const getTotalHours = (): number => {
+    return tasks.reduce((acc, task) => acc + (task.hoursPerWeek || 4), 0);
   };
 
   return (
@@ -141,7 +155,7 @@ export function Step3Tasks() {
               </p>
             </motion.div>
           ) : (
-            tasks.map((task, index) => {
+            [...tasks].sort((a, b) => b.createdAt - a.createdAt).map((task, index) => {
               const isExpanded = expandedTaskId === task.id;
               const avgScore = getTaskAverage(task);
               const color = getResilienceColor(avgScore);
@@ -162,7 +176,7 @@ export function Step3Tasks() {
                     onClick={() => toggleExpand(task.id)}
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <span className="font-medium text-slate-200">{task.name}</span>
                         <select
                           value={task.temporalite}
@@ -176,6 +190,11 @@ export function Step3Tasks() {
                             </option>
                           ))}
                         </select>
+                        {/* Indicateur heures */}
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <Timer className="w-3 h-3" />
+                          {task.hoursPerWeek || 4}h/{l === 'fr' ? 'sem' : 'wk'}
+                        </span>
                       </div>
                     </div>
 
@@ -207,7 +226,7 @@ export function Step3Tasks() {
                     </div>
                   </div>
 
-                  {/* Expanded Resilience Sliders */}
+                  {/* Expanded Resilience Sliders - 5 Dimensions */}
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
@@ -222,7 +241,38 @@ export function Step3Tasks() {
                             {t('resilienceHint')}
                           </p>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Temps + 5 Curseurs de Résilience */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/* 0. Temps consacré (slider style) */}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2">
+                                <Timer className="w-4 h-4 text-blue-400" />
+                                <span className="text-sm font-medium text-slate-200">
+                                  {l === 'fr' ? 'Heures / semaine' : 'Hours / week'}
+                                </span>
+                                <span className="ml-auto text-lg font-bold text-blue-400">
+                                  {task.hoursPerWeek || 4}h
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500">
+                                {l === 'fr' ? 'Temps moyen consacré à cette tâche' : 'Average time spent on this task'}
+                              </p>
+                              <input
+                                type="range"
+                                min="0.5"
+                                max="20"
+                                step="0.5"
+                                value={task.hoursPerWeek || 4}
+                                onChange={(e) => updateTask(task.id, { hoursPerWeek: parseFloat(e.target.value) })}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                              />
+                              <div className="flex justify-between text-xs text-slate-600">
+                                <span>0.5h</span>
+                                <span>20h</span>
+                              </div>
+                            </div>
+                            {/* 1. Données (IA) */}
                             <ResilienceSlider
                               label={t('resilience.data')}
                               description={t('resilience.dataDesc')}
@@ -230,7 +280,10 @@ export function Step3Tasks() {
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, donnees: value }
                               })}
+                              icon={<Cpu className="w-4 h-4" />}
                             />
+                            
+                            {/* 2. Décision */}
                             <ResilienceSlider
                               label={t('resilience.decision')}
                               description={t('resilience.decisionDesc')}
@@ -238,7 +291,10 @@ export function Step3Tasks() {
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, decision: value }
                               })}
+                              icon={<Brain className="w-4 h-4" />}
                             />
+                            
+                            {/* 3. Relationnel */}
                             <ResilienceSlider
                               label={t('resilience.relational')}
                               description={t('resilience.relationalDesc')}
@@ -246,7 +302,10 @@ export function Step3Tasks() {
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, relationnel: value }
                               })}
+                              icon={<Users className="w-4 h-4" />}
                             />
+                            
+                            {/* 4. Créativité */}
                             <ResilienceSlider
                               label={t('resilience.creativity')}
                               description={t('resilience.creativityDesc')}
@@ -254,6 +313,18 @@ export function Step3Tasks() {
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, creativite: value }
                               })}
+                              icon={<Lightbulb className="w-4 h-4" />}
+                            />
+                            
+                            {/* 5. Exécution Physique (NOUVEAU) */}
+                            <ResilienceSlider
+                              label={t('resilience.execution')}
+                              description={t('resilience.executionDesc')}
+                              value={task.resilience.execution}
+                              onChange={(value) => updateTask(task.id, {
+                                resilience: { ...task.resilience, execution: value }
+                              })}
+                              icon={<Cog className="w-4 h-4" />}
                             />
                           </div>
                         </div>
@@ -272,27 +343,41 @@ export function Step3Tasks() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="apex-card p-6 flex items-center justify-between"
+          className="apex-card p-6"
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
-              {tasks.length}
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                {tasks.length}
+              </div>
+              <span className="text-slate-300">
+                {getLexiconValue(tasksLexicon.registeredLabel, persona, locale)}
+              </span>
             </div>
-            <span className="text-slate-300">
-              {getLexiconValue(tasksLexicon.registeredLabel, persona, locale)}
-            </span>
-          </div>
-          
-          <div className="text-right">
-            <span className="text-sm text-slate-500">{t('averageScore')}</span>
-            <span className={cn(
-              'ml-2 text-xl font-bold',
-              getResilienceColor(getOverallAverage()) === 'emerald' && 'text-emerald-400',
-              getResilienceColor(getOverallAverage()) === 'amber' && 'text-amber-400',
-              getResilienceColor(getOverallAverage()) === 'rose' && 'text-rose-400'
-            )}>
-              {getOverallAverage()}%
-            </span>
+            
+            {/* Total heures/semaine */}
+            <div className="flex items-center gap-2">
+              <Timer className="w-4 h-4 text-slate-500" />
+              <span className={cn(
+                'text-sm font-medium',
+                getTotalHours() >= 35 && getTotalHours() <= 45 ? 'text-emerald-400' : 
+                getTotalHours() > 50 ? 'text-rose-400' : 'text-amber-400'
+              )}>
+                {getTotalHours()}h/{l === 'fr' ? 'semaine' : 'week'}
+              </span>
+            </div>
+            
+            <div className="text-right">
+              <span className="text-sm text-slate-500">{t('averageScore')}</span>
+              <span className={cn(
+                'ml-2 text-xl font-bold',
+                getResilienceColor(getOverallAverage()) === 'emerald' && 'text-emerald-400',
+                getResilienceColor(getOverallAverage()) === 'amber' && 'text-amber-400',
+                getResilienceColor(getOverallAverage()) === 'rose' && 'text-rose-400'
+              )}>
+                {getOverallAverage()}%
+              </span>
+            </div>
           </div>
         </motion.div>
       )}

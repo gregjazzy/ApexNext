@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw } from 'lucide-react';
+import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
 import { ScoreRing } from '@/components/ui/ScoreRing';
@@ -10,9 +10,10 @@ import { verdictLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
 export function Step6Verdict() {
   const t = useTranslations('step6');
+  const tStep4 = useTranslations('step4');
   const tStep5 = useTranslations('step5');
   const locale = useLocale();
-  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep } = useAuditStore();
+  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep, prevStep } = useAuditStore();
   
   const resilienceScore = getResilienceScore();
   const talentScore = getTalentScore();
@@ -20,13 +21,18 @@ export function Step6Verdict() {
   const persona = context.persona || 'salarie';
   const l = locale === 'en' ? 'en' : 'fr';
   
-  // Calculate overall score (weighted average)
+  // Score final : Vulnérabilité Tâches vs Force Signature
+  // Vulnérabilité = 100 - resilienceScore (plus le score est bas, plus c'est vulnérable)
+  const taskVulnerability = 100 - resilienceScore;
+  const signatureStrength = talentScore;
+  
+  // Score global : combinaison résilience + signature
   const overallScore = Math.round((resilienceScore * 0.6) + (talentScore * 0.4));
   
-  // Find most vulnerable and most resilient tasks
+  // Calcul du score d'une tâche sur 5 dimensions
   const getTaskScore = (task: Task): number => {
-    const { donnees, decision, relationnel, creativite } = task.resilience;
-    return Math.round((donnees + decision + relationnel + creativite) / 4);
+    const { donnees, decision, relationnel, creativite, execution } = task.resilience;
+    return Math.round((donnees + decision + relationnel + creativite + execution) / 5);
   };
   
   const sortedTasks = [...tasks].sort((a, b) => getTaskScore(a) - getTaskScore(b));
@@ -43,12 +49,30 @@ export function Step6Verdict() {
 
   const getLevelLabel = (level: string): string => {
     const labels: Record<string, string> = {
-      debutant: tStep5('levels.beginner'),
-      avance: tStep5('levels.advanced'),
+      debutant: tStep5('levels.debutant'),
+      avance: tStep5('levels.avance'),
       expert: tStep5('levels.expert'),
     };
     return labels[level] || level;
   };
+
+  // Obtenir le label traduit pour un actif
+  const getAssetLabel = (assetId: string): string => {
+    try {
+      return tStep4(`assets.${assetId}` as any) || assetId;
+    } catch {
+      return assetId;
+    }
+  };
+
+  // 5 Dimensions de résilience
+  const dimensions = [
+    { key: 'donnees', label: t('dimensions.data'), icon: <Cpu className="w-5 h-5" />, color: 'blue' },
+    { key: 'decision', label: t('dimensions.decision'), icon: <Brain className="w-5 h-5" />, color: 'purple' },
+    { key: 'relationnel', label: t('dimensions.relational'), icon: <Users className="w-5 h-5" />, color: 'pink' },
+    { key: 'creativite', label: t('dimensions.creativity'), icon: <Lightbulb className="w-5 h-5" />, color: 'yellow' },
+    { key: 'execution', label: t('dimensions.execution'), icon: <Cog className="w-5 h-5" />, color: 'orange' },
+  ];
 
   return (
     <motion.div
@@ -114,6 +138,7 @@ export function Step6Verdict() {
               </p>
             </div>
             
+            {/* Vulnérabilité vs Force Signature */}
             <div className="flex gap-6">
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider">{t('tasks')}</p>
@@ -142,7 +167,7 @@ export function Step6Verdict() {
         </div>
       </motion.div>
 
-      {/* Two Column Layout */}
+      {/* Two Column Layout - Vulnerable vs Resilient */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Vulnerable Tasks */}
         <motion.div
@@ -227,7 +252,7 @@ export function Step6Verdict() {
         </motion.div>
       </div>
 
-      {/* Resilience Breakdown */}
+      {/* 5 Dimensions Resilience Breakdown */}
       <motion.div
         className="apex-card p-6"
         initial={{ opacity: 0, y: 20 }}
@@ -236,20 +261,19 @@ export function Step6Verdict() {
       >
         <h3 className="text-lg font-medium text-slate-200 mb-6">{t('resilienceBreakdown')}</h3>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { key: 'donnees', label: t('dimensions.data'), icon: <Database className="w-5 h-5" /> },
-            { key: 'decision', label: t('dimensions.decision'), icon: <Brain className="w-5 h-5" /> },
-            { key: 'relationnel', label: t('dimensions.relational'), icon: <Heart className="w-5 h-5" /> },
-            { key: 'creativite', label: t('dimensions.creativity'), icon: <Sparkles className="w-5 h-5" /> },
-          ].map(({ key, label, icon }) => {
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {dimensions.map(({ key, label, icon }) => {
             const avg = tasks.length > 0
               ? Math.round(tasks.reduce((acc, t) => acc + t.resilience[key as keyof typeof t.resilience], 0) / tasks.length)
               : 0;
             const color = getResilienceColor(avg);
             
             return (
-              <div key={key} className="text-center p-4 bg-slate-800/30 rounded-lg">
+              <motion.div 
+                key={key} 
+                className="text-center p-4 bg-slate-800/30 rounded-lg"
+                whileHover={{ scale: 1.02 }}
+              >
                 <div className={cn(
                   'w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center',
                   color === 'emerald' && 'bg-emerald-500/20 text-emerald-400',
@@ -258,7 +282,7 @@ export function Step6Verdict() {
                 )}>
                   {icon}
                 </div>
-                <p className="text-sm text-slate-400 mb-1">{label}</p>
+                <p className="text-xs text-slate-400 mb-1">{label}</p>
                 <p className={cn(
                   'text-2xl font-bold',
                   color === 'emerald' && 'text-emerald-400',
@@ -267,15 +291,15 @@ export function Step6Verdict() {
                 )}>
                   {avg}%
                 </p>
-              </div>
+              </motion.div>
             );
           })}
         </div>
       </motion.div>
 
-      {/* Talents & Software */}
+      {/* Actifs Stratégiques & Software */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Talents */}
+        {/* Actifs Stratégiques (Talents) */}
         <motion.div
           className="apex-card p-6"
           initial={{ opacity: 0, x: -20 }}
@@ -293,7 +317,7 @@ export function Step6Verdict() {
                 key={talent.id}
                 className="flex items-center justify-between p-2 bg-slate-800/30 rounded"
               >
-                <span className="text-slate-300">{talent.name}</span>
+                <span className="text-slate-300">{getAssetLabel(talent.id)}</span>
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -344,6 +368,26 @@ export function Step6Verdict() {
           </div>
         </motion.div>
       </div>
+
+      {/* Navigation - Retour à l'étape précédente */}
+      <motion.div
+        className="flex items-center justify-between pt-8 border-t border-slate-800"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.75 }}
+      >
+        <motion.button
+          onClick={prevStep}
+          className="apex-button-outline flex items-center gap-2"
+          whileHover={{ x: -4 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <ChevronLeft className="w-4 h-4" />
+          {l === 'fr' ? 'Retour au Tech Scan' : 'Back to Tech Scan'}
+        </motion.button>
+        
+        <div />
+      </motion.div>
 
       {/* Call to Action */}
       <motion.div

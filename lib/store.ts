@@ -7,17 +7,20 @@ export type Goal = 'augmentation' | 'pivot' | null;
 export type Temporality = 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
 export type SkillLevel = 'debutant' | 'avance' | 'expert';
 
+// 5 Curseurs de Résilience (incluant Exécution Physique pour menace robotique)
 export interface ResilienceScores {
-  donnees: number;      // 0-100: Tâches basées sur les données
+  donnees: number;      // 0-100: Vulnérabilité données/IA
   decision: number;     // 0-100: Prise de décision
   relationnel: number;  // 0-100: Aspect relationnel/humain
   creativite: number;   // 0-100: Créativité requise
+  execution: number;    // 0-100: Exécution Physique/Manuelle (menace robotique)
 }
 
 export interface Task {
   id: string;
   name: string;
   temporalite: Temporality;
+  hoursPerWeek: number; // Heures par semaine consacrées à cette tâche
   resilience: ResilienceScores;
   createdAt: number;
 }
@@ -25,7 +28,9 @@ export interface Task {
 export interface Talent {
   id: string;
   name: string;
-  category: string;
+  description: string;
+  example: string; // Exemple concret pour tooltip
+  icon: string;
   level: number; // 1-5
   selected: boolean;
 }
@@ -54,7 +59,7 @@ interface AuditStore {
   // Tasks
   tasks: Task[];
   
-  // Talents (user's signature)
+  // Talents (user's signature) - 5 sur 12 Actifs Stratégiques
   talents: Talent[];
   
   // Software stack
@@ -73,7 +78,7 @@ interface AuditStore {
   setJobDescription: (description: string) => void;
   
   // Actions - Tasks
-  addTask: (name: string) => void;
+  addTask: (name: string) => string; // Retourne l'ID de la nouvelle tâche
   updateTask: (id: string, task: Partial<Task>) => void;
   removeTask: (id: string) => void;
   
@@ -96,38 +101,96 @@ interface AuditStore {
   reset: () => void;
 }
 
-// Predefined talents list
-export const AVAILABLE_TALENTS: Omit<Talent, 'level' | 'selected'>[] = [
-  // Analytiques
-  { id: 'analyse-donnees', name: 'Analyse de données', category: 'Analytique' },
-  { id: 'resolution-problemes', name: 'Résolution de problèmes', category: 'Analytique' },
-  { id: 'pensee-critique', name: 'Pensée critique', category: 'Analytique' },
-  { id: 'recherche', name: 'Recherche & Investigation', category: 'Analytique' },
-  
-  // Relationnels
-  { id: 'negociation', name: 'Négociation', category: 'Relationnel' },
-  { id: 'leadership', name: 'Leadership', category: 'Relationnel' },
-  { id: 'communication', name: 'Communication', category: 'Relationnel' },
-  { id: 'empathie', name: 'Empathie & Écoute', category: 'Relationnel' },
-  { id: 'gestion-conflits', name: 'Gestion des conflits', category: 'Relationnel' },
-  
-  // Créatifs
-  { id: 'design', name: 'Design & Esthétique', category: 'Créatif' },
-  { id: 'innovation', name: 'Innovation', category: 'Créatif' },
-  { id: 'storytelling', name: 'Storytelling', category: 'Créatif' },
-  { id: 'ideation', name: 'Idéation & Brainstorming', category: 'Créatif' },
-  
-  // Opérationnels
-  { id: 'gestion-projet', name: 'Gestion de projet', category: 'Opérationnel' },
-  { id: 'organisation', name: 'Organisation', category: 'Opérationnel' },
-  { id: 'planification', name: 'Planification stratégique', category: 'Opérationnel' },
-  { id: 'execution', name: 'Exécution & Rigueur', category: 'Opérationnel' },
-  
-  // Techniques
-  { id: 'tech-savvy', name: 'Maîtrise technologique', category: 'Technique' },
-  { id: 'automatisation', name: 'Automatisation', category: 'Technique' },
-  { id: 'integration', name: 'Intégration de systèmes', category: 'Technique' },
+// Les 12 Actifs Stratégiques Officiels avec descriptions et exemples concrets
+export const STRATEGIC_ASSETS: Omit<Talent, 'level' | 'selected'>[] = [
+  { 
+    id: 'arbitrage-incertitude', 
+    name: 'Arbitrage en Incertitude', 
+    description: 'Décider et trancher quand les données sont incomplètes ou contradictoires.',
+    example: 'Ex: Choisir un prestataire sans avoir toutes les références, lancer un projet malgré des inconnues.',
+    icon: 'Scale'
+  },
+  { 
+    id: 'synthese-strategique', 
+    name: 'Synthèse Stratégique', 
+    description: 'Transformer une masse d\'informations en une vision ou un cap clair.',
+    example: 'Ex: Résumer 50 pages de rapport en 3 points clés, prioriser les actions après une réunion.',
+    icon: 'Target'
+  },
+  { 
+    id: 'intelligence-negociation', 
+    name: 'Intelligence de Négociation', 
+    description: 'Gérer des conflits d\'intérêts et obtenir des accords complexes.',
+    example: 'Ex: Négocier une augmentation, gérer un désaccord entre services, convaincre un client difficile.',
+    icon: 'Handshake'
+  },
+  { 
+    id: 'pensee-systemique', 
+    name: 'Pensée Systémique', 
+    description: 'Comprendre comment un changement local impacte toute une organisation.',
+    example: 'Ex: Anticiper les effets d\'un nouveau logiciel sur tous les services, prévoir les conséquences d\'une réorg.',
+    icon: 'Network'
+  },
+  { 
+    id: 'diagnostic-crise', 
+    name: 'Diagnostic de Crise', 
+    description: 'Identifier la cause d\'un problème inédit et improviser une solution.',
+    example: 'Ex: Trouver pourquoi un process plante, gérer une urgence client, résoudre un bug critique.',
+    icon: 'AlertTriangle'
+  },
+  { 
+    id: 'tactique-relationnelle', 
+    name: 'Tactique Relationnelle', 
+    description: 'Construire des réseaux de confiance et d\'influence à haut niveau.',
+    example: 'Ex: Se faire des alliés dans d\'autres équipes, cultiver de bonnes relations avec la direction.',
+    icon: 'Users'
+  },
+  { 
+    id: 'innovation-rupture', 
+    name: 'Innovation de Rupture', 
+    description: 'Imaginer des concepts qui n\'existent pas dans les bases de données passées.',
+    example: 'Ex: Proposer une nouvelle façon de travailler, inventer un process inédit, créer un produit original.',
+    icon: 'Lightbulb'
+  },
+  { 
+    id: 'pilotage-ia', 
+    name: 'Pilotage de l\'IA (IA Ops)', 
+    description: 'Orchestrer et superviser des agents IA pour décupler la production.',
+    example: 'Ex: Utiliser ChatGPT pour rédiger plus vite, automatiser des tâches avec l\'IA, créer des prompts efficaces.',
+    icon: 'Bot'
+  },
+  { 
+    id: 'ethique-gouvernance', 
+    name: 'Éthique & Gouvernance', 
+    description: 'Porter la responsabilité morale et légale des décisions automatisées.',
+    example: 'Ex: Valider qu\'une décision IA est juste, s\'assurer du respect des règles RGPD, arbitrer un dilemme éthique.',
+    icon: 'Shield'
+  },
+  { 
+    id: 'leadership-transition', 
+    name: 'Leadership de Transition', 
+    description: 'Mobiliser et engager des équipes dans des phases de mutation profonde.',
+    example: 'Ex: Accompagner une équipe dans un changement d\'outil, motiver lors d\'une restructuration.',
+    icon: 'Flag'
+  },
+  { 
+    id: 'analyse-critique', 
+    name: 'Analyse Critique & Biais', 
+    description: 'Repérer les erreurs, les hallucinations et les biais des systèmes d\'IA.',
+    example: 'Ex: Vérifier qu\'un texte généré par IA est correct, détecter une info fausse, challenger un rapport.',
+    icon: 'Search'
+  },
+  { 
+    id: 'communication-influence', 
+    name: 'Communication d\'Influence', 
+    description: 'Aligner et convaincre des parties prenantes aux visions divergentes.',
+    example: 'Ex: Présenter un projet au CODIR, convaincre des collègues réticents, fédérer autour d\'une idée.',
+    icon: 'MessageSquare'
+  },
 ];
+
+// Legacy export for compatibility
+export const AVAILABLE_TALENTS = STRATEGIC_ASSETS;
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -170,21 +233,27 @@ export const useAuditStore = create<AuditStore>()(
         context: { ...state.context, jobDescription }
       })),
 
-      // Tasks
-      addTask: (name) => set((state) => ({
-        tasks: [...state.tasks, {
-          id: generateId(),
-          name,
-          temporalite: 'quotidien' as Temporality,
-          resilience: {
-            donnees: 50,
-            decision: 50,
-            relationnel: 50,
-            creativite: 50,
-          },
-          createdAt: Date.now(),
-        }]
-      })),
+      // Tasks - avec 5 curseurs de résilience
+      addTask: (name) => {
+        const taskId = generateId();
+        set((state) => ({
+          tasks: [...state.tasks, {
+            id: taskId,
+            name,
+            temporalite: 'quotidien' as Temporality,
+            hoursPerWeek: 4, // Valeur par défaut: 4h/semaine
+            resilience: {
+              donnees: 50,
+              decision: 50,
+              relationnel: 50,
+              creativite: 50,
+              execution: 50,
+            },
+            createdAt: Date.now(),
+          }]
+        }));
+        return taskId;
+      },
       updateTask: (id, taskUpdate) => set((state) => ({
         tasks: state.tasks.map((t) =>
           t.id === id ? { ...t, ...taskUpdate } : t
@@ -194,9 +263,9 @@ export const useAuditStore = create<AuditStore>()(
         tasks: state.tasks.filter((t) => t.id !== id)
       })),
 
-      // Talents
+      // Talents - 12 Actifs Stratégiques
       initializeTalents: () => set({
-        talents: AVAILABLE_TALENTS.map((t) => ({
+        talents: STRATEGIC_ASSETS.map((t) => ({
           ...t,
           level: 3,
           selected: false,
@@ -238,7 +307,7 @@ export const useAuditStore = create<AuditStore>()(
         software: state.software.filter((s) => s.id !== id)
       })),
 
-      // Computed
+      // Computed - Vulnérabilité moyenne sur 5 dimensions
       getSelectedTalents: () => get().talents.filter(t => t.selected),
       
       getResilienceScore: () => {
@@ -246,12 +315,14 @@ export const useAuditStore = create<AuditStore>()(
         if (tasks.length === 0) return 0;
         
         const totalScores = tasks.reduce((acc, task) => {
+          // Moyenne des 5 curseurs de résilience
           const taskScore = (
             task.resilience.donnees +
             task.resilience.decision +
             task.resilience.relationnel +
-            task.resilience.creativite
-          ) / 4;
+            task.resilience.creativite +
+            task.resilience.execution
+          ) / 5;
           return acc + taskScore;
         }, 0);
         
@@ -271,7 +342,7 @@ export const useAuditStore = create<AuditStore>()(
         currentStep: 1,
         context: initialContext,
         tasks: [],
-        talents: AVAILABLE_TALENTS.map((t) => ({
+        talents: STRATEGIC_ASSETS.map((t) => ({
           ...t,
           level: 3,
           selected: false,
@@ -280,7 +351,7 @@ export const useAuditStore = create<AuditStore>()(
       }),
     }),
     {
-      name: 'apex-audit-storage',
+      name: 'apex-audit-storage-v3', // Version bump pour reset du localStorage
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
@@ -291,4 +362,3 @@ export const useAuditStore = create<AuditStore>()(
     }
   )
 );
-

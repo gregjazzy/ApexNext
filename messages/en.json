@@ -30,41 +30,41 @@
   "stepper": {
     "matrix": "Matrix",
     "context": "Context",
-    "tasks": "Tasks",
-    "talents": "Talents",
+    "tasks": "Processes",
+    "talents": "Assets",
     "tech": "Tech",
     "verdict": "Verdict"
   },
   "step1": {
-    "title": "The Matrix",
-    "subtitle": "Define your profile and goal to calibrate your resilience audit.",
-    "whoAreYou": "Who are you?",
-    "whatGoal": "What is your goal?",
+    "title": "Strategic Initialization",
+    "subtitle": "Configure your analysis prism for a precision audit.",
+    "whoAreYou": "What is your profile?",
+    "whatGoal": "What is your strategic objective?",
     "yourConfig": "Your configuration:",
     "inMode": "in",
-    "nextButton": "Define context",
+    "nextButton": "Launch Deep Audit →",
     "personas": {
       "salarie": {
         "title": "Employee",
-        "description": "You're employed and want to evolve"
+        "description": "You're employed and want to secure your trajectory"
       },
       "freelance": {
         "title": "Freelance",
-        "description": "Independent looking to diversify"
+        "description": "Independent looking to scale and optimize"
       },
       "leader": {
         "title": "Leader / HR",
-        "description": "You manage a team or human resources"
+        "description": "You drive organizational transformations"
       }
     },
     "goals": {
       "augmentation": {
-        "title": "Augmentation",
-        "description": "Strengthen and amplify your current role"
+        "title": "AI Acceleration",
+        "description": "Delegate execution to unlock your strategic value"
       },
       "pivot": {
-        "title": "Pivot",
-        "description": "Radically transform your career path"
+        "title": "Strategic Mutation",
+        "description": "Identify a resilient trajectory based on your talents"
       }
     }
   },
@@ -75,11 +75,19 @@
     "jobTitlePlaceholder": "E.g.: Digital Project Manager, Senior Developer...",
     "industry": "Industry",
     "industryPlaceholder": "Select your industry",
-    "jobDescription": "Job Description (optional)",
-    "dragDropHint": "Drag and drop your job description",
+    "jobDescription": {
+      "salarie": "Job Description",
+      "freelance": "Services Catalog",
+      "leader": "Business Unit Scope"
+    },
+    "dragDropHint": {
+      "salarie": "Drag your job description",
+      "freelance": "Drag your services catalog",
+      "leader": "Drag the scope description"
+    },
     "browseHint": "or click to browse (.txt file)",
-    "importedFile": "Imported job description",
-    "nextButton": "Audit tasks",
+    "importedFile": "Document imported",
+    "nextButton": "Audit processes",
     "industries": {
       "tech": "Tech / Software",
       "finance": "Finance / Banking",
@@ -96,8 +104,8 @@
     }
   },
   "step3": {
-    "title": "Temporal Audit",
-    "subtitle": "List your main tasks and evaluate their vulnerability to automation.",
+    "title": "Process Audit",
+    "subtitle": "List your main tasks and evaluate their vulnerability across 5 disruption dimensions.",
     "addTask": "Add a task",
     "taskPlaceholder": "E.g.: Report writing, Team management...",
     "add": "Add",
@@ -105,8 +113,8 @@
     "taskRegistered": "task registered",
     "tasksRegistered": "tasks registered",
     "averageScore": "Average score:",
-    "nextButton": "Define your talents",
-    "resilienceHint": "Evaluate this task's resilience to AI (100 = very resilient, human essential)",
+    "nextButton": "Inventory your assets",
+    "resilienceHint": "Evaluate this task's resilience (100 = very resilient, human essential)",
     "temporality": {
       "daily": "Daily",
       "weekly": "Weekly",
@@ -115,55 +123,48 @@
     },
     "resilience": {
       "data": "Data",
-      "dataDesc": "Complexity of data handled",
+      "dataDesc": "Vulnerability to AI automation (structured data)",
       "decision": "Decision",
-      "decisionDesc": "Judgment and decision-making",
+      "decisionDesc": "Complexity of judgment and decision-making",
       "relational": "Relational",
-      "relationalDesc": "Required human interactions",
+      "relationalDesc": "Need for authentic human interactions",
       "creativity": "Creativity",
-      "creativityDesc": "Innovation and original thinking"
+      "creativityDesc": "Need for innovation and original thinking",
+      "execution": "Physical Execution",
+      "executionDesc": "Vulnerability to robotics and autonomous systems"
     }
   },
   "step4": {
-    "title": "Talent Signature",
-    "subtitle": "Select your top 5 talents and evaluate your mastery level.",
-    "selected": "Selected talents",
+    "title": "Strategic Assets Inventory",
+    "subtitle": "Select your top 5 assets among the 12 critical non-automatable skills.",
+    "selected": "Selected assets",
     "masteryLevel": "Mastery level",
-    "hint": "💡 Select exactly 5 talents to define your unique signature",
+    "hint": "💡 Select exactly 5 strategic assets",
     "nextButton": "Scan your tools",
     "categories": {
-      "analytical": "📊 Analytical",
-      "relational": "🤝 Relational",
-      "creative": "🎨 Creative",
-      "operational": "⚙️ Operational",
-      "technical": "💻 Technical"
+      "strategique": "🎯 Strategy & Analysis",
+      "influence": "💼 Influence & Negotiation",
+      "leadership": "👔 Leadership & Governance",
+      "innovation": "🚀 Innovation & AI"
     },
-    "talents": {
-      "data-analysis": "Data Analysis",
-      "problem-solving": "Problem Solving",
-      "critical-thinking": "Critical Thinking",
-      "research": "Research & Investigation",
-      "negotiation": "Negotiation",
-      "leadership": "Leadership",
-      "communication": "Communication",
-      "empathy": "Empathy & Listening",
-      "conflict-management": "Conflict Management",
-      "design": "Design & Aesthetics",
-      "innovation": "Innovation",
-      "storytelling": "Storytelling",
-      "ideation": "Ideation & Brainstorming",
-      "project-management": "Project Management",
-      "organization": "Organization",
-      "strategic-planning": "Strategic Planning",
-      "execution": "Execution & Rigor",
-      "tech-savvy": "Tech Savvy",
-      "automation": "Automation",
-      "integration": "Systems Integration"
+    "assets": {
+      "arbitrage-incertitude": "Uncertainty Arbitrage",
+      "synthese-strategique": "Strategic Synthesis",
+      "pensee-systemique": "Systems Thinking",
+      "analyse-critique": "Critical Analysis & Bias",
+      "intelligence-negociation": "Negotiation Intelligence",
+      "tactique-relationnelle": "Relational Tactics",
+      "communication-influence": "Influence Communication",
+      "diagnostic-crise": "Crisis Diagnosis",
+      "leadership-transition": "Transition Leadership",
+      "ethique-gouvernance": "Ethics & Governance",
+      "innovation-rupture": "Disruptive Innovation",
+      "pilotage-ia": "AI Piloting (AI Ops)"
     }
   },
   "step5": {
     "title": "Tech Scan",
-    "subtitle": "Identify your top 3 tools and your mastery level.",
+    "subtitle": "Identify your 3 main production tools and your mastery level.",
     "added": "Tools added",
     "addTool": "Add a tool",
     "toolPlaceholder": "E.g.: Excel, Figma, Python...",
@@ -173,24 +174,24 @@
     "expertTools": "tool(s) at Expert level",
     "nextButton": "See the verdict",
     "levels": {
-      "beginner": "Beginner",
-      "advanced": "Advanced",
+      "debutant": "Beginner",
+      "avance": "Advanced",
       "expert": "Expert"
     }
   },
   "step6": {
     "title": "The Verdict",
-    "subtitle": "Your AI resilience diagnostic",
+    "subtitle": "Your AI & robotics resilience diagnostic",
     "globalScore": "Global Score",
-    "tasks": "Tasks",
-    "talents": "Talents",
+    "tasks": "Task Vulnerability",
+    "talents": "Signature Strength",
     "vulnerableZones": "Vulnerable Zones",
     "resilientZones": "Resilient Zones",
-    "resilienceBreakdown": "Resilience Breakdown",
-    "yourSignature": "Your Signature",
+    "resilienceBreakdown": "5 Dimensions Breakdown",
+    "yourSignature": "Your Strategic Assets",
     "techStack": "Tech Stack",
     "readyForStep2": "Ready for Step 2: Professional Ikigai",
-    "readyForStep2Desc": "Use this diagnostic to build your ideal trajectory, aligned with your talents and tomorrow's opportunities.",
+    "readyForStep2Desc": "Use this diagnostic to build your ideal trajectory, aligned with your assets and tomorrow's opportunities.",
     "restartAudit": "Restart audit",
     "accessIkigai": "Access Ikigai",
     "comingSoon": "(Coming Soon)",
@@ -200,10 +201,11 @@
       "critical": "Critical"
     },
     "dimensions": {
-      "data": "Data",
+      "data": "Data (AI)",
       "decision": "Decision",
       "relational": "Relational",
-      "creativity": "Creativity"
+      "creativity": "Creativity",
+      "execution": "Physical (Robot)"
     }
   },
   "language": {
