@@ -1,0 +1,214 @@
+{
+  "common": {
+    "appName": "APEX Next",
+    "tagline": "Your Professional Mutation GPS in the AI Era",
+    "version": "Deep Audit Engine v2",
+    "step": "Step",
+    "of": "of",
+    "back": "Back",
+    "continue": "Continue",
+    "loading": "Loading..."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "orContinueWith": "Or continue with",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "welcomeBack": "Welcome back!",
+    "welcomeMessage": "Sign in to access your resilience diagnostic.",
+    "demoCredentials": "Demo: use any email with the password",
+    "signInWithGitHub": "Continue with GitHub",
+    "signInWithGoogle": "Continue with Google",
+    "signInWithEmail": "Sign in",
+    "invalidCredentials": "Invalid email or password"
+  },
+  "stepper": {
+    "matrix": "Matrix",
+    "context": "Context",
+    "tasks": "Tasks",
+    "talents": "Talents",
+    "tech": "Tech",
+    "verdict": "Verdict"
+  },
+  "step1": {
+    "title": "The Matrix",
+    "subtitle": "Define your profile and goal to calibrate your resilience audit.",
+    "whoAreYou": "Who are you?",
+    "whatGoal": "What is your goal?",
+    "yourConfig": "Your configuration:",
+    "inMode": "in",
+    "nextButton": "Define context",
+    "personas": {
+      "salarie": {
+        "title": "Employee",
+        "description": "You're employed and want to evolve"
+      },
+      "freelance": {
+        "title": "Freelance",
+        "description": "Independent looking to diversify"
+      },
+      "leader": {
+        "title": "Leader / HR",
+        "description": "You manage a team or human resources"
+      }
+    },
+    "goals": {
+      "augmentation": {
+        "title": "Augmentation",
+        "description": "Strengthen and amplify your current role"
+      },
+      "pivot": {
+        "title": "Pivot",
+        "description": "Radically transform your career path"
+      }
+    }
+  },
+  "step2": {
+    "title": "Context Mapping",
+    "subtitle": "Describe your current professional environment to personalize the analysis.",
+    "jobTitle": "Job Title",
+    "jobTitlePlaceholder": "E.g.: Digital Project Manager, Senior Developer...",
+    "industry": "Industry",
+    "industryPlaceholder": "Select your industry",
+    "jobDescription": "Job Description (optional)",
+    "dragDropHint": "Drag and drop your job description",
+    "browseHint": "or click to browse (.txt file)",
+    "importedFile": "Imported job description",
+    "nextButton": "Audit tasks",
+    "industries": {
+      "tech": "Tech / Software",
+      "finance": "Finance / Banking",
+      "health": "Healthcare / Pharma",
+      "retail": "Retail / E-commerce",
+      "industry": "Industry / Manufacturing",
+      "consulting": "Consulting / Services",
+      "media": "Media / Communication",
+      "education": "Education / Training",
+      "realestate": "Real Estate / Construction",
+      "energy": "Energy / Environment",
+      "transport": "Transport / Logistics",
+      "other": "Other"
+    }
+  },
+  "step3": {
+    "title": "Temporal Audit",
+    "subtitle": "List your main tasks and evaluate their vulnerability to automation.",
+    "addTask": "Add a task",
+    "taskPlaceholder": "E.g.: Report writing, Team management...",
+    "add": "Add",
+    "noTasks": "Add at least one task to continue",
+    "taskRegistered": "task registered",
+    "tasksRegistered": "tasks registered",
+    "averageScore": "Average score:",
+    "nextButton": "Define your talents",
+    "resilienceHint": "Evaluate this task's resilience to AI (100 = very resilient, human essential)",
+    "temporality": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "strategic": "Strategic"
+    },
+    "resilience": {
+      "data": "Data",
+      "dataDesc": "Complexity of data handled",
+      "decision": "Decision",
+      "decisionDesc": "Judgment and decision-making",
+      "relational": "Relational",
+      "relationalDesc": "Required human interactions",
+      "creativity": "Creativity",
+      "creativityDesc": "Innovation and original thinking"
+    }
+  },
+  "step4": {
+    "title": "Talent Signature",
+    "subtitle": "Select your top 5 talents and evaluate your mastery level.",
+    "selected": "Selected talents",
+    "masteryLevel": "Mastery level",
+    "hint": "💡 Select exactly 5 talents to define your unique signature",
+    "nextButton": "Scan your tools",
+    "categories": {
+      "analytical": "📊 Analytical",
+      "relational": "🤝 Relational",
+      "creative": "🎨 Creative",
+      "operational": "⚙️ Operational",
+      "technical": "💻 Technical"
+    },
+    "talents": {
+      "data-analysis": "Data Analysis",
+      "problem-solving": "Problem Solving",
+      "critical-thinking": "Critical Thinking",
+      "research": "Research & Investigation",
+      "negotiation": "Negotiation",
+      "leadership": "Leadership",
+      "communication": "Communication",
+      "empathy": "Empathy & Listening",
+      "conflict-management": "Conflict Management",
+      "design": "Design & Aesthetics",
+      "innovation": "Innovation",
+      "storytelling": "Storytelling",
+      "ideation": "Ideation & Brainstorming",
+      "project-management": "Project Management",
+      "organization": "Organization",
+      "strategic-planning": "Strategic Planning",
+      "execution": "Execution & Rigor",
+      "tech-savvy": "Tech Savvy",
+      "automation": "Automation",
+      "integration": "Systems Integration"
+    }
+  },
+  "step5": {
+    "title": "Tech Scan",
+    "subtitle": "Identify your top 3 tools and your mastery level.",
+    "added": "Tools added",
+    "addTool": "Add a tool",
+    "toolPlaceholder": "E.g.: Excel, Figma, Python...",
+    "add": "Add",
+    "quickSuggestions": "Quick suggestions",
+    "stackDefined": "Tech stack defined!",
+    "expertTools": "tool(s) at Expert level",
+    "nextButton": "See the verdict",
+    "levels": {
+      "beginner": "Beginner",
+      "advanced": "Advanced",
+      "expert": "Expert"
+    }
+  },
+  "step6": {
+    "title": "The Verdict",
+    "subtitle": "Your AI resilience diagnostic",
+    "globalScore": "Global Score",
+    "tasks": "Tasks",
+    "talents": "Talents",
+    "vulnerableZones": "Vulnerable Zones",
+    "resilientZones": "Resilient Zones",
+    "resilienceBreakdown": "Resilience Breakdown",
+    "yourSignature": "Your Signature",
+    "techStack": "Tech Stack",
+    "readyForStep2": "Ready for Step 2: Professional Ikigai",
+    "readyForStep2Desc": "Use this diagnostic to build your ideal trajectory, aligned with your talents and tomorrow's opportunities.",
+    "restartAudit": "Restart audit",
+    "accessIkigai": "Access Ikigai",
+    "comingSoon": "(Coming Soon)",
+    "status": {
+      "resilient": "Resilient",
+      "vulnerable": "Vulnerable",
+      "critical": "Critical"
+    },
+    "dimensions": {
+      "data": "Data",
+      "decision": "Decision",
+      "relational": "Relational",
+      "creativity": "Creativity"
+    }
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English",
+    "select": "Language"
+  }
+}

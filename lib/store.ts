@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 // Types
 export type Persona = 'salarie' | 'freelance' | 'leader' | null;
 export type Goal = 'augmentation' | 'pivot' | null;
-export type Temporality = 'daily' | 'weekly' | 'monthly' | 'strategic';
+export type Temporality = 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
 export type SkillLevel = 'debutant' | 'avance' | 'expert';
 
 export interface ResilienceScores {
@@ -17,7 +17,7 @@ export interface ResilienceScores {
 export interface Task {
   id: string;
   name: string;
-  temporality: Temporality;
+  temporalite: Temporality;
   resilience: ResilienceScores;
   createdAt: number;
 }
@@ -73,7 +73,7 @@ interface AuditStore {
   setJobDescription: (description: string) => void;
   
   // Actions - Tasks
-  addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
+  addTask: (name: string) => void;
   updateTask: (id: string, task: Partial<Task>) => void;
   removeTask: (id: string) => void;
   
@@ -83,8 +83,8 @@ interface AuditStore {
   initializeTalents: () => void;
   
   // Actions - Software
-  addSoftware: (software: Omit<Software, 'id'>) => void;
-  updateSoftware: (id: string, software: Partial<Software>) => void;
+  addSoftware: (name: string) => void;
+  updateSoftware: (id: string, level: SkillLevel) => void;
   removeSoftware: (id: string) => void;
   
   // Computed values
@@ -171,10 +171,17 @@ export const useAuditStore = create<AuditStore>()(
       })),
 
       // Tasks
-      addTask: (task) => set((state) => ({
+      addTask: (name) => set((state) => ({
         tasks: [...state.tasks, {
-          ...task,
           id: generateId(),
+          name,
+          temporalite: 'quotidien' as Temporality,
+          resilience: {
+            donnees: 50,
+            decision: 50,
+            relationnel: 50,
+            creativite: 50,
+          },
           createdAt: Date.now(),
         }]
       })),
@@ -217,14 +224,14 @@ export const useAuditStore = create<AuditStore>()(
       })),
 
       // Software
-      addSoftware: (software) => set((state) => ({
+      addSoftware: (name) => set((state) => ({
         software: state.software.length < 3
-          ? [...state.software, { ...software, id: generateId() }]
+          ? [...state.software, { id: generateId(), name, level: 'debutant' as SkillLevel }]
           : state.software
       })),
-      updateSoftware: (id, softwareUpdate) => set((state) => ({
+      updateSoftware: (id, level) => set((state) => ({
         software: state.software.map((s) =>
-          s.id === id ? { ...s, ...softwareUpdate } : s
+          s.id === id ? { ...s, level } : s
         )
       })),
       removeSoftware: (id) => set((state) => ({

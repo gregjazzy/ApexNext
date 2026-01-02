@@ -3,29 +3,31 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, Briefcase, FileText, Upload, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 
-const industries = [
-  'Tech / Software',
-  'Finance / Banque',
-  'Santé / Pharma',
-  'Retail / E-commerce',
-  'Industrie / Manufacturing',
-  'Conseil / Services',
-  'Média / Communication',
-  'Éducation / Formation',
-  'Immobilier / Construction',
-  'Énergie / Environnement',
-  'Transport / Logistique',
-  'Autre',
-];
-
 export function Step2Context() {
+  const t = useTranslations('step2');
   const { context, setJobTitle, setIndustry, setJobDescription, nextStep, prevStep } = useAuditStore();
   const [dragActive, setDragActive] = useState(false);
 
   const canProceed = context.jobTitle.trim() && context.industry;
+
+  const industries = [
+    { key: 'tech', label: t('industries.tech') },
+    { key: 'finance', label: t('industries.finance') },
+    { key: 'health', label: t('industries.health') },
+    { key: 'retail', label: t('industries.retail') },
+    { key: 'industry', label: t('industries.industry') },
+    { key: 'consulting', label: t('industries.consulting') },
+    { key: 'media', label: t('industries.media') },
+    { key: 'education', label: t('industries.education') },
+    { key: 'realestate', label: t('industries.realestate') },
+    { key: 'energy', label: t('industries.energy') },
+    { key: 'transport', label: t('industries.transport') },
+    { key: 'other', label: t('industries.other') },
+  ];
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -83,7 +85,7 @@ export function Step2Context() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          Context Mapping
+          {t('title')}
         </motion.h1>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
@@ -91,7 +93,7 @@ export function Step2Context() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Décrivez votre environnement professionnel actuel pour personnaliser l'analyse.
+          {t('subtitle')}
         </motion.p>
       </div>
 
@@ -106,13 +108,13 @@ export function Step2Context() {
           >
             <label className="apex-label flex items-center gap-2">
               <Briefcase className="w-4 h-4" />
-              Intitulé de poste
+              {t('jobTitle')}
             </label>
             <input
               type="text"
               value={context.jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="Ex: Chef de projet digital, Développeur senior..."
+              placeholder={t('jobTitlePlaceholder')}
               className="apex-input"
             />
           </motion.div>
@@ -125,17 +127,17 @@ export function Step2Context() {
           >
             <label className="apex-label flex items-center gap-2">
               <Building2 className="w-4 h-4" />
-              Secteur d'activité
+              {t('industry')}
             </label>
             <select
               value={context.industry}
               onChange={(e) => setIndustry(e.target.value)}
               className="apex-select"
             >
-              <option value="">Sélectionnez votre secteur</option>
+              <option value="">{t('industryPlaceholder')}</option>
               {industries.map((ind) => (
-                <option key={ind} value={ind}>
-                  {ind}
+                <option key={ind.key} value={ind.label}>
+                  {ind.label}
                 </option>
               ))}
             </select>
@@ -150,7 +152,7 @@ export function Step2Context() {
         >
           <label className="apex-label flex items-center gap-2">
             <FileText className="w-4 h-4" />
-            Fiche de poste (optionnel)
+            {t('jobDescription')}
           </label>
           
           <div
@@ -176,10 +178,10 @@ export function Step2Context() {
             <Upload className={`w-10 h-10 mx-auto mb-4 ${dragActive ? 'text-blue-400' : 'text-slate-500'}`} />
             
             <p className="text-slate-300 font-medium mb-1">
-              Glissez votre fiche de poste
+              {t('dragDropHint')}
             </p>
             <p className="text-sm text-slate-500">
-              ou cliquez pour parcourir (fichier .txt)
+              {t('browseHint')}
             </p>
           </div>
         </motion.div>
@@ -195,7 +197,7 @@ export function Step2Context() {
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-slate-300 flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Fiche de poste importée
+              {t('importedFile')}
             </span>
             <button
               onClick={() => setJobDescription('')}
@@ -217,9 +219,8 @@ export function Step2Context() {
         onPrev={prevStep}
         onNext={nextStep}
         nextDisabled={!canProceed}
-        nextLabel="Auditer les tâches"
+        nextLabel={t('nextButton')}
       />
     </motion.div>
   );
 }
-

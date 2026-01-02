@@ -2,11 +2,14 @@
 
 import { motion } from 'framer-motion';
 import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
 import { ScoreRing } from '@/components/ui/ScoreRing';
-import { cn, getResilienceColor, getResilienceLabel, getTemporalityLabel, getLevelLabel } from '@/lib/utils';
+import { cn, getResilienceColor } from '@/lib/utils';
 
 export function Step6Verdict() {
+  const t = useTranslations('step6');
+  const tStep5 = useTranslations('step5');
   const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep } = useAuditStore();
   
   const resilienceScore = getResilienceScore();
@@ -28,6 +31,21 @@ export function Step6Verdict() {
 
   const scoreColor = getResilienceColor(overallScore);
 
+  const getStatusLabel = (score: number): string => {
+    if (score >= 70) return t('status.resilient');
+    if (score >= 40) return t('status.vulnerable');
+    return t('status.critical');
+  };
+
+  const getLevelLabel = (level: string): string => {
+    const labels: Record<string, string> = {
+      debutant: tStep5('levels.beginner'),
+      avance: tStep5('levels.advanced'),
+      expert: tStep5('levels.expert'),
+    };
+    return labels[level] || level;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,7 +61,7 @@ export function Step6Verdict() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          Le Verdict
+          {t('title')}
         </motion.h1>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
@@ -51,7 +69,7 @@ export function Step6Verdict() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Votre diagnostic de résilience face à l'IA
+          {t('subtitle')}
         </motion.p>
       </div>
 
@@ -68,7 +86,7 @@ export function Step6Verdict() {
         transition={{ delay: 0.3, type: 'spring' }}
       >
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          <ScoreRing score={overallScore} size="lg" label="Score Global" />
+          <ScoreRing score={overallScore} size="lg" label={t('globalScore')} />
           
           <div className="text-left space-y-4">
             <div>
@@ -78,7 +96,7 @@ export function Step6Verdict() {
                 scoreColor === 'amber' && 'text-amber-400',
                 scoreColor === 'rose' && 'text-rose-400'
               )}>
-                {getResilienceLabel(overallScore)}
+                {getStatusLabel(overallScore)}
               </h2>
               <p className="text-slate-400 mt-1">
                 {context.jobTitle} • {context.industry}
@@ -87,7 +105,7 @@ export function Step6Verdict() {
             
             <div className="flex gap-6">
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Tâches</p>
+                <p className="text-xs text-slate-500 uppercase tracking-wider">{t('tasks')}</p>
                 <p className={cn(
                   'text-2xl font-bold',
                   getResilienceColor(resilienceScore) === 'emerald' && 'text-emerald-400',
@@ -98,7 +116,7 @@ export function Step6Verdict() {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">Talents</p>
+                <p className="text-xs text-slate-500 uppercase tracking-wider">{t('talents')}</p>
                 <p className={cn(
                   'text-2xl font-bold',
                   getResilienceColor(talentScore) === 'emerald' && 'text-emerald-400',
@@ -124,7 +142,7 @@ export function Step6Verdict() {
         >
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-5 h-5 text-rose-400" />
-            <h3 className="text-lg font-medium text-slate-200">Zones Vulnérables</h3>
+            <h3 className="text-lg font-medium text-slate-200">{t('vulnerableZones')}</h3>
           </div>
           
           <div className="space-y-3">
@@ -141,7 +159,6 @@ export function Step6Verdict() {
                 >
                   <div>
                     <p className="font-medium text-slate-200">{task.name}</p>
-                    <p className="text-xs text-slate-500">{getTemporalityLabel(task.temporality)}</p>
                   </div>
                   <span className={cn(
                     'text-lg font-bold tabular-nums',
@@ -166,7 +183,7 @@ export function Step6Verdict() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Shield className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-lg font-medium text-slate-200">Zones Résilientes</h3>
+            <h3 className="text-lg font-medium text-slate-200">{t('resilientZones')}</h3>
           </div>
           
           <div className="space-y-3">
@@ -183,7 +200,6 @@ export function Step6Verdict() {
                 >
                   <div>
                     <p className="font-medium text-slate-200">{task.name}</p>
-                    <p className="text-xs text-slate-500">{getTemporalityLabel(task.temporality)}</p>
                   </div>
                   <span className={cn(
                     'text-lg font-bold tabular-nums',
@@ -207,14 +223,14 @@ export function Step6Verdict() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
       >
-        <h3 className="text-lg font-medium text-slate-200 mb-6">Répartition de la Résilience</h3>
+        <h3 className="text-lg font-medium text-slate-200 mb-6">{t('resilienceBreakdown')}</h3>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { key: 'donnees', label: 'Données', icon: <Database className="w-5 h-5" /> },
-            { key: 'decision', label: 'Décision', icon: <Brain className="w-5 h-5" /> },
-            { key: 'relationnel', label: 'Relationnel', icon: <Heart className="w-5 h-5" /> },
-            { key: 'creativite', label: 'Créativité', icon: <Sparkles className="w-5 h-5" /> },
+            { key: 'donnees', label: t('dimensions.data'), icon: <Database className="w-5 h-5" /> },
+            { key: 'decision', label: t('dimensions.decision'), icon: <Brain className="w-5 h-5" /> },
+            { key: 'relationnel', label: t('dimensions.relational'), icon: <Heart className="w-5 h-5" /> },
+            { key: 'creativite', label: t('dimensions.creativity'), icon: <Sparkles className="w-5 h-5" /> },
           ].map(({ key, label, icon }) => {
             const avg = tasks.length > 0
               ? Math.round(tasks.reduce((acc, t) => acc + t.resilience[key as keyof typeof t.resilience], 0) / tasks.length)
@@ -257,7 +273,7 @@ export function Step6Verdict() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="w-5 h-5 text-amber-400" />
-            <h3 className="text-lg font-medium text-slate-200">Votre Signature</h3>
+            <h3 className="text-lg font-medium text-slate-200">{t('yourSignature')}</h3>
           </div>
           
           <div className="space-y-2">
@@ -294,7 +310,7 @@ export function Step6Verdict() {
         >
           <div className="flex items-center gap-2 mb-4">
             <Monitor className="w-5 h-5 text-blue-400" />
-            <h3 className="text-lg font-medium text-slate-200">Stack Technique</h3>
+            <h3 className="text-lg font-medium text-slate-200">{t('techStack')}</h3>
           </div>
           
           <div className="space-y-2">
@@ -327,10 +343,10 @@ export function Step6Verdict() {
       >
         <TrendingUp className="w-12 h-12 text-blue-400 mx-auto mb-4" />
         <h3 className="text-xl font-serif text-slate-100 mb-2">
-          Prêt pour l'Étape 2 : Ikigai Professionnel
+          {t('readyForStep2')}
         </h3>
         <p className="text-slate-400 mb-6 max-w-xl mx-auto">
-          Utilisez ce diagnostic pour construire votre trajectoire idéale, alignée sur vos talents et les opportunités de demain.
+          {t('readyForStep2Desc')}
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -344,7 +360,7 @@ export function Step6Verdict() {
             whileTap={{ scale: 0.98 }}
           >
             <RefreshCw className="w-4 h-4" />
-            Recommencer l'audit
+            {t('restartAudit')}
           </motion.button>
           
           <motion.button
@@ -352,12 +368,11 @@ export function Step6Verdict() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            Accéder à l'Ikigai
-            <span className="text-xs opacity-75">(Bientôt)</span>
+            {t('accessIkigai')}
+            <span className="text-xs opacity-75">{t('comingSoon')}</span>
           </motion.button>
         </div>
       </motion.div>
     </motion.div>
   );
 }
-

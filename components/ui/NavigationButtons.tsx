@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 interface NavigationButtonsProps {
@@ -19,14 +20,19 @@ interface NavigationButtonsProps {
 export function NavigationButtons({
   onPrev,
   onNext,
-  prevLabel = 'Retour',
-  nextLabel = 'Continuer',
+  prevLabel,
+  nextLabel,
   prevDisabled = false,
   nextDisabled = false,
   showPrev = true,
   showNext = true,
   nextVariant = 'primary',
 }: NavigationButtonsProps) {
+  const t = useTranslations('common');
+  
+  const finalPrevLabel = prevLabel || t('back');
+  const finalNextLabel = nextLabel || t('continue');
+
   return (
     <div className="flex items-center justify-between pt-8 border-t border-slate-800">
       {showPrev ? (
@@ -38,7 +44,7 @@ export function NavigationButtons({
           whileTap={{ scale: 0.98 }}
         >
           <ChevronLeft className="w-4 h-4" />
-          {prevLabel}
+          {finalPrevLabel}
         </motion.button>
       ) : (
         <div />
@@ -57,11 +63,10 @@ export function NavigationButtons({
           whileHover={{ x: 4 }}
           whileTap={{ scale: 0.98 }}
         >
-          {nextLabel}
+          {finalNextLabel}
           <ChevronRight className="w-4 h-4" />
         </motion.button>
       )}
     </div>
   );
 }
-

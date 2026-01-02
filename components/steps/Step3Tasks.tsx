@@ -2,59 +2,57 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Database, Brain, Heart, Sparkles, Clock, Calendar, CalendarDays, Target } from 'lucide-react';
-import { useAuditStore, Task, Temporality, ResilienceScores } from '@/lib/store';
+import { Plus, Clock, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
-import { cn, getTemporalityLabel, getResilienceColor } from '@/lib/utils';
+import { cn, getResilienceColor } from '@/lib/utils';
 
-const temporalities: { id: Temporality; label: string; icon: React.ReactNode }[] = [
-  { id: 'daily', label: 'Quotidien', icon: <Clock className="w-4 h-4" /> },
-  { id: 'weekly', label: 'Hebdomadaire', icon: <Calendar className="w-4 h-4" /> },
-  { id: 'monthly', label: 'Mensuel', icon: <CalendarDays className="w-4 h-4" /> },
-  { id: 'strategic', label: 'Stratégique', icon: <Target className="w-4 h-4" /> },
-];
-
-const defaultResilience: ResilienceScores = {
-  donnees: 50,
-  decision: 50,
-  relationnel: 50,
-  creativite: 50,
-};
+const TEMPORALITIES: Temporality[] = ['quotidien', 'hebdomadaire', 'mensuel', 'strategique'];
 
 export function Step3Tasks() {
-  const { tasks, addTask, updateTask, removeTask, nextStep, prevStep } = useAuditStore();
+  const t = useTranslations('step3');
+  const { tasks, addTask, removeTask, updateTask, nextStep, prevStep } = useAuditStore();
+  
   const [newTaskName, setNewTaskName] = useState('');
-  const [newTaskTemp, setNewTaskTemp] = useState<Temporality>('daily');
-  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
-  const canProceed = tasks.length >= 1;
+  const canProceed = tasks.length > 0;
+
+  const temporalityLabels: Record<Temporality, string> = {
+    quotidien: t('temporality.daily'),
+    hebdomadaire: t('temporality.weekly'),
+    mensuel: t('temporality.monthly'),
+    strategique: t('temporality.strategic'),
+  };
 
   const handleAddTask = () => {
-    if (!newTaskName.trim()) return;
-    
-    addTask({
-      name: newTaskName.trim(),
-      temporality: newTaskTemp,
-      resilience: { ...defaultResilience },
-    });
-    
-    setNewTaskName('');
-    setNewTaskTemp('daily');
+    if (newTaskName.trim()) {
+      addTask(newTaskName.trim());
+      setNewTaskName('');
+    }
   };
 
-  const handleUpdateResilience = (taskId: string, key: keyof ResilienceScores, value: number) => {
-    const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
-    
-    updateTask(taskId, {
-      resilience: { ...task.resilience, [key]: value }
-    });
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddTask();
+    }
   };
 
-  const getTaskScore = (task: Task): number => {
+  const toggleExpand = (taskId: string) => {
+    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+  };
+
+  const getTaskAverage = (task: Task): number => {
     const { donnees, decision, relationnel, creativite } = task.resilience;
     return Math.round((donnees + decision + relationnel + creativite) / 4);
+  };
+
+  const getOverallAverage = (): number => {
+    if (tasks.length === 0) return 0;
+    const sum = tasks.reduce((acc, task) => acc + getTaskAverage(task), 0);
+    return Math.round(sum / tasks.length);
   };
 
   return (
@@ -62,7 +60,7 @@ export function Step3Tasks() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="space-y-8"
+      className="space-y-10"
     >
       {/* Header */}
       <div className="text-center space-y-4">
@@ -72,7 +70,7 @@ export function Step3Tasks() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          Audit Temporel
+          {t('title')}
         </motion.h1>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
@@ -80,58 +78,36 @@ export function Step3Tasks() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Listez vos tâches principales et évaluez leur vulnérabilité à l'automatisation.
+          {t('subtitle')}
         </motion.p>
       </div>
 
-      {/* Add Task Form */}
+      {/* Add Task Input */}
       <motion.div
         className="apex-card p-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <h3 className="text-lg font-medium text-slate-200 mb-4">Ajouter une tâche</h3>
-        
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              value={newTaskName}
-              onChange={(e) => setNewTaskName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
-              placeholder="Ex: Rédaction de rapports, Gestion d'équipe..."
-              className="apex-input"
-            />
-          </div>
-          
-          <div className="flex gap-2">
-            {temporalities.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setNewTaskTemp(t.id)}
-                className={cn(
-                  'px-3 py-2 rounded-lg border transition-all duration-200 flex items-center gap-2 text-sm',
-                  newTaskTemp === t.id
-                    ? 'border-blue-500 bg-blue-500/20 text-blue-300'
-                    : 'border-slate-700 text-slate-400 hover:border-slate-600'
-                )}
-              >
-                {t.icon}
-                <span className="hidden sm:inline">{t.label}</span>
-              </button>
-            ))}
-          </div>
-          
+        <label className="apex-label">{t('addTask')}</label>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={newTaskName}
+            onChange={(e) => setNewTaskName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={t('taskPlaceholder')}
+            className="apex-input flex-1"
+          />
           <motion.button
             onClick={handleAddTask}
             disabled={!newTaskName.trim()}
-            className="apex-button flex items-center gap-2"
+            className="apex-button flex items-center gap-2 whitespace-nowrap"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Plus className="w-4 h-4" />
-            Ajouter
+            <Plus className="w-5 h-5" />
+            {t('add')}
           </motion.button>
         </div>
       </motion.div>
@@ -139,133 +115,141 @@ export function Step3Tasks() {
       {/* Tasks List */}
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
-          {tasks.map((task, index) => {
-            const taskScore = getTaskScore(task);
-            const scoreColor = getResilienceColor(taskScore);
-            const isEditing = editingTask === task.id;
+          {tasks.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="apex-card p-8 text-center"
+            >
+              <Clock className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+              <p className="text-slate-400">{t('noTasks')}</p>
+            </motion.div>
+          ) : (
+            tasks.map((task, index) => {
+              const isExpanded = expandedTaskId === task.id;
+              const avgScore = getTaskAverage(task);
+              const color = getResilienceColor(avgScore);
 
-            return (
-              <motion.div
-                key={task.id}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ delay: index * 0.05 }}
-                className="apex-card overflow-hidden"
-              >
-                {/* Task Header */}
-                <div
-                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-800/30 transition-colors"
-                  onClick={() => setEditingTask(isEditing ? null : task.id)}
+              return (
+                <motion.div
+                  key={task.id}
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="apex-card overflow-hidden"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={cn(
-                      'w-12 h-12 rounded-lg flex items-center justify-center font-bold text-lg',
-                      scoreColor === 'emerald' && 'bg-emerald-500/20 text-emerald-400',
-                      scoreColor === 'amber' && 'bg-amber-500/20 text-amber-400',
-                      scoreColor === 'rose' && 'bg-rose-500/20 text-rose-400'
-                    )}>
-                      {taskScore}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-slate-100">{task.name}</h4>
-                      <span className="text-sm text-slate-500 flex items-center gap-1">
-                        {temporalities.find(t => t.id === task.temporality)?.icon}
-                        {getTemporalityLabel(task.temporality)}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <motion.button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeTask(task.id);
-                      }}
-                      className="p-2 hover:bg-rose-500/20 rounded-lg transition-colors text-slate-400 hover:text-rose-400"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </motion.button>
-                    <motion.div
-                      animate={{ rotate: isEditing ? 180 : 0 }}
-                      className="text-slate-400"
-                    >
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Resilience Sliders */}
-                <AnimatePresence>
-                  {isEditing && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-slate-800"
-                    >
-                      <div className="p-6 space-y-6">
-                        <p className="text-sm text-slate-400">
-                          Évaluez la résilience de cette tâche face à l'IA (100 = très résilient, humain essentiel)
-                        </p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <ResilienceSlider
-                            label="Données"
-                            description="Complexité des données manipulées"
-                            icon={<Database className="w-4 h-4" />}
-                            value={task.resilience.donnees}
-                            onChange={(v) => handleUpdateResilience(task.id, 'donnees', v)}
-                          />
-                          
-                          <ResilienceSlider
-                            label="Décision"
-                            description="Jugement et prise de décision"
-                            icon={<Brain className="w-4 h-4" />}
-                            value={task.resilience.decision}
-                            onChange={(v) => handleUpdateResilience(task.id, 'decision', v)}
-                          />
-                          
-                          <ResilienceSlider
-                            label="Relationnel"
-                            description="Interactions humaines requises"
-                            icon={<Heart className="w-4 h-4" />}
-                            value={task.resilience.relationnel}
-                            onChange={(v) => handleUpdateResilience(task.id, 'relationnel', v)}
-                          />
-                          
-                          <ResilienceSlider
-                            label="Créativité"
-                            description="Innovation et pensée originale"
-                            icon={<Sparkles className="w-4 h-4" />}
-                            value={task.resilience.creativite}
-                            onChange={(v) => handleUpdateResilience(task.id, 'creativite', v)}
-                          />
-                        </div>
+                  {/* Task Header */}
+                  <div
+                    className="p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-800/30 transition-colors"
+                    onClick={() => toggleExpand(task.id)}
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium text-slate-200">{task.name}</span>
+                        <select
+                          value={task.temporalite}
+                          onChange={(e) => updateTask(task.id, { temporalite: e.target.value as Temporality })}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400"
+                        >
+                          {TEMPORALITIES.map((temp) => (
+                            <option key={temp} value={temp}>
+                              {temporalityLabels[temp]}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
+                    </div>
 
-        {tasks.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12 text-slate-500"
-          >
-            <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Ajoutez au moins une tâche pour continuer</p>
-          </motion.div>
-        )}
+                    <div className="flex items-center gap-4">
+                      <div className={cn(
+                        'text-lg font-bold tabular-nums',
+                        color === 'emerald' && 'text-emerald-400',
+                        color === 'amber' && 'text-amber-400',
+                        color === 'rose' && 'text-rose-400'
+                      )}>
+                        {avgScore}%
+                      </div>
+                      
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeTask(task.id);
+                        }}
+                        className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      {isExpanded ? (
+                        <ChevronUp className="w-5 h-5 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-slate-500" />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expanded Resilience Sliders */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="border-t border-slate-800"
+                      >
+                        <div className="p-6 space-y-6">
+                          <p className="text-sm text-slate-500">
+                            {t('resilienceHint')}
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ResilienceSlider
+                              label={t('resilience.data')}
+                              description={t('resilience.dataDesc')}
+                              value={task.resilience.donnees}
+                              onChange={(value) => updateTask(task.id, {
+                                resilience: { ...task.resilience, donnees: value }
+                              })}
+                            />
+                            <ResilienceSlider
+                              label={t('resilience.decision')}
+                              description={t('resilience.decisionDesc')}
+                              value={task.resilience.decision}
+                              onChange={(value) => updateTask(task.id, {
+                                resilience: { ...task.resilience, decision: value }
+                              })}
+                            />
+                            <ResilienceSlider
+                              label={t('resilience.relational')}
+                              description={t('resilience.relationalDesc')}
+                              value={task.resilience.relationnel}
+                              onChange={(value) => updateTask(task.id, {
+                                resilience: { ...task.resilience, relationnel: value }
+                              })}
+                            />
+                            <ResilienceSlider
+                              label={t('resilience.creativity')}
+                              description={t('resilience.creativityDesc')}
+                              value={task.resilience.creativite}
+                              onChange={(value) => updateTask(task.id, {
+                                resilience: { ...task.resilience, creativite: value }
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Summary */}
@@ -273,22 +257,28 @@ export function Step3Tasks() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="apex-card p-4 flex items-center justify-between"
+          className="apex-card p-6 flex items-center justify-between"
         >
-          <span className="text-slate-400">
-            {tasks.length} tâche{tasks.length > 1 ? 's' : ''} enregistrée{tasks.length > 1 ? 's' : ''}
-          </span>
-          <span className="text-slate-300 font-medium">
-            Score moyen :{' '}
-            <span className={cn(
-              'font-bold',
-              getResilienceColor(Math.round(tasks.reduce((acc, t) => acc + getTaskScore(t), 0) / tasks.length)) === 'emerald' && 'text-emerald-400',
-              getResilienceColor(Math.round(tasks.reduce((acc, t) => acc + getTaskScore(t), 0) / tasks.length)) === 'amber' && 'text-amber-400',
-              getResilienceColor(Math.round(tasks.reduce((acc, t) => acc + getTaskScore(t), 0) / tasks.length)) === 'rose' && 'text-rose-400'
-            )}>
-              {Math.round(tasks.reduce((acc, t) => acc + getTaskScore(t), 0) / tasks.length)}%
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+              {tasks.length}
+            </div>
+            <span className="text-slate-300">
+              {tasks.length === 1 ? t('taskRegistered') : t('tasksRegistered')}
             </span>
-          </span>
+          </div>
+          
+          <div className="text-right">
+            <span className="text-sm text-slate-500">{t('averageScore')}</span>
+            <span className={cn(
+              'ml-2 text-xl font-bold',
+              getResilienceColor(getOverallAverage()) === 'emerald' && 'text-emerald-400',
+              getResilienceColor(getOverallAverage()) === 'amber' && 'text-amber-400',
+              getResilienceColor(getOverallAverage()) === 'rose' && 'text-rose-400'
+            )}>
+              {getOverallAverage()}%
+            </span>
+          </div>
         </motion.div>
       )}
 
@@ -296,9 +286,8 @@ export function Step3Tasks() {
         onPrev={prevStep}
         onNext={nextStep}
         nextDisabled={!canProceed}
-        nextLabel="Définir vos talents"
+        nextLabel={t('nextButton')}
       />
     </motion.div>
   );
 }
-

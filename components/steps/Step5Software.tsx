@@ -2,63 +2,51 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Monitor, Plus, Trash2, Award } from 'lucide-react';
+import { Plus, Monitor, Trash2, Star, CheckCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuditStore, SkillLevel } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
-import { cn, getLevelLabel } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
-const levels: { id: SkillLevel; label: string; color: string }[] = [
-  { id: 'debutant', label: 'Débutant', color: 'text-slate-400 border-slate-600' },
-  { id: 'avance', label: 'Avancé', color: 'text-blue-400 border-blue-500' },
-  { id: 'expert', label: 'Expert', color: 'text-amber-400 border-amber-500' },
-];
-
-const suggestedSoftware = [
-  'Excel / Google Sheets',
-  'PowerPoint / Slides',
-  'Slack / Teams',
-  'Notion / Confluence',
-  'Salesforce',
-  'SAP',
-  'Photoshop / Figma',
-  'VS Code / IDE',
-  'Python / R',
-  'ChatGPT / Claude',
-  'Tableau / Power BI',
-  'Jira / Asana',
-];
+const LEVELS: SkillLevel[] = ['debutant', 'avance', 'expert'];
+const COMMON_TOOLS = ['Excel', 'PowerPoint', 'Figma', 'Notion', 'Slack', 'Python', 'ChatGPT', 'Salesforce', 'Jira', 'Tableau'];
 
 export function Step5Software() {
-  const { software, addSoftware, updateSoftware, removeSoftware, nextStep, prevStep } = useAuditStore();
-  const [newSoftwareName, setNewSoftwareName] = useState('');
-  const [newSoftwareLevel, setNewSoftwareLevel] = useState<SkillLevel>('avance');
+  const t = useTranslations('step5');
+  const { software, addSoftware, removeSoftware, updateSoftware, nextStep, prevStep } = useAuditStore();
+  
+  const [newToolName, setNewToolName] = useState('');
 
-  const canProceed = software.length >= 1;
-  const canAddMore = software.length < 3;
+  const canProceed = software.length >= 3;
 
-  const handleAddSoftware = () => {
-    if (!newSoftwareName.trim() || !canAddMore) return;
-    
-    addSoftware({
-      name: newSoftwareName.trim(),
-      level: newSoftwareLevel,
-    });
-    
-    setNewSoftwareName('');
-    setNewSoftwareLevel('avance');
+  const levelLabels: Record<SkillLevel, string> = {
+    debutant: t('levels.beginner'),
+    avance: t('levels.advanced'),
+    expert: t('levels.expert'),
   };
 
-  const handleQuickAdd = (name: string) => {
-    if (!canAddMore || software.some(s => s.name === name)) return;
-    addSoftware({ name, level: 'avance' });
+  const handleAddTool = (name?: string) => {
+    const toolName = name || newToolName.trim();
+    if (toolName && software.length < 3) {
+      addSoftware(toolName);
+      setNewToolName('');
+    }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddTool();
+    }
+  };
+
+  const expertCount = software.filter(s => s.level === 'expert').length;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="space-y-8"
+      className="space-y-10"
     >
       {/* Header */}
       <div className="text-center space-y-4">
@@ -68,7 +56,7 @@ export function Step5Software() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          Tech Scan
+          {t('title')}
         </motion.h1>
         <motion.p
           className="apex-subtitle text-lg max-w-2xl mx-auto"
@@ -76,11 +64,11 @@ export function Step5Software() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          Identifiez vos 3 outils principaux et votre niveau de maîtrise.
+          {t('subtitle')}
         </motion.p>
       </div>
 
-      {/* Counter */}
+      {/* Software Count */}
       <motion.div
         className="apex-card p-4 flex items-center justify-between"
         initial={{ opacity: 0, y: 20 }}
@@ -89,195 +77,153 @@ export function Step5Software() {
       >
         <div className="flex items-center gap-3">
           <Monitor className="w-5 h-5 text-blue-400" />
-          <span className="text-slate-300">Outils ajoutés</span>
-        </div>
-        <div className="flex items-center gap-2">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'w-3 h-3 rounded-full transition-all duration-300',
-                i < software.length ? 'bg-blue-500' : 'bg-slate-700'
-              )}
-            />
-          ))}
-          <span className={cn(
-            'ml-2 font-bold tabular-nums',
-            software.length === 3 ? 'text-blue-400' : 'text-slate-400'
-          )}>
-            {software.length}/3
+          <span className="text-slate-300 font-medium">
+            {t('added')}: <span className={cn(
+              'font-bold',
+              software.length >= 3 ? 'text-emerald-400' : 'text-blue-400'
+            )}>{software.length}</span> / 3
           </span>
         </div>
+        {software.length >= 3 && (
+          <span className="flex items-center gap-2 text-sm text-emerald-400">
+            <CheckCircle className="w-4 h-4" />
+            {t('stackDefined')}
+          </span>
+        )}
       </motion.div>
 
-      {/* Current Software */}
-      <AnimatePresence mode="popLayout">
-        {software.map((sw, index) => (
-          <motion.div
-            key={sw.id}
-            layout
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ delay: index * 0.05 }}
-            className="apex-card p-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center">
-                  <Monitor className="w-6 h-6 text-slate-400" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-slate-100">{sw.name}</h4>
-                  <span className={cn(
-                    'text-sm font-medium',
-                    sw.level === 'expert' && 'text-amber-400',
-                    sw.level === 'avance' && 'text-blue-400',
-                    sw.level === 'debutant' && 'text-slate-400'
-                  )}>
-                    {getLevelLabel(sw.level)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Level Selector */}
-                <div className="flex gap-1">
-                  {levels.map((level) => (
-                    <button
-                      key={level.id}
-                      onClick={() => updateSoftware(sw.id, { level: level.id })}
-                      className={cn(
-                        'px-3 py-1 rounded text-xs font-medium border transition-all duration-200',
-                        sw.level === level.id
-                          ? level.color + ' bg-opacity-20'
-                          : 'border-slate-700 text-slate-500 hover:border-slate-600'
-                      )}
-                      style={{
-                        backgroundColor: sw.level === level.id 
-                          ? level.id === 'expert' ? 'rgba(245, 158, 11, 0.1)' 
-                          : level.id === 'avance' ? 'rgba(59, 130, 246, 0.1)' 
-                          : 'rgba(148, 163, 184, 0.1)'
-                          : undefined
-                      }}
-                    >
-                      {level.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Delete */}
-                <motion.button
-                  onClick={() => removeSoftware(sw.id)}
-                  className="p-2 hover:bg-rose-500/20 rounded-lg transition-colors text-slate-400 hover:text-rose-400"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {/* Add Software Form */}
-      {canAddMore && (
+      {/* Add Tool Input */}
+      {software.length < 3 && (
         <motion.div
           className="apex-card p-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h3 className="text-lg font-medium text-slate-200 mb-4">Ajouter un outil</h3>
-          
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={newSoftwareName}
-                onChange={(e) => setNewSoftwareName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddSoftware()}
-                placeholder="Ex: Excel, Figma, Python..."
-                className="apex-input"
-              />
-            </div>
-            
-            <div className="flex gap-2">
-              {levels.map((level) => (
-                <button
-                  key={level.id}
-                  onClick={() => setNewSoftwareLevel(level.id)}
-                  className={cn(
-                    'px-4 py-2 rounded-lg border transition-all duration-200 text-sm font-medium',
-                    newSoftwareLevel === level.id
-                      ? level.color + ' bg-opacity-20'
-                      : 'border-slate-700 text-slate-500 hover:border-slate-600'
-                  )}
-                  style={{
-                    backgroundColor: newSoftwareLevel === level.id 
-                      ? level.id === 'expert' ? 'rgba(245, 158, 11, 0.1)' 
-                      : level.id === 'avance' ? 'rgba(59, 130, 246, 0.1)' 
-                      : 'rgba(148, 163, 184, 0.1)'
-                      : undefined
-                  }}
-                >
-                  {level.label}
-                </button>
-              ))}
-            </div>
-            
+          <label className="apex-label">{t('addTool')}</label>
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={newToolName}
+              onChange={(e) => setNewToolName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t('toolPlaceholder')}
+              className="apex-input flex-1"
+            />
             <motion.button
-              onClick={handleAddSoftware}
-              disabled={!newSoftwareName.trim()}
-              className="apex-button flex items-center gap-2"
+              onClick={() => handleAddTool()}
+              disabled={!newToolName.trim()}
+              className="apex-button flex items-center gap-2 whitespace-nowrap"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Plus className="w-4 h-4" />
-              Ajouter
+              <Plus className="w-5 h-5" />
+              {t('add')}
             </motion.button>
           </div>
 
-          {/* Quick Add Suggestions */}
-          <div>
-            <span className="text-xs text-slate-500 uppercase tracking-wider mb-3 block">
-              Suggestions rapides
-            </span>
+          {/* Quick Suggestions */}
+          <div className="mt-4">
+            <p className="text-xs text-slate-500 mb-2">{t('quickSuggestions')}</p>
             <div className="flex flex-wrap gap-2">
-              {suggestedSoftware
-                .filter(name => !software.some(s => s.name === name))
-                .slice(0, 8)
-                .map((name) => (
-                  <motion.button
-                    key={name}
-                    onClick={() => handleQuickAdd(name)}
-                    className="px-3 py-1.5 rounded-lg bg-slate-800/50 border border-slate-700 text-sm text-slate-400 hover:border-slate-600 hover:text-slate-300 transition-all"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    + {name}
-                  </motion.button>
-                ))}
+              {COMMON_TOOLS.filter(tool => 
+                !software.some(s => s.name.toLowerCase() === tool.toLowerCase())
+              ).slice(0, 6).map((tool) => (
+                <button
+                  key={tool}
+                  onClick={() => handleAddTool(tool)}
+                  className="px-3 py-1 text-sm rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"
+                >
+                  + {tool}
+                </button>
+              ))}
             </div>
           </div>
         </motion.div>
       )}
 
+      {/* Software List */}
+      <div className="space-y-4">
+        <AnimatePresence mode="popLayout">
+          {software.map((sw, index) => (
+            <motion.div
+              key={sw.id}
+              layout
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ delay: index * 0.05 }}
+              className="apex-card p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <Monitor className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <span className="font-medium text-slate-200 text-lg">{sw.name}</span>
+                </div>
+                
+                <button
+                  onClick={() => removeSoftware(sw.id)}
+                  className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Level Selection */}
+              <div className="flex gap-2">
+                {LEVELS.map((level) => {
+                  const isActive = sw.level === level;
+                  return (
+                    <motion.button
+                      key={level}
+                      onClick={() => updateSoftware(sw.id, level)}
+                      className={cn(
+                        'flex-1 py-3 rounded-lg text-sm font-medium transition-all duration-200',
+                        isActive
+                          ? level === 'expert'
+                            ? 'bg-amber-500/20 border border-amber-500/50 text-amber-300'
+                            : level === 'avance'
+                              ? 'bg-blue-500/20 border border-blue-500/50 text-blue-300'
+                              : 'bg-slate-700 border border-slate-600 text-slate-200'
+                          : 'bg-slate-800/50 border border-slate-700 text-slate-400 hover:bg-slate-800 hover:border-slate-600'
+                      )}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {levelLabels[level]}
+                      {level === 'expert' && isActive && (
+                        <Star className="w-4 h-4 inline-block ml-1 fill-amber-400 text-amber-400" />
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
       {/* Summary */}
-      {software.length === 3 && (
+      {software.length >= 3 && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="apex-card p-6 text-center glow-blue"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="apex-card p-6 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-emerald-500/30"
         >
-          <Award className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-          <p className="text-slate-300">
-            Stack technologique défini !
-          </p>
-          <p className="text-sm text-slate-500 mt-1">
-            {software.filter(s => s.level === 'expert').length} outil(s) en niveau Expert
-          </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-6 h-6 text-emerald-400" />
+              <span className="text-slate-200 font-medium">{t('stackDefined')}</span>
+            </div>
+            {expertCount > 0 && (
+              <span className="flex items-center gap-1 text-amber-400 text-sm">
+                <Star className="w-4 h-4 fill-amber-400" />
+                {expertCount} {t('expertTools')}
+              </span>
+            )}
+          </div>
         </motion.div>
       )}
 
@@ -285,10 +231,9 @@ export function Step5Software() {
         onPrev={prevStep}
         onNext={nextStep}
         nextDisabled={!canProceed}
-        nextLabel="Voir le verdict"
+        nextLabel={t('nextButton')}
         nextVariant="success"
       />
     </motion.div>
   );
 }
-

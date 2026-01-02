@@ -10,8 +10,10 @@ interface ScoreRingProps {
   showLabel?: boolean;
 }
 
+type ColorKey = 'emerald' | 'amber' | 'rose';
+
 export function ScoreRing({ score, size = 'md', label, showLabel = true }: ScoreRingProps) {
-  const color = getResilienceColor(score);
+  const color = getResilienceColor(score) as ColorKey;
   
   const sizes = {
     sm: { ring: 80, stroke: 6, text: 'text-lg', label: 'text-xs' },

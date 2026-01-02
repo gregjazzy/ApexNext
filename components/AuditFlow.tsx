@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Compass } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { Stepper, AUDIT_STEPS } from '@/components/ui/Stepper';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { UserMenu } from '@/components/ui/UserMenu';
 import {
   Step1Matrix,
   Step2Context,
@@ -24,7 +28,10 @@ const stepComponents: Record<number, React.ComponentType> = {
 };
 
 export function AuditFlow() {
+  const { data: session } = useSession();
   const { currentStep, initializeTalents, talents } = useAuditStore();
+  const t = useTranslations('common');
+  const tStepper = useTranslations('stepper');
 
   // Initialize talents on mount
   useEffect(() => {
@@ -34,6 +41,13 @@ export function AuditFlow() {
   }, [talents.length, initializeTalents]);
 
   const CurrentStepComponent = stepComponents[currentStep] || Step1Matrix;
+
+  // Translated steps
+  const translatedSteps = AUDIT_STEPS.map(step => ({
+    ...step,
+    title: tStepper(step.shortTitle.toLowerCase()),
+    shortTitle: tStepper(step.shortTitle.toLowerCase()),
+  }));
 
   return (
     <div className="min-h-screen">
@@ -49,20 +63,28 @@ export function AuditFlow() {
                 <Compass className="w-6 h-6 text-white" />
               </motion.div>
               <div>
-                <h1 className="font-serif text-xl font-bold text-slate-100">APEX Next</h1>
-                <p className="text-xs text-slate-500">Deep Audit Engine v2</p>
+                <h1 className="font-serif text-xl font-bold text-slate-100">{t('appName')}</h1>
+                <p className="text-xs text-slate-500">{t('version')}</p>
               </div>
             </div>
             
-            <div className="hidden md:block text-right">
-              <p className="text-xs text-slate-500">Étape {currentStep} / {AUDIT_STEPS.length}</p>
-              <p className="text-sm text-slate-300 font-medium">
-                {AUDIT_STEPS.find(s => s.number === currentStep)?.title}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="hidden md:block text-right mr-4">
+                <p className="text-xs text-slate-500">{t('step')} {currentStep} {t('of')} {AUDIT_STEPS.length}</p>
+                <p className="text-sm text-slate-300 font-medium">
+                  {translatedSteps.find(s => s.number === currentStep)?.title}
+                </p>
+              </div>
+              
+              <LanguageSwitcher />
+              
+              {session?.user && (
+                <UserMenu user={session.user} />
+              )}
             </div>
           </div>
           
-          <Stepper currentStep={currentStep} steps={AUDIT_STEPS} />
+          <Stepper currentStep={currentStep} steps={translatedSteps} />
         </div>
       </header>
 
@@ -87,11 +109,10 @@ export function AuditFlow() {
       <footer className="fixed bottom-0 left-0 right-0 py-3 backdrop-blur-md bg-slate-950/80 border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <p className="text-xs text-slate-600">
-            APEX Next • GPS de la Mutation Professionnelle face à l'IA
+            {t('appName')} • {t('tagline')}
           </p>
         </div>
       </footer>
     </div>
   );
 }
-

@@ -12,6 +12,8 @@ interface ResilienceSliderProps {
   icon?: React.ReactNode;
 }
 
+type ColorKey = 'emerald' | 'amber' | 'rose';
+
 export function ResilienceSlider({
   label,
   description,
@@ -19,9 +21,9 @@ export function ResilienceSlider({
   onChange,
   icon,
 }: ResilienceSliderProps) {
-  const color = getResilienceColor(value);
+  const color = getResilienceColor(value) as ColorKey;
   
-  const colorClasses = {
+  const colorClasses: Record<ColorKey, { track: string; thumb: string; glow: string; text: string }> = {
     emerald: {
       track: 'bg-emerald-500',
       thumb: 'border-emerald-500 hover:border-emerald-400',

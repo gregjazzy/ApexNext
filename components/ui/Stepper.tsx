@@ -49,7 +49,7 @@ export function Stepper({ currentStep, steps }: StepperProps) {
                 </motion.div>
                 <span
                   className={cn(
-                    'text-sm font-medium transition-colors duration-200',
+                    'text-sm font-medium transition-colors duration-200 capitalize',
                     isActive && 'text-slate-100',
                     isComplete && 'text-emerald-400',
                     isPending && 'text-slate-500'
@@ -78,9 +78,9 @@ export function Stepper({ currentStep, steps }: StepperProps) {
       <div className="md:hidden">
         <div className="flex items-center justify-between mb-2">
           <span className="text-slate-400 text-sm">
-            Étape {currentStep} sur {steps.length}
+            {currentStep} / {steps.length}
           </span>
-          <span className="text-slate-100 text-sm font-medium">
+          <span className="text-slate-100 text-sm font-medium capitalize">
             {steps.find(s => s.number === currentStep)?.title}
           </span>
         </div>
@@ -98,11 +98,10 @@ export function Stepper({ currentStep, steps }: StepperProps) {
 }
 
 export const AUDIT_STEPS: Step[] = [
-  { number: 1, title: 'La Matrice', shortTitle: 'Matrice' },
-  { number: 2, title: 'Contexte', shortTitle: 'Contexte' },
-  { number: 3, title: 'Audit Temporel', shortTitle: 'Tâches' },
-  { number: 4, title: 'Signature Talents', shortTitle: 'Talents' },
-  { number: 5, title: 'Tech Scan', shortTitle: 'Tech' },
-  { number: 6, title: 'Le Verdict', shortTitle: 'Verdict' },
+  { number: 1, title: 'La Matrice', shortTitle: 'matrix' },
+  { number: 2, title: 'Contexte', shortTitle: 'context' },
+  { number: 3, title: 'Audit Temporel', shortTitle: 'tasks' },
+  { number: 4, title: 'Signature Talents', shortTitle: 'talents' },
+  { number: 5, title: 'Tech Scan', shortTitle: 'tech' },
+  { number: 6, title: 'Le Verdict', shortTitle: 'verdict' },
 ];
-
