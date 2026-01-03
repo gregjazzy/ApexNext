@@ -1,10 +1,10 @@
-# APEX Next v2
+# APEX Next v2.1
 
 > **GPS de la Mutation Professionnelle face à l'IA**
 
-APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé.
+APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé avec synchronisation totale des données Audit + Portrait Humain.
 
-![Version](https://img.shields.io/badge/version-2.0-blue)
+![Version](https://img.shields.io/badge/version-2.1-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -24,8 +24,16 @@ APEX Next analyse votre profil professionnel à travers **8 étapes** pour ident
 6. **Le Verdict** - Dashboard avec score global et radar de résilience
 
 ### Phase 2 : Stratégie (Étapes 7-8)
-7. **Matrice Ikigai 2.0** - Visualisation 4 dimensions + Métiers Refuges
-8. **Plan d'Action** - Roadmap en 3 piliers avec actions prioritaires
+7. **Matrice Ikigai 2.0** - Visualisation 4 dimensions + Métiers Refuges + Value Curves
+8. **Plan d'Action** - Roadmap en 3 piliers avec actions dynamiques, KPIs de résilience et outils suggérés
+
+### Module Portrait de Mutation (Parcours Pivot)
+Pour le parcours "Pivot", un module additionnel capture le portrait humain :
+- **Passions Concrètes** - Ce qui fait vibrer l'utilisateur
+- **Le Carré d'As** - 4 talents naturels
+- **Zone de Rejet** - Ce qui épuise l'énergie
+- **L'Horizon Cible** - Secteur cible + 2 métiers idéaux
+- **Le Manifeste Humain** - Vision et impact souhaité
 
 ---
 
@@ -40,7 +48,8 @@ apex-next/
 │   ├── auth/
 │   │   ├── signin/             # Page de connexion
 │   │   └── error/              # Page d'erreur auth
-│   ├── audit/                  # Page principale de l'audit
+│   ├── audit/                  # PHASE 1 - Diagnostic (Steps 1-6)
+│   ├── strategy/               # PHASE 2 - Stratégie (Steps 7-8) ★
 │   ├── globals.css             # Design System "Expert Dark"
 │   ├── layout.tsx              # Root layout avec providers
 │   └── page.tsx                # Landing page
@@ -51,9 +60,9 @@ apex-next/
 │   │   ├── Step3Tasks.tsx
 │   │   ├── Step4Talents.tsx
 │   │   ├── Step5Software.tsx
-│   │   ├── Step6Verdict.tsx
+│   │   ├── Step6Verdict.tsx    # → Redirige vers /strategy
 │   │   ├── Step7Ikigai.tsx
-│   │   └── Step8Roadmap.tsx
+│   │   └── Step8Roadmap.tsx    # + Export PDF
 │   ├── ui/                     # Composants UI réutilisables
 │   │   ├── NavigationButtons.tsx
 │   │   ├── ResilienceRadar.tsx
@@ -62,16 +71,23 @@ apex-next/
 │   │   ├── SelectionCard.tsx
 │   │   ├── Stepper.tsx
 │   │   └── ...
-│   └── AuditFlow.tsx           # Orchestrateur du tunnel
+│   ├── AuditFlow.tsx           # Orchestrateur Phase 1
+│   ├── StrategyFlow.tsx        # Orchestrateur Phase 2 ★
+│   └── PortraitMutation.tsx    # Module Portrait (Pivot) ★
 ├── lib/
-│   ├── store.ts                # Zustand store avec persistence
+│   ├── store.ts                # Zustand store avec persistence (~2100 lignes)
 │   ├── lexicon.ts              # Dictionnaire dynamique par persona
+│   ├── reportGenerator.ts      # Export PDF (jsPDF) ★
 │   └── utils.ts                # Utilitaires (cn, getResilienceColor)
+├── types/
+│   └── jspdf-autotable.d.ts    # Types jsPDF ★
 ├── messages/
 │   ├── fr.json                 # Traductions français
 │   └── en.json                 # Traductions anglais
 └── i18n/                       # Configuration next-intl
 ```
+
+★ = Nouveaux fichiers v2.1
 
 ---
 
@@ -84,11 +100,12 @@ apex-next/
 | **Tailwind CSS** | Design System "Expert Dark" |
 | **Zustand** | State management avec persistence |
 | **Framer Motion** | Animations et transitions |
-| **Recharts** | Visualisations (Radar Chart) |
+| **Recharts** | Visualisations (Radar Chart, Value Curves) |
 | **NextAuth.js** | Authentification (Credentials, GitHub, Google) |
 | **next-intl** | Internationalisation (FR/EN) |
 | **Radix UI** | Composants accessibles (Slider, Select) |
 | **Lucide React** | Icônes |
+| **jsPDF + autotable** | Export PDF stratégique ★ |
 
 ---
 
@@ -365,8 +382,12 @@ Analyse IA du document de poste (mock actuellement, prêt pour intégration).
 - [x] Internationalisation FR/EN
 - [x] Radar Chart résilience
 - [x] Lexique dynamique par persona
+- [x] Export PDF stratégique (jsPDF)
+- [x] Module Portrait de Mutation (Pivot)
+- [x] Synchronisation Totale Plan d'Action (Audit + Portrait Humain)
+- [x] Séparation Phase 1/Phase 2 avec routes distinctes
+- [x] KPIs de résilience et outils suggérés
 - [ ] Intégration IA (OpenAI/Anthropic) pour analyse documents
-- [ ] Export PDF du diagnostic
 - [ ] Dashboard historique des audits
 - [ ] Pondération des scores par persona/objectif
 

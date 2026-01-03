@@ -7,6 +7,65 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [2.1.0] - 2026-01-03
+
+### ✨ Ajouté
+
+#### Synchronisation Totale du Plan d'Action (Audit + Portrait Humain)
+- **Interface RoadmapAction enrichie** avec nouveaux champs :
+  - `resilienceScore` : Score 1-10 de protection contre le remplacement
+  - `suggestedTool` : Outil concret suggéré (ChatGPT, No-code, etc.)
+  - `sourceData` : Source des données (Audit, Portrait Humain, etc.)
+
+- **Injection de données hybrides** :
+  - Pilier 1 : Zone de Rejet + Tâche vulnérable
+  - Pilier 2 : Carré d'As + Passions Concrètes
+  - Pilier 3 : Métier Idéal + Secteur Cible
+
+- **Verbes d'impact** (wording Consulting) :
+  - Déléguer, Implémenter, Configurer (Pilier 1)
+  - Déployer, Sécuriser, Arbitrer (Pilier 2)
+  - Négocier, Implémenter (Pilier 3)
+
+#### Module Portrait de Mutation (Parcours Pivot)
+- **Nouveau composant `PortraitMutation.tsx`** avec 5 sections :
+  1. Passions Concrètes (texte libre)
+  2. Le Carré d'As (4 talents naturels)
+  3. Zone de Rejet (tags ajoutables)
+  4. L'Horizon Cible (secteur + 2 métiers idéaux)
+  5. Le Manifeste Humain (texte libre)
+
+- **Interface `UserIntention`** dans le store Zustand
+- **Wiring Intelligence** :
+  - Ajustement Ikigai (Engagement pondéré par passions/secteur)
+  - Zone de Rejet → Colonne ÉLIMINER de la matrice ERAC
+  - Métiers Idéaux → Priorité dans les Niches de Résilience
+
+#### Séparation Phase 1 / Phase 2
+- **Route `/strategy`** pour la Phase 2
+- **Composant `StrategyFlow.tsx`** orchestrateur de la Phase 2
+- **Step6 redirige vers `/strategy`** après validation du diagnostic
+
+#### Export PDF Stratégique
+- **Nouveau fichier `lib/reportGenerator.ts`**
+- Export PDF complet avec jsPDF + jsPDF-autotable :
+  - Synthèse exécutive
+  - Méthodologie ERAC
+  - Audit détaillé des tâches
+  - Actifs stratégiques
+  - Matrice ERAC & Ikigai
+  - Plan d'Action par piliers
+
+### 🔧 Modifié
+- **`lib/store.ts`** : Version `apex-audit-storage-v6`
+  - Ajout de `userIntention` dans le state
+  - `generateRoadmap()` accepte maintenant `userIntention`
+  - Calculs dynamiques avec données Portrait Humain
+- **`Step8Roadmap.tsx`** : Affichage des nouveaux KPIs (Résilience, Outil, Source)
+- **`Step7Ikigai.tsx`** : Intégration du Portrait de Mutation dans les calculs
+
+---
+
 ## [2.0.0] - 2026-01-03
 
 ### ✨ Ajouté

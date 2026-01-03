@@ -1,4 +1,4 @@
-# Architecture Technique APEX Next
+# Architecture Technique APEX Next v2.1
 
 Ce document détaille l'architecture technique de l'application APEX Next.
 
@@ -18,7 +18,8 @@ apex-next/
 │   ├── auth/                   # Pages d'authentification
 │   │   ├── signin/page.tsx     # Page connexion
 │   │   └── error/page.tsx      # Page erreur
-│   ├── audit/page.tsx          # Page principale audit
+│   ├── audit/page.tsx          # PHASE 1 - Diagnostic (Steps 1-6)
+│   ├── strategy/page.tsx       # PHASE 2 - Stratégie (Steps 7-8) ★
 │   ├── globals.css             # Design System
 │   ├── layout.tsx              # Root layout
 │   └── page.tsx                # Landing/redirect
@@ -31,9 +32,9 @@ apex-next/
 │   │   ├── Step3Tasks.tsx      # Audit des tâches
 │   │   ├── Step4Talents.tsx    # Sélection 5/12 talents
 │   │   ├── Step5Software.tsx   # Stack technique
-│   │   ├── Step6Verdict.tsx    # Dashboard diagnostic
+│   │   ├── Step6Verdict.tsx    # Dashboard diagnostic → /strategy
 │   │   ├── Step7Ikigai.tsx     # Matrice Ikigai 2.0
-│   │   └── Step8Roadmap.tsx    # Plan d'action
+│   │   └── Step8Roadmap.tsx    # Plan d'action + Export PDF
 │   │
 │   ├── ui/                     # Composants UI
 │   │   ├── LanguageSwitcher.tsx
@@ -46,12 +47,18 @@ apex-next/
 │   │   ├── TalentBadge.tsx
 │   │   └── UserMenu.tsx
 │   │
-│   └── AuditFlow.tsx           # Orchestrateur principal
+│   ├── AuditFlow.tsx           # Orchestrateur Phase 1
+│   ├── StrategyFlow.tsx        # Orchestrateur Phase 2 ★
+│   └── PortraitMutation.tsx    # Module Portrait de Mutation (Pivot) ★
 │
 ├── lib/
-│   ├── store.ts                # Zustand store
+│   ├── store.ts                # Zustand store (~2100 lignes)
 │   ├── lexicon.ts              # Dictionnaire dynamique
+│   ├── reportGenerator.ts      # Export PDF (jsPDF) ★
 │   └── utils.ts                # Utilitaires
+│
+├── types/
+│   └── jspdf-autotable.d.ts    # Types jsPDF autotable ★
 │
 ├── messages/                   # Traductions i18n
 │   ├── fr.json
@@ -65,6 +72,8 @@ apex-next/
 ├── middleware.ts               # Middleware i18n + auth
 └── next.config.mjs
 ```
+
+★ = Nouveaux fichiers v2.1
 
 ---
 
@@ -101,6 +110,8 @@ Changer la clé `name` reset le localStorage :
 - `v2` → Ajout des 12 actifs stratégiques
 - `v3` → Ajout du 5e curseur (execution physique)
 - `v4` → Phase 2 (strategy)
+- `v5` → Moteur de Mutation Radicale (Pivot)
+- `v6` → Portrait de Mutation + Synchronisation Totale
 
 ### Actions Principales
 
@@ -116,6 +127,7 @@ setGoal(goal)
 setJobTitle(title)
 setIndustry(industry)
 setJobDescription(desc)
+setYearsExperience(years)
 
 // Tasks
 addTask(name) → taskId
@@ -138,10 +150,22 @@ removeSoftware(id)
 generateStrategy()   // Calcule les scores Phase 2
 toggleRoadmapAction(id)
 
+// User Intention (Portrait de Mutation - Parcours Pivot) ★
+setPassionsConcretes(passions: string)
+setNaturalTalents(talents: string[])
+setRejectionZone(zone: string)
+setTargetSector(sector: string)
+setIdealJobs(jobs: string[])
+setHumanManifesto(manifesto: string)
+
+// Mutation Drivers (Pivot) ★
+setMutationDrivers(drivers: string[])
+
 // Computed
 getSelectedTalents() → Talent[]
 getResilienceScore() → number
 getTalentScore() → number
+computeKPIs() → { productivity, timeLiberated, resilienceIndex }
 
 // Reset
 reset()
@@ -399,11 +423,12 @@ const response = await openai.chat.completions.create({
 
 ## 🎭 Composants Clés
 
-### AuditFlow
+### AuditFlow (Phase 1 - Diagnostic)
 
-Orchestrateur principal qui gère le routing des étapes :
+Orchestrateur de la Phase 1 (étapes 1-6) :
 
 ```typescript
+// components/AuditFlow.tsx
 const stepComponents: Record<number, React.ComponentType> = {
   1: Step1Matrix,
   2: Step2Context,
@@ -411,11 +436,39 @@ const stepComponents: Record<number, React.ComponentType> = {
   4: Step4Talents,
   5: Step5Software,
   6: Step6Verdict,
-  7: Step7Ikigai,
-  8: Step8Roadmap,
 };
 
 const CurrentStepComponent = stepComponents[currentStep];
+```
+
+### StrategyFlow (Phase 2 - Stratégie) ★
+
+Orchestrateur de la Phase 2 (étapes 7-8) avec insertion conditionnelle du Portrait de Mutation :
+
+```typescript
+// components/StrategyFlow.tsx
+const STRATEGY_STEPS = [
+  { step: 7, component: Step7Ikigai, label: 'Ikigai' },
+  { step: 8, component: Step8Roadmap, label: "Plan d'Action" },
+];
+
+// Si goal === 'pivot', insère PortraitMutation entre les étapes
+```
+
+### PortraitMutation (Parcours Pivot) ★
+
+Module de capture du "Portrait Humain" avec 5 sections :
+
+```typescript
+// components/PortraitMutation.tsx
+interface UserIntention {
+  passionsConcretes: string;     // Section 1
+  naturalTalents: string[];      // Section 2 (4 talents)
+  rejectionZone: string;         // Section 3
+  targetSector: string;          // Section 4
+  idealJobs: string[];           // Section 4 (2 métiers)
+  humanManifesto: string;        // Section 5
+}
 ```
 
 ### ResilienceSlider

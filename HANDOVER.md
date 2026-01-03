@@ -1,4 +1,4 @@
-# 🔄 HANDOVER - APEX Next v2
+# 🔄 HANDOVER - APEX Next v2.1
 
 > **Document de passation pour assurer la continuité du développement**
 > Dernière mise à jour : 3 janvier 2026
@@ -8,11 +8,11 @@
 ## 📍 État Actuel du Projet
 
 ### Résumé en une phrase
-**APEX Next est un outil de diagnostic stratégique en 8 étapes qui évalue la résilience professionnelle face à l'IA et génère un plan d'action personnalisé.**
+**APEX Next est un outil de diagnostic stratégique en 8 étapes qui évalue la résilience professionnelle face à l'IA et génère un plan d'action personnalisé avec synchronisation totale des données Audit + Portrait Humain.**
 
 ### Version actuelle
-- **Version** : 2.0.0
-- **Commit** : `7c298ea`
+- **Version** : 2.1.0
+- **Commit** : `8223b26`
 - **Repo** : https://github.com/gregjazzy/ApexNext
 
 ### Ce qui est TERMINÉ ✅
@@ -23,6 +23,10 @@
 5. **Lexique dynamique** adapté par persona
 6. **Radar Chart** résilience (5 dimensions)
 7. **Documentation** complète (README, ARCHITECTURE, CHANGELOG)
+8. **Export PDF** stratégique complet (jsPDF + autotable)
+9. **Portrait de Mutation** (Pivot) → Module complet avec 5 sections
+10. **Synchronisation Totale** Plan d'Action ← Audit + Portrait Humain
+11. **Séparation Phase 1/Phase 2** → Routes `/audit` et `/strategy`
 
 ### Ce qui est PRÉPARÉ (structure en place) 🔧
 1. **Analyse IA documents** → Endpoint `/api/analyze-job` avec mock
@@ -30,9 +34,8 @@
 
 ### Ce qui reste À FAIRE 📝
 1. **Intégration IA réelle** (OpenAI/Anthropic) pour `/api/analyze-job`
-2. **Export PDF** du diagnostic (placeholder dans Step8)
-3. **Pondération des scores** selon persona/objectif
-4. **Dashboard historique** des audits (optionnel)
+2. **Pondération des scores** selon persona/objectif
+3. **Dashboard historique** des audits (optionnel)
 
 ---
 
@@ -42,24 +45,27 @@
 ```
 Next.js 15 (App Router) + TypeScript + Tailwind CSS
 Zustand (state) + Framer Motion (animations) + Recharts (graphiques)
-NextAuth.js (auth) + next-intl (i18n)
+NextAuth.js (auth) + next-intl (i18n) + jsPDF (export PDF)
 ```
 
 ### Fichiers Critiques à Connaître
 
 | Fichier | Rôle | Lignes |
 |---------|------|--------|
-| `lib/store.ts` | Store Zustand central | ~650 |
+| `lib/store.ts` | Store Zustand central | ~2100 |
 | `lib/lexicon.ts` | Dictionnaire dynamique par persona | ~280 |
-| `components/AuditFlow.tsx` | Orchestrateur des 8 étapes | ~120 |
-| `components/steps/Step*.tsx` | Composants des étapes | ~200-350 chacun |
+| `lib/reportGenerator.ts` | Export PDF stratégique | ~500 |
+| `components/AuditFlow.tsx` | Orchestrateur Phase 1 | ~140 |
+| `components/StrategyFlow.tsx` | Orchestrateur Phase 2 | ~180 |
+| `components/PortraitMutation.tsx` | Module Portrait (Pivot) | ~350 |
+| `components/steps/Step*.tsx` | Composants des étapes | ~200-450 chacun |
 | `app/api/analyze-job/route.ts` | Endpoint IA (mock) | ~130 |
-| `messages/fr.json` + `en.json` | Traductions | ~250 chacun |
+| `messages/fr.json` + `en.json` | Traductions | ~350 chacun |
 
 ### Store Zustand - Structure Principale
 
 ```typescript
-// lib/store.ts - Clé localStorage: 'apex-audit-storage-v4'
+// lib/store.ts - Clé localStorage: 'apex-audit-storage-v6'
 
 interface AuditStore {
   currentStep: number;  // 1-8
@@ -70,12 +76,38 @@ interface AuditStore {
     jobTitle: string;
     industry: string;
     jobDescription: string;
+    yearsExperience: number;
   };
   
   tasks: Task[];           // Tâches avec 5 curseurs résilience
   talents: Talent[];       // 12 actifs, 5 sélectionnés max
   software: Software[];    // 3 outils max
   strategy: StrategyData;  // Phase 2 (généré automatiquement)
+  
+  // NOUVEAU: Portrait Humain (Parcours Pivot)
+  userIntention: {
+    passionsConcretes: string;     // Texte libre
+    naturalTalents: string[];      // 4 talents naturels
+    rejectionZone: string;         // Ce qui épuise l'utilisateur
+    targetSector: string;          // Secteur cible
+    idealJobs: string[];           // 2 métiers idéaux
+    humanManifesto: string;        // Vision de l'utilisateur
+  };
+}
+
+// NOUVEAU: RoadmapAction enrichie
+interface RoadmapAction {
+  id: string;
+  pillar: 'delegation' | 'reinforcement' | 'positioning' | 'disengagement' | 'oceanBleu' | 'landing';
+  title: string;
+  description: string;
+  priority: 'immediate' | 'short_term' | 'medium_term';
+  completed: boolean;
+  eracCategory?: 'eliminate' | 'reduce' | 'raise' | 'create';
+  kpi?: string;
+  resilienceScore?: number;    // NOUVEAU: Score 1-10
+  suggestedTool?: string;      // NOUVEAU: Outil concret
+  sourceData?: string;         // NOUVEAU: Source des données
 }
 ```
 
@@ -276,7 +308,8 @@ apex-next/
 │   ├── auth/
 │   │   ├── signin/page.tsx
 │   │   └── error/page.tsx
-│   ├── audit/page.tsx              ← PAGE PRINCIPALE
+│   ├── audit/page.tsx              ← PHASE 1 (Diagnostic)
+│   ├── strategy/page.tsx           ← PHASE 2 (Stratégie) ★ NOUVEAU
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
@@ -287,16 +320,21 @@ apex-next/
 │   │   ├── Step3Tasks.tsx          ← CONTIENT BOUTON "GÉNÉRER TÂCHES"
 │   │   ├── Step4Talents.tsx
 │   │   ├── Step5Software.tsx
-│   │   ├── Step6Verdict.tsx
+│   │   ├── Step6Verdict.tsx        ← REDIRIGE VERS /strategy
 │   │   ├── Step7Ikigai.tsx
 │   │   ├── Step8Roadmap.tsx        ← CONTIENT BOUTON "EXPORT PDF"
 │   │   └── index.ts
 │   ├── ui/
-│   └── AuditFlow.tsx               ← ORCHESTRATEUR
+│   ├── AuditFlow.tsx               ← ORCHESTRATEUR PHASE 1
+│   ├── StrategyFlow.tsx            ← ORCHESTRATEUR PHASE 2 ★ NOUVEAU
+│   └── PortraitMutation.tsx        ← MODULE PORTRAIT (PIVOT) ★ NOUVEAU
 ├── lib/
 │   ├── store.ts                    ← ZUSTAND STORE (CŒUR)
 │   ├── lexicon.ts                  ← DICTIONNAIRE DYNAMIQUE
+│   ├── reportGenerator.ts          ← EXPORT PDF ★ NOUVEAU
 │   └── utils.ts
+├── types/
+│   └── jspdf-autotable.d.ts        ← TYPES jsPDF ★ NOUVEAU
 ├── messages/
 │   ├── fr.json
 │   └── en.json
