@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Users, Zap, Shuffle, Compass } from 'lucide-react';
+import { User, Briefcase, Users, Zap, Shuffle, Compass, UserCog } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useAuditStore, Persona, Goal } from '@/lib/store';
@@ -51,29 +51,59 @@ export function Step1Matrix() {
     },
   ];
 
+  // Type pour les options de goal
+  type GoalOption = {
+    id: Goal;
+    title: string;
+    description: string;
+    icon: React.ReactNode;
+    accentColor: 'blue' | 'emerald' | 'violet';
+  };
+
   // Goals with dynamic titles AND descriptions based on persona
-  const getGoals = () => [
-    {
-      id: 'augmentation' as Goal,
-      title: persona 
-        ? getGoalTitle('augmentation', persona, locale)
-        : (l === 'fr' ? "Axe Augmentation" : "Augmentation Axis"),
-      description: persona 
-        ? getGoalDescription('augmentation', persona, locale)
-        : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
-      icon: <Zap className="w-6 h-6" />,
-    },
-    {
-      id: 'pivot' as Goal,
-      title: persona 
-        ? getGoalTitle('pivot', persona, locale)
-        : (l === 'fr' ? "Axe Pivot" : "Pivot Axis"),
-      description: persona 
-        ? getGoalDescription('pivot', persona, locale)
-        : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
-      icon: <Shuffle className="w-6 h-6" />,
-    },
-  ];
+  const getGoals = (): GoalOption[] => {
+    const baseGoals: GoalOption[] = [
+      {
+        id: 'augmentation',
+        title: persona 
+          ? getGoalTitle('augmentation', persona, locale)
+          : (l === 'fr' ? "Axe Augmentation" : "Augmentation Axis"),
+        description: persona 
+          ? getGoalDescription('augmentation', persona, locale)
+          : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
+        icon: <Zap className="w-6 h-6" />,
+        accentColor: 'blue',
+      },
+      {
+        id: 'pivot',
+        title: persona 
+          ? getGoalTitle('pivot', persona, locale)
+          : (l === 'fr' ? "Axe Pivot" : "Pivot Axis"),
+        description: persona 
+          ? getGoalDescription('pivot', persona, locale)
+          : (l === 'fr' ? "Sélectionnez d'abord votre profil" : "Select your profile first"),
+        icon: <Shuffle className="w-6 h-6" />,
+        accentColor: 'emerald',
+      },
+    ];
+
+    // Option Reclassement/PSE uniquement pour Leader/RH
+    if (persona === 'leader') {
+      baseGoals.push({
+        id: 'reclassement',
+        title: l === 'fr' 
+          ? "Cellule de Reclassement Stratégique" 
+          : "Strategic Outplacement Cell",
+        description: l === 'fr'
+          ? "Piloter un Plan de Reclassement (Mutation de Masse) — Audit de transition collective pour vos équipes."
+          : "Lead a Redeployment Plan (Mass Transition) — Collective transition audit for your teams.",
+        icon: <UserCog className="w-6 h-6" />,
+        accentColor: 'violet',
+      });
+    }
+
+    return baseGoals;
+  };
 
   return (
     <motion.div
@@ -145,7 +175,9 @@ export function Step1Matrix() {
               </span>
               {l === 'fr' ? 'Quel est votre objectif stratégique ?' : 'What is your strategic objective?'}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 gap-4 ${
+              persona === 'leader' ? 'md:grid-cols-3' : 'md:grid-cols-2'
+            }`}>
               {getGoals().map((g) => (
                 <SelectionCard
                   key={g.id}
@@ -154,7 +186,7 @@ export function Step1Matrix() {
                   icon={g.icon}
                   selected={goal === g.id}
                   onClick={() => setGoal(g.id)}
-                  accentColor={g.id === 'augmentation' ? 'blue' : 'emerald'}
+                  accentColor={g.accentColor}
                 />
               ))}
             </div>

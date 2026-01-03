@@ -20,7 +20,9 @@ import {
   LayoutGrid,
   ArrowRight,
   Info,
-  Star
+  Star,
+  Users,
+  Shield
 } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -97,6 +99,20 @@ const HUB_NODES: HubNode[] = [
   },
 ];
 
+// Node spécial pour le mode Reclassement/PSE (remplace Portrait)
+const COHORT_NODE: HubNode = {
+  id: 'cohort',
+  step: 2,
+  title: { fr: 'Tableau de Bord de Cohorte', en: 'Cohort Dashboard' },
+  subtitle: { fr: 'Cellule de Reclassement', en: 'Outplacement Cell' },
+  description: { fr: 'Suivi de la progression des portraits de mutation de vos équipes', en: 'Track your teams\' mutation portrait progress' },
+  icon: Users,
+  route: '/cohort',
+  color: 'violet',
+  gradientFrom: 'from-violet-500',
+  gradientTo: 'to-indigo-500',
+};
+
 // ===============================================
 // COMPOSANT PRINCIPAL
 // ===============================================
@@ -113,7 +129,8 @@ export function StrategyHub() {
     talents,
     getSelectedTalents,
     strategy,
-    userIntention
+    userIntention,
+    cohortData
   } = useAuditStore();
 
   const [isClient, setIsClient] = useState(false);
@@ -140,6 +157,7 @@ export function StrategyHub() {
     const hasPortrait = userIntention.isComplete;
     const hasStrategy = strategy.generatedAt !== null;
     const isPivot = context.goal === 'pivot';
+    const isReclassement = context.goal === 'reclassement';
 
     switch (nodeId) {
       case 'diagnostic':
@@ -151,9 +169,21 @@ export function StrategyHub() {
         // Si Pivot : afficher "Requis" tant que non complété
         return hasPortrait ? 'completed' : 'required';
       
+      case 'cohort':
+        // Mode Reclassement : Tableau de bord de cohorte
+        if (!hasDiagnostic) return 'locked';
+        const hasCompletedMembers = cohortData.stats.completedCount > 0;
+        const allMembersCompleted = cohortData.members.length > 0 && 
+          cohortData.stats.completedCount === cohortData.members.length;
+        if (allMembersCompleted) return 'completed';
+        if (hasCompletedMembers) return 'current';
+        return 'todo';
+      
       case 'strategy':
         if (!hasDiagnostic) return 'locked';
         if (isPivot && !hasPortrait) return 'locked';
+        // En mode reclassement, stratégie débloquée après ajout de membres
+        if (isReclassement && cohortData.members.length === 0) return 'locked';
         return hasStrategy ? 'completed' : 'todo';
       
       case 'roadmap':
@@ -215,16 +245,33 @@ export function StrategyHub() {
 
   const isAugmentation = context.goal === 'augmentation';
   const isPivot = context.goal === 'pivot';
+  const isReclassement = context.goal === 'reclassement';
   
-  // Filtrer les nodes selon le goal (Portrait uniquement pour Pivot)
-  const visibleNodes = HUB_NODES.filter(node => {
-    if (node.id === 'portrait' && !isPivot) return false;
-    return true;
-  });
+  // Filtrer et remplacer les nodes selon le goal
+  const visibleNodes = HUB_NODES
+    .filter(node => {
+      // Augmentation : pas de portrait
+      if (node.id === 'portrait' && isAugmentation) return false;
+      // Reclassement : pas de portrait (remplacé par cohort)
+      if (node.id === 'portrait' && isReclassement) return false;
+      return true;
+    })
+    .map(node => {
+      // Pour Reclassement, insérer le node Cohort après diagnostic
+      return node;
+    });
+  
+  // En mode Reclassement, ajouter le node Cohort après Diagnostic
+  if (isReclassement) {
+    const diagnosticIndex = visibleNodes.findIndex(n => n.id === 'diagnostic');
+    if (diagnosticIndex !== -1) {
+      visibleNodes.splice(diagnosticIndex + 1, 0, COHORT_NODE);
+    }
+  }
   
   const completedCount = visibleNodes.filter(n => getNodeStatus(n.id) === 'completed').length;
-  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot
-  const totalSteps = isPivot ? 4 : 3;
+  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot/Reclassement
+  const totalSteps = isAugmentation ? 3 : 4;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   // Labels personnalisés par persona
@@ -298,14 +345,18 @@ export function StrategyHub() {
                   flex items-center gap-2 px-3 py-1.5 rounded-full border
                   ${isAugmentation 
                     ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' 
-                    : 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400'
+                    : isReclassement
+                      ? 'bg-violet-500/20 border-violet-500/30 text-violet-400'
+                      : 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400'
                   }
                 `}>
-                  {isAugmentation ? <Zap className="w-4 h-4" /> : <Compass className="w-4 h-4" />}
+                  {isAugmentation ? <Zap className="w-4 h-4" /> : isReclassement ? <Shield className="w-4 h-4" /> : <Compass className="w-4 h-4" />}
                   <span className="text-sm font-medium">
                     {isAugmentation 
                       ? (l === 'fr' ? 'Augmentation' : 'Augmentation')
-                      : (l === 'fr' ? 'Pivot' : 'Pivot')
+                      : isReclassement
+                        ? (l === 'fr' ? 'Reclassement' : 'Outplacement')
+                        : (l === 'fr' ? 'Pivot' : 'Pivot')
                     }
                   </span>
                 </div>
@@ -505,10 +556,16 @@ export function StrategyHub() {
                   <span className="text-slate-500 block text-xs mb-1">
                     {l === 'fr' ? 'Objectif' : 'Goal'}
                   </span>
-                  <span className={`font-medium ${isAugmentation ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                  <span className={`font-medium ${
+                    isAugmentation ? 'text-emerald-400' : 
+                    isReclassement ? 'text-violet-400' : 
+                    'text-indigo-400'
+                  }`}>
                     {isAugmentation 
                       ? (l === 'fr' ? 'Augmentation' : 'Augmentation')
-                      : (l === 'fr' ? 'Pivot' : 'Pivot')
+                      : isReclassement
+                        ? (l === 'fr' ? 'Reclassement' : 'Outplacement')
+                        : (l === 'fr' ? 'Pivot' : 'Pivot')
                     }
                   </span>
                 </div>

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-type AccentColor = 'blue' | 'emerald' | 'amber' | 'rose';
+type AccentColor = 'blue' | 'emerald' | 'amber' | 'rose' | 'violet';
 
 interface SelectionCardProps {
   title: string;
@@ -59,6 +59,15 @@ const colorClasses: Record<AccentColor, {
     iconBg: 'bg-rose-500/20',
     iconText: 'text-rose-400',
     titleText: 'text-rose-100',
+  },
+  violet: {
+    bg: 'bg-violet-500/10',
+    border: 'border-violet-500',
+    ring: 'ring-violet-500/30',
+    checkBg: 'bg-violet-500',
+    iconBg: 'bg-violet-500/20',
+    iconText: 'text-violet-400',
+    titleText: 'text-violet-100',
   },
 };
 

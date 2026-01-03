@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 // Types
 export type Persona = 'salarie' | 'freelance' | 'leader' | null;
-export type Goal = 'augmentation' | 'pivot' | null;
+export type Goal = 'augmentation' | 'pivot' | 'reclassement' | null;
 export type Temporality = 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
 export type SkillLevel = 'debutant' | 'avance' | 'expert';
 
@@ -126,6 +126,47 @@ export interface ComputedKPIs {
   riskReductionScore: number;           // Score de réduction du risque (0-100)
   marketPositioningScore: number;       // Score de positionnement marché (0-100)
   transitionReadinessScore: number;     // Score de préparation à la transition (0-100)
+}
+
+// ===============================================
+// MODE RECLASSEMENT / PSE (Leader RH uniquement)
+// ===============================================
+// Cellule de reclassement stratégique - Audit de transition collective
+
+export interface CohortMember {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
+  currentRole: string;
+  invitedAt: number | null;
+  completedPortraitAt: number | null;
+  employabilityIndex: number | null;  // Indice de réemployabilité (0-100)
+  status: 'pending' | 'invited' | 'in_progress' | 'completed';
+}
+
+export interface CohortData {
+  // Configuration de la cohorte
+  cohortName: string;                    // Ex: "PSE Q1 2024 - Site Lyon"
+  targetCompletionDate: number | null;   // Date cible de fin
+  totalMembers: number;                  // Nombre total de collaborateurs
+  
+  // Membres de la cohorte
+  members: CohortMember[];
+  
+  // Statistiques agrégées
+  stats: {
+    invitedCount: number;
+    inProgressCount: number;
+    completedCount: number;
+    averageEmployabilityIndex: number;   // Indice moyen de réemployabilité
+    highRiskCount: number;               // Collaborateurs à risque élevé
+    readyForTransitionCount: number;     // Prêts pour transition immédiate
+  };
+  
+  // Métadonnées
+  createdAt: number | null;
+  lastUpdatedAt: number | null;
 }
 
 // ===============================================
@@ -294,7 +335,7 @@ export interface StrategyData {
   
   // Métadonnées
   generatedAt: number | null;
-  parcours: 'augmentation' | 'pivot' | null;
+  parcours: 'augmentation' | 'pivot' | 'reclassement' | null;
   
   // Scores agrégés
   capitalActif: number;
@@ -310,6 +351,7 @@ interface AuditStore {
   strategy: StrategyData;
   computedKPIs: ComputedKPIs;
   userIntention: UserIntention;  // Portrait de Mutation (Pivot uniquement)
+  cohortData: CohortData;        // Données de cohorte (Reclassement/PSE uniquement)
   
   // Actions - Navigation
   setStep: (step: number) => void;
@@ -338,6 +380,15 @@ interface AuditStore {
   setHorizonCible: (horizon: UserIntention['horizonCible']) => void;
   setManifesteHumain: (manifeste: string) => void;
   validateUserIntention: () => void;
+  
+  // Actions - Cohorte (Reclassement/PSE uniquement)
+  setCohortName: (name: string) => void;
+  setCohortTargetDate: (date: number) => void;
+  addCohortMember: (member: Omit<CohortMember, 'id' | 'invitedAt' | 'completedPortraitAt' | 'employabilityIndex' | 'status'>) => void;
+  updateCohortMember: (id: string, updates: Partial<CohortMember>) => void;
+  removeCohortMember: (id: string) => void;
+  inviteCohortMembers: (memberIds: string[]) => void;
+  updateCohortStats: () => void;
   
   // Actions - Tasks
   addTask: (name: string) => string;
@@ -1685,6 +1736,23 @@ const initialKPIs: ComputedKPIs = {
   transitionReadinessScore: 0,
 };
 
+const initialCohortData: CohortData = {
+  cohortName: '',
+  targetCompletionDate: null,
+  totalMembers: 0,
+  members: [],
+  stats: {
+    invitedCount: 0,
+    inProgressCount: 0,
+    completedCount: 0,
+    averageEmployabilityIndex: 0,
+    highRiskCount: 0,
+    readyForTransitionCount: 0,
+  },
+  createdAt: null,
+  lastUpdatedAt: null,
+};
+
 const initialIkigai: IkigaiStrategique = {
   engagementStrategique: 0,
   expertiseDistinctive: 0,
@@ -1730,6 +1798,7 @@ export const useAuditStore = create<AuditStore>()(
       strategy: initialStrategy,
       computedKPIs: initialKPIs,
       userIntention: initialUserIntention,
+      cohortData: initialCohortData,
 
       // Navigation (8 étapes)
       setStep: (step) => set({ currentStep: step }),
@@ -1805,6 +1874,85 @@ export const useAuditStore = create<AuditStore>()(
             ...state.userIntention,
             isComplete,
             completedAt: isComplete ? Date.now() : null
+          }
+        };
+      }),
+
+      // Cohorte (Reclassement/PSE)
+      setCohortName: (cohortName) => set((state) => ({
+        cohortData: { ...state.cohortData, cohortName, createdAt: state.cohortData.createdAt || Date.now() }
+      })),
+      setCohortTargetDate: (targetCompletionDate) => set((state) => ({
+        cohortData: { ...state.cohortData, targetCompletionDate }
+      })),
+      addCohortMember: (member) => set((state) => {
+        const newMember: CohortMember = {
+          id: generateId(),
+          ...member,
+          invitedAt: null,
+          completedPortraitAt: null,
+          employabilityIndex: null,
+          status: 'pending',
+        };
+        return {
+          cohortData: {
+            ...state.cohortData,
+            members: [...state.cohortData.members, newMember],
+            totalMembers: state.cohortData.members.length + 1,
+            lastUpdatedAt: Date.now(),
+          }
+        };
+      }),
+      updateCohortMember: (id, updates) => set((state) => ({
+        cohortData: {
+          ...state.cohortData,
+          members: state.cohortData.members.map(m => 
+            m.id === id ? { ...m, ...updates } : m
+          ),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      removeCohortMember: (id) => set((state) => ({
+        cohortData: {
+          ...state.cohortData,
+          members: state.cohortData.members.filter(m => m.id !== id),
+          totalMembers: state.cohortData.members.length - 1,
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      inviteCohortMembers: (memberIds) => set((state) => ({
+        cohortData: {
+          ...state.cohortData,
+          members: state.cohortData.members.map(m => 
+            memberIds.includes(m.id) ? { ...m, status: 'invited' as const, invitedAt: Date.now() } : m
+          ),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      updateCohortStats: () => set((state) => {
+        const members = state.cohortData.members;
+        const invitedCount = members.filter(m => m.status !== 'pending').length;
+        const inProgressCount = members.filter(m => m.status === 'in_progress').length;
+        const completedCount = members.filter(m => m.status === 'completed').length;
+        const completedWithIndex = members.filter(m => m.status === 'completed' && m.employabilityIndex !== null);
+        const averageEmployabilityIndex = completedWithIndex.length > 0
+          ? completedWithIndex.reduce((sum, m) => sum + (m.employabilityIndex || 0), 0) / completedWithIndex.length
+          : 0;
+        const highRiskCount = completedWithIndex.filter(m => (m.employabilityIndex || 0) < 40).length;
+        const readyForTransitionCount = completedWithIndex.filter(m => (m.employabilityIndex || 0) >= 70).length;
+        
+        return {
+          cohortData: {
+            ...state.cohortData,
+            stats: {
+              invitedCount,
+              inProgressCount,
+              completedCount,
+              averageEmployabilityIndex: Math.round(averageEmployabilityIndex),
+              highRiskCount,
+              readyForTransitionCount,
+            },
+            lastUpdatedAt: Date.now(),
           }
         };
       }),
@@ -2073,10 +2221,11 @@ export const useAuditStore = create<AuditStore>()(
         strategy: initialStrategy,
         computedKPIs: initialKPIs,
         userIntention: initialUserIntention,
+        cohortData: initialCohortData,
       }),
     }),
     {
-      name: 'apex-audit-storage-v6', // Version bump pour Portrait de Mutation
+      name: 'apex-audit-storage-v7', // Version bump pour Mode Reclassement/PSE
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
@@ -2085,6 +2234,7 @@ export const useAuditStore = create<AuditStore>()(
         software: state.software,
         strategy: state.strategy,
         userIntention: state.userIntention,
+        cohortData: state.cohortData,
       }),
     }
   )
