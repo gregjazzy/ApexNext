@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar, Rocket, Zap, Compass } from 'lucide-react';
+import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar, Rocket, Zap, Compass, LayoutGrid } from 'lucide-react';
 import { ResilienceRadar } from '@/components/ui/ResilienceRadar';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
@@ -486,6 +486,17 @@ export function Step6Verdict() {
             >
               <RefreshCw className="w-4 h-4" />
               {t('restartAudit')}
+            </motion.button>
+            
+            {/* Bouton Hub - Centre de Commandement */}
+            <motion.button
+              onClick={() => router.push('/hub')}
+              className="apex-button-outline flex items-center justify-center gap-2 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              {l === 'fr' ? 'Centre de Commandement' : 'Command Center'}
             </motion.button>
             
             <motion.button

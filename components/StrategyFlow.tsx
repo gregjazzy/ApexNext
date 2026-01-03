@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Rocket, ChevronLeft, Zap, Compass, ArrowLeft } from 'lucide-react';
+import { Rocket, ChevronLeft, Zap, Compass, ArrowLeft, LayoutGrid } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -138,6 +138,20 @@ export function StrategyFlow() {
           <div className="flex items-center justify-between">
             {/* Logo & Titre */}
             <div className="flex items-center gap-4">
+              {/* Bouton retour au Hub */}
+              <motion.button
+                onClick={() => router.push('/hub')}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 transition-colors text-indigo-400 hover:text-indigo-300"
+                whileHover={{ x: -2 }}
+                whileTap={{ scale: 0.98 }}
+                title={l === 'fr' ? 'Centre de Commandement' : 'Command Center'}
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span className="text-sm hidden sm:inline">
+                  {l === 'fr' ? 'Hub' : 'Hub'}
+                </span>
+              </motion.button>
+              
               {/* Bouton retour au diagnostic */}
               <motion.button
                 onClick={() => {
