@@ -99,32 +99,34 @@ const HUB_NODES: HubNode[] = [
   },
 ];
 
-// Node spécial pour le mode Reclassement/PSE (remplace Portrait)
+// Node Cohorte : Dashboard de progression (L'OFFRE) - Step 2 pour Leader
+// Affiche la progression de collecte des portraits + accès à la saisie
 const COHORT_NODE: HubNode = {
   id: 'cohort',
   step: 2,
-  title: { fr: 'Tableau de Bord de Cohorte', en: 'Cohort Dashboard' },
-  subtitle: { fr: 'Cellule de Reclassement', en: 'Outplacement Cell' },
-  description: { fr: 'Suivi de la progression des portraits de mutation de vos équipes', en: 'Track your teams\' mutation portrait progress' },
+  title: { fr: 'Portraits de la Cohorte', en: 'Cohort Portraits' },
+  subtitle: { fr: 'L\'Offre — Collecte des Profils', en: 'The Supply — Profile Collection' },
+  description: { fr: 'Progression des portraits de mutation : X% complétés. Gérez et suivez les profils de vos collaborateurs.', en: 'Mutation portrait progress: X% completed. Manage and track your team members\' profiles.' },
   icon: Users,
   route: '/cohort',
   color: 'violet',
   gradientFrom: 'from-violet-500',
-  gradientTo: 'to-indigo-500',
+  gradientTo: 'to-purple-500',
 };
 
-// Node spécial pour le mode GPEC (Leader + Pivot)
+// Node GPEC : Référentiel Cible (LA DEMANDE) - Step 1 pour Leader
+// Doit être configuré EN PREMIER avant la collecte des portraits
 const GPEC_NODE: HubNode = {
   id: 'gpec',
-  step: 2,
-  title: { fr: 'Exigences Stratégiques', en: 'Strategic Requirements' },
-  subtitle: { fr: 'Métiers de Demain', en: 'Jobs of Tomorrow' },
-  description: { fr: 'Définissez les postes cibles et compétences clés de l\'organisation', en: 'Define target positions and key competencies for your organization' },
+  step: 1,
+  title: { fr: 'Référentiel Cible', en: 'Target Framework' },
+  subtitle: { fr: 'La Demande — Postes de Demain', en: 'The Demand — Jobs of Tomorrow' },
+  description: { fr: 'Définissez les postes cibles avec leurs 3 compétences clés (Haptique, Relationnel, Technique)', en: 'Define target positions with their 3 key competencies (Haptic, Relational, Technical)' },
   icon: Target,
   route: '/gpec',
-  color: 'emerald',
-  gradientFrom: 'from-emerald-500',
-  gradientTo: 'to-teal-500',
+  color: 'teal',
+  gradientFrom: 'from-teal-500',
+  gradientTo: 'to-cyan-500',
 };
 
 // ===============================================
@@ -173,39 +175,61 @@ export function StrategyHub() {
     const hasStrategy = strategy.generatedAt !== null;
     const isPivot = context.goal === 'pivot';
     const isReclassement = context.goal === 'reclassement';
+    const isLeader = context.persona === 'leader';
+    const isGPECMode = isLeader && (isPivot || isReclassement);
+    
+    // Vérifications spécifiques GPEC
+    const hasGPECConfigured = enterpriseTargets.isConfigured;
+    const hasCohortMembers = cohortData.members.length > 0;
+    const hasCompletedMembers = cohortData.stats.completedCount > 0;
+    const allMembersCompleted = hasCohortMembers && 
+      cohortData.stats.completedCount === cohortData.members.length;
 
     switch (nodeId) {
-      case 'diagnostic':
-        return hasDiagnostic ? 'completed' : 'todo';
-      
-      case 'portrait':
-        if (!hasDiagnostic) return 'locked';
-        if (!isPivot) return 'optional';
-        // Si Pivot : afficher "Requis" tant que non complété
-        return hasPortrait ? 'completed' : 'required';
-      
-      case 'cohort':
-        // Mode Reclassement : Tableau de bord de cohorte
-        if (!hasDiagnostic) return 'locked';
-        const hasCompletedMembers = cohortData.stats.completedCount > 0;
-        const allMembersCompleted = cohortData.members.length > 0 && 
-          cohortData.stats.completedCount === cohortData.members.length;
-        if (allMembersCompleted) return 'completed';
-        if (hasCompletedMembers) return 'current';
-        return 'todo';
+      // ===============================================
+      // FLUX GPEC : GPEC → Portrait/Cohorte → Strategy → Roadmap
+      // ===============================================
       
       case 'gpec':
-        // Mode GPEC : Exigences stratégiques entreprise
-        if (!hasDiagnostic) return 'locked';
-        if (enterpriseTargets.isConfigured) return 'completed';
+        // Step 1 en mode GPEC : toujours accessible
+        if (hasGPECConfigured) return 'completed';
         if (enterpriseTargets.futureJobs.length > 0) return 'current';
         return 'todo';
       
+      case 'cohort':
+        // Step 2 en mode PSE : requiert GPEC configuré
+        if (isGPECMode && !hasGPECConfigured) return 'locked';
+        if (allMembersCompleted) return 'completed';
+        if (hasCompletedMembers) return 'current';
+        if (hasCohortMembers) return 'todo';
+        return 'todo';
+      
+      case 'portrait':
+        // GPEC Mode : requiert GPEC configuré
+        if (isGPECMode && !hasGPECConfigured) return 'locked';
+        // Standard Mode : requiert Diagnostic
+        if (!isGPECMode && !hasDiagnostic) return 'locked';
+        if (!isPivot && !isGPECMode) return 'optional';
+        return hasPortrait ? 'completed' : 'required';
+      
+      // ===============================================
+      // FLUX STANDARD : Diagnostic → Portrait → Strategy → Roadmap
+      // ===============================================
+      
+      case 'diagnostic':
+        return hasDiagnostic ? 'completed' : 'todo';
+      
       case 'strategy':
+        // GPEC Mode : requiert GPEC + Portrait/Cohorte
+        if (isGPECMode) {
+          if (!hasGPECConfigured) return 'locked';
+          if (isReclassement && !hasCohortMembers) return 'locked';
+          if (isPivot && !hasPortrait) return 'locked';
+          return hasStrategy ? 'completed' : 'todo';
+        }
+        // Standard Mode : requiert Diagnostic (+ Portrait si Pivot)
         if (!hasDiagnostic) return 'locked';
         if (isPivot && !hasPortrait) return 'locked';
-        // En mode reclassement, stratégie débloquée après ajout de membres
-        if (isReclassement && cohortData.members.length === 0) return 'locked';
         return hasStrategy ? 'completed' : 'todo';
       
       case 'roadmap':
@@ -268,42 +292,54 @@ export function StrategyHub() {
   const isAugmentation = context.goal === 'augmentation';
   const isPivot = context.goal === 'pivot';
   const isReclassement = context.goal === 'reclassement';
+  const isLeader = context.persona === 'leader';
   
-  // Filtrer et remplacer les nodes selon le goal
-  const visibleNodes = HUB_NODES
-    .filter(node => {
-      // Augmentation : pas de portrait
-      if (node.id === 'portrait' && isAugmentation) return false;
-      // Reclassement : pas de portrait (remplacé par cohort)
-      if (node.id === 'portrait' && isReclassement) return false;
-      return true;
-    })
-    .map(node => {
-      // Pour Reclassement, insérer le node Cohort après diagnostic
-      return node;
-    });
+  // Mode GPEC = Leader + (Pivot ou Reclassement)
+  const isGPECMode = isLeader && (isPivot || isReclassement);
   
-  // En mode Reclassement, ajouter le node Cohort ET GPEC après Diagnostic
-  if (isReclassement) {
-    const diagnosticIndex = visibleNodes.findIndex(n => n.id === 'diagnostic');
-    if (diagnosticIndex !== -1) {
-      // Ajouter Cohort puis GPEC après Diagnostic
-      visibleNodes.splice(diagnosticIndex + 1, 0, COHORT_NODE, GPEC_NODE);
-    }
-  }
+  // ===============================================
+  // CONSTRUCTION DES NODES VISIBLES
+  // ===============================================
+  // 
+  // FLUX STANDARD (Salarié/Freelance) :
+  //   1. Diagnostic → 2. Portrait → 3. Arbitrage → 4. Roadmap
+  //
+  // FLUX GPEC (Leader + Pivot/Reclassement) :
+  //   1. Référentiel Cible (DEMANDE) → 2. Portrait/Cohorte (OFFRE) → 3. Arbitrage (MATCHING) → 4. Roadmap
+  //
+  // ===============================================
   
-  // En mode Leader + Pivot (non reclassement), ajouter le node Exigences Stratégiques après Portrait
-  const isGPEC = isPivot && context.persona === 'leader' && !isReclassement;
-  if (isGPEC) {
-    const portraitIndex = visibleNodes.findIndex(n => n.id === 'portrait');
-    if (portraitIndex !== -1) {
-      visibleNodes.splice(portraitIndex + 1, 0, GPEC_NODE);
-    }
+  let visibleNodes: HubNode[] = [];
+  
+  if (isGPECMode) {
+    // FLUX GPEC : Référentiel → Portrait/Cohorte → Arbitrage → Roadmap
+    visibleNodes = [
+      { ...GPEC_NODE, step: 1 },  // Step 1 : LA DEMANDE
+      isReclassement 
+        ? { ...COHORT_NODE, step: 2 }  // Step 2 : L'OFFRE (Dashboard Cohorte pour PSE)
+        : { ...HUB_NODES.find(n => n.id === 'portrait')!, step: 2 },  // Step 2 : L'OFFRE (Portrait pour GPEC)
+      { ...HUB_NODES.find(n => n.id === 'strategy')!, step: 3 },  // Step 3 : MATCHING
+      { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 4 },   // Step 4 : Plan de Reskilling
+    ];
+  } else if (isAugmentation) {
+    // FLUX AUGMENTATION : Diagnostic → Arbitrage → Roadmap (pas de Portrait)
+    visibleNodes = [
+      { ...HUB_NODES.find(n => n.id === 'diagnostic')!, step: 1 },
+      { ...HUB_NODES.find(n => n.id === 'strategy')!, step: 2 },
+      { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 3 },
+    ];
+  } else {
+    // FLUX STANDARD (Pivot individuel) : Diagnostic → Portrait → Arbitrage → Roadmap
+    visibleNodes = [
+      { ...HUB_NODES.find(n => n.id === 'diagnostic')!, step: 1 },
+      { ...HUB_NODES.find(n => n.id === 'portrait')!, step: 2 },
+      { ...HUB_NODES.find(n => n.id === 'strategy')!, step: 3 },
+      { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 4 },
+    ];
   }
   
   const completedCount = visibleNodes.filter(n => getNodeStatus(n.id) === 'completed').length;
-  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot, 5 pour GPEC (leader+pivot), 5 pour Reclassement
-  const totalSteps = isAugmentation ? 3 : (isReclassement || isGPEC) ? 5 : 4;
+  const totalSteps = visibleNodes.length;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   // Labels personnalisés par persona
