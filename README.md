@@ -1,10 +1,10 @@
-# APEX Next v2.3
+# APEX Next v2.4
 
 > **GPS de la Mutation Professionnelle face à l'IA**
 
 APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé. En mode GPEC, il devient un outil de **planification stratégique RH** avec matching collaborateurs × postes cibles.
 
-![Version](https://img.shields.io/badge/version-2.3-blue)
+![Version](https://img.shields.io/badge/version-2.4-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -15,17 +15,24 @@ APEX Next est un outil de diagnostic stratégique qui évalue la résilience pro
 
 APEX Next analyse votre profil professionnel à travers **8 étapes** pour identifier vos vulnérabilités et opportunités face à la transformation digitale :
 
-### Centre de Commandement (StrategyHub) ★
-Après la sélection du Persona et de l'Objectif, l'utilisateur accède au **Centre de Commandement** — une cartographie visuelle des étapes à compléter :
+### Centre de Commandement (StrategyHub) ★★
+Après la sélection du Persona et de l'Objectif, l'utilisateur accède au **Centre de Commandement** — une cartographie visuelle des étapes à compléter.
 
-| Étape | Nom | Status |
-|-------|-----|--------|
-| 1 | Diagnostic de Vulnérabilité | Obligatoire |
-| 2 | Portrait de Mutation | Requis (Pivot) / Absent (Augmentation) |
-| 2b | Tableau de Bord de Cohorte | Mode Reclassement uniquement ★ |
-| 2c | Exigences Stratégiques (GPEC) | Mode Reclassement uniquement ★ |
-| 3 | Arbitrage Stratégique (Ikigai) | Obligatoire |
-| 4 | Roadmap Opérationnelle | Obligatoire |
+#### Flux Standard (Salarié / Freelance)
+| Step | Nom | Description |
+|------|-----|-------------|
+| 1 | Diagnostic de Vulnérabilité | Audit des tâches, talents et outils |
+| 2 | Portrait de Mutation | Passions, talents innés, aspirations (Pivot uniquement) |
+| 3 | Arbitrage Stratégique | Matrice ERAC & Ikigai |
+| 4 | Roadmap Opérationnelle | Plan d'action personnalisé |
+
+#### Flux GPEC (Leader + Pivot/Reclassement) ★★
+| Step | Nom | Description |
+|------|-----|-------------|
+| 1 | **Référentiel Cible (DEMANDE)** | Définir les Postes de Demain + 3 compétences clés |
+| 2 | **Portrait / Cohorte (OFFRE)** | Collecte des profils collaborateurs |
+| 3 | **Arbitrage (MATCHING)** | Matrice de matching : qui pour quel poste ? |
+| 4 | **Roadmap (RESKILLING)** | Plan de formation avec gaps de compétences |
 
 ### Phase 1 : Diagnostic (Étapes 1-6)
 1. **La Matrice** - Sélection du profil et objectif
@@ -48,7 +55,46 @@ Après la sélection du Persona et de l'Objectif, l'utilisateur accède au **Cen
 
 ---
 
-## 🆕 Nouveautés v2.2
+## 🆕 Nouveautés v2.4
+
+### Restructuration du Flux GPEC ★★★
+Le flux GPEC a été entièrement restructuré selon la logique métier **DEMANDE → OFFRE → MATCHING** :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FLUX GPEC (Leader)                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Step 1: RÉFÉRENTIEL CIBLE (LA DEMANDE)                         │
+│  └── Le RH définit les Postes de Demain                         │
+│      └── 3 compétences clés : Haptique, Relationnel, Technique  │
+│                              ↓                                   │
+│  Step 2: PORTRAIT / COHORTE (L'OFFRE)                           │
+│  └── Collecte des profils des collaborateurs                    │
+│      └── Dashboard progression : "X% portraits complétés"       │
+│                              ↓                                   │
+│  Step 3: ARBITRAGE (LE MATCHING)                                │
+│  └── Exécution de calculateEmployeeMatches()                    │
+│      └── Matrice : "Qui est prêt pour quel métier ?"           │
+│                              ↓                                   │
+│  Step 4: ROADMAP (PLAN DE RESKILLING)                           │
+│  └── Gap de compétences + heures de formation                   │
+│      └── Plan en 3 phases : Évaluation → Formation → Transition │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Logique des Dépendances ★★★
+| Step | Prérequis | Déverrouillé par |
+|------|-----------|------------------|
+| 1. Référentiel | Aucun | Toujours accessible |
+| 2. Portrait | Step 1 configuré | `enterpriseTargets.isConfigured` |
+| 3. Arbitrage | Step 2 complété | Portrait ou membres cohorte |
+| 4. Roadmap | Step 3 complété | `strategy.generatedAt` |
+
+---
+
+## 🆕 Nouveautés v2.2-2.3
 
 ### Mode Reclassement / PSE (Leader RH) ★
 Un nouveau parcours dédié aux RH pilotant un plan de reclassement collectif :

@@ -1,9 +1,9 @@
-# HANDOVER — APEX Next v2.3
+# HANDOVER — APEX Next v2.4
 
 > Document de passation technique pour reprise du projet
 > 
 > **Date** : Janvier 2026
-> **Version** : 2.3
+> **Version** : 2.4
 > **Repo** : https://github.com/gregjazzy/ApexNext
 
 ---
@@ -41,6 +41,38 @@ APEX Next est un **GPS de la Mutation Professionnelle** qui aide les utilisateur
 | **Augmentation** | Optimiser le poste actuel | Focus efficience, délégation technologique |
 | **Pivot** | Changer de métier/secteur | Portrait de Mutation, Métiers Refuges |
 | **Reclassement** | PSE / Mutation de masse (RH) | GPEC, Cohorte, Matching collaborateurs |
+
+### Flux GPEC (v2.4) ★★★
+
+Le flux GPEC a été restructuré selon la logique métier **DEMANDE → OFFRE → MATCHING** :
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ Step 1: RÉFÉRENTIEL CIBLE (LA DEMANDE)                          │
+│         → Le RH définit les Postes de Demain                    │
+│         → 3 compétences clés par poste (Haptique, Rel., Tech.)  │
+├─────────────────────────────────────────────────────────────────┤
+│ Step 2: PORTRAIT / COHORTE (L'OFFRE)                            │
+│         → Collecte des profils des collaborateurs               │
+│         → Dashboard progression : "X% portraits complétés"      │
+├─────────────────────────────────────────────────────────────────┤
+│ Step 3: ARBITRAGE (LE MATCHING)                                 │
+│         → Exécution de calculateEmployeeMatches()               │
+│         → Matrice : "Qui est prêt pour quel métier de demain ?" │
+├─────────────────────────────────────────────────────────────────┤
+│ Step 4: ROADMAP (PLAN DE RESKILLING)                            │
+│         → Gap de compétences + heures de formation              │
+│         → Plan en 3 phases : Évaluation → Formation → Transition│
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Logique des dépendances :**
+| Step | Déverrouillé par |
+|------|------------------|
+| 1. Référentiel | Toujours accessible (Step 1) |
+| 2. Portrait/Cohorte | `enterpriseTargets.isConfigured === true` |
+| 3. Arbitrage | Portrait complété ou membres cohorte ajoutés |
+| 4. Roadmap | `strategy.generatedAt !== null` |
 
 ---
 
@@ -319,22 +351,31 @@ interface HubNode {
   gradientTo: string;
 }
 
-// Nœuds conditionnels selon le parcours
-const visibleNodes = useMemo(() => {
-  let nodes = [...HUB_NODES];
-  
-  if (isReclassement) {
-    // Retire Portrait, ajoute Cohort + GPEC
-    nodes = nodes.filter(n => n.id !== 'portrait');
-    nodes.splice(1, 0, COHORT_NODE, ENTERPRISE_TARGET_NODE);
-  } else if (isAugmentation) {
-    // Retire Portrait complètement
-    nodes = nodes.filter(n => n.id !== 'portrait');
-  }
-  
-  return nodes;
-}, [isReclassement, isAugmentation]);
+// Construction des nodes selon le mode (v2.4)
+let visibleNodes: HubNode[] = [];
+
+if (isGPECMode) {
+  // FLUX GPEC : Référentiel → Portrait/Cohorte → Arbitrage → Roadmap
+  visibleNodes = [
+    { ...GPEC_NODE, step: 1 },     // Step 1 : LA DEMANDE
+    isReclassement 
+      ? { ...COHORT_NODE, step: 2 }   // Step 2 : L'OFFRE (Dashboard Cohorte)
+      : { ...portraitNode, step: 2 }, // Step 2 : L'OFFRE (Portrait)
+    { ...strategyNode, step: 3 },  // Step 3 : MATCHING
+    { ...roadmapNode, step: 4 },   // Step 4 : Plan de Reskilling
+  ];
+} else if (isAugmentation) {
+  // FLUX AUGMENTATION : Diagnostic → Arbitrage → Roadmap
+  visibleNodes = [diagnosticNode, strategyNode, roadmapNode];
+} else {
+  // FLUX STANDARD : Diagnostic → Portrait → Arbitrage → Roadmap
+  visibleNodes = [diagnosticNode, portraitNode, strategyNode, roadmapNode];
+}
 ```
+
+**Nodes spéciaux GPEC :**
+- `GPEC_NODE` : "Référentiel Cible" — Définir Postes de Demain
+- `COHORT_NODE` : "Portraits de la Cohorte" — Dashboard progression
 
 ### 5.2 Step1Matrix.tsx (Matrice Persona/Objectif)
 
