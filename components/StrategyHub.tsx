@@ -213,12 +213,19 @@ export function StrategyHub() {
   // CALCUL DES STATISTIQUES
   // ===============================================
 
-  const completedCount = HUB_NODES.filter(n => getNodeStatus(n.id) === 'completed').length;
-  // Toujours afficher 4 étapes (reflète les 4 cartes visibles)
-  const totalSteps = 4;
-  const progressPercent = Math.round((completedCount / totalSteps) * 100);
-
   const isAugmentation = context.goal === 'augmentation';
+  const isPivot = context.goal === 'pivot';
+  
+  // Filtrer les nodes selon le goal (Portrait uniquement pour Pivot)
+  const visibleNodes = HUB_NODES.filter(node => {
+    if (node.id === 'portrait' && !isPivot) return false;
+    return true;
+  });
+  
+  const completedCount = visibleNodes.filter(n => getNodeStatus(n.id) === 'completed').length;
+  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot
+  const totalSteps = isPivot ? 4 : 3;
+  const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   // Labels personnalisés par persona
   const personaLabels: Record<string, { fr: string; en: string }> = {
@@ -359,7 +366,15 @@ export function StrategyHub() {
 
           {/* Nodes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {HUB_NODES.map((node, index) => {
+            {HUB_NODES
+              // Filtrer : masquer "Portrait de Mutation" si goal !== 'pivot'
+              .filter(node => {
+                if (node.id === 'portrait' && context.goal !== 'pivot') {
+                  return false;
+                }
+                return true;
+              })
+              .map((node, index) => {
               const status = getNodeStatus(node.id);
               const badge = getStatusBadge(status);
               const isLocked = status === 'locked';
@@ -424,7 +439,7 @@ export function StrategyHub() {
                             text-xs font-medium px-2 py-0.5 rounded
                             ${isLocked ? 'bg-slate-800/50 text-slate-500' : 'bg-slate-800 text-slate-400'}
                           `}>
-                            {l === 'fr' ? 'Étape' : 'Step'} {node.step}
+                            {l === 'fr' ? 'Étape' : 'Step'} {index + 1}
                           </span>
                         </div>
                         <h3 className={`text-xl font-semibold ${isLocked ? 'text-slate-500' : 'text-white'}`}>
