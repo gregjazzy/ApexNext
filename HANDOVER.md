@@ -11,8 +11,8 @@
 **APEX Next est un outil de diagnostic stratégique en 8 étapes qui évalue la résilience professionnelle face à l'IA et génère un plan d'action personnalisé avec synchronisation totale des données Audit + Portrait Humain.**
 
 ### Version actuelle
-- **Version** : 2.1.0
-- **Commit** : `8223b26`
+- **Version** : 2.2.0
+- **Commit** : `b4dd8ff`
 - **Repo** : https://github.com/gregjazzy/ApexNext
 
 ### Ce qui est TERMINÉ ✅
@@ -27,6 +27,7 @@
 9. **Portrait de Mutation** (Pivot) → Module complet avec 5 sections
 10. **Synchronisation Totale** Plan d'Action ← Audit + Portrait Humain
 11. **Séparation Phase 1/Phase 2** → Routes `/audit` et `/strategy`
+12. **Centre de Commandement (Hub)** → Route `/hub` avec 4 nœuds orchestrés
 
 ### Ce qui est PRÉPARÉ (structure en place) 🔧
 1. **Analyse IA documents** → Endpoint `/api/analyze-job` avec mock
@@ -309,7 +310,9 @@ apex-next/
 │   │   ├── signin/page.tsx
 │   │   └── error/page.tsx
 │   ├── audit/page.tsx              ← PHASE 1 (Diagnostic)
-│   ├── strategy/page.tsx           ← PHASE 2 (Stratégie) ★ NOUVEAU
+│   ├── strategy/page.tsx           ← PHASE 2 (Stratégie)
+│   ├── hub/page.tsx                ← CENTRE DE COMMANDEMENT ★★ NOUVEAU
+│   ├── portrait/page.tsx           ← PORTRAIT AUTONOME ★★ NOUVEAU
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
@@ -320,21 +323,23 @@ apex-next/
 │   │   ├── Step3Tasks.tsx          ← CONTIENT BOUTON "GÉNÉRER TÂCHES"
 │   │   ├── Step4Talents.tsx
 │   │   ├── Step5Software.tsx
-│   │   ├── Step6Verdict.tsx        ← REDIRIGE VERS /strategy
+│   │   ├── Step6Verdict.tsx        ← REDIRIGE VERS /strategy + BOUTON HUB
 │   │   ├── Step7Ikigai.tsx
 │   │   ├── Step8Roadmap.tsx        ← CONTIENT BOUTON "EXPORT PDF"
 │   │   └── index.ts
 │   ├── ui/
+│   │   └── BackToHub.tsx           ← BOUTON RETOUR AU HUB ★★ NOUVEAU
 │   ├── AuditFlow.tsx               ← ORCHESTRATEUR PHASE 1
-│   ├── StrategyFlow.tsx            ← ORCHESTRATEUR PHASE 2 ★ NOUVEAU
-│   └── PortraitMutation.tsx        ← MODULE PORTRAIT (PIVOT) ★ NOUVEAU
+│   ├── StrategyFlow.tsx            ← ORCHESTRATEUR PHASE 2 + BOUTON HUB
+│   ├── StrategyHub.tsx             ← CENTRE DE COMMANDEMENT ★★ NOUVEAU
+│   └── PortraitMutation.tsx        ← MODULE PORTRAIT (PIVOT)
 ├── lib/
 │   ├── store.ts                    ← ZUSTAND STORE (CŒUR)
 │   ├── lexicon.ts                  ← DICTIONNAIRE DYNAMIQUE
-│   ├── reportGenerator.ts          ← EXPORT PDF ★ NOUVEAU
+│   ├── reportGenerator.ts          ← EXPORT PDF
 │   └── utils.ts
 ├── types/
-│   └── jspdf-autotable.d.ts        ← TYPES jsPDF ★ NOUVEAU
+│   └── jspdf-autotable.d.ts        ← TYPES jsPDF
 ├── messages/
 │   ├── fr.json
 │   └── en.json
@@ -344,6 +349,8 @@ apex-next/
 ├── CHANGELOG.md
 └── HANDOVER.md                     ← CE FICHIER
 ```
+
+★★ = Nouveaux fichiers v2.2
 
 ---
 

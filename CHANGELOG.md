@@ -7,6 +7,25 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ---
 
+## [2.2.0] - 2026-01-03
+
+### ✨ Ajouté
+
+#### Centre de Commandement (StrategyHub)
+- **Nouveau composant `StrategyHub.tsx`** : Vue centrale "Centre de Commandement" avec grille technique Slate 950
+- **4 Nœuds de navigation** :
+  1. Diagnostic de Vulnérabilité (Étape 1 - Obligatoire)
+  2. Portrait de Mutation (Étape 2 - Obligatoire Pivot / Optionnel Augmentation)
+  3. Arbitrage Stratégique (Étape 3 - Matrice ERAC & Ikigai)
+  4. Roadmap Opérationnelle (Étape 4 - Plan d'Action)
+- **Badges d'état** : Terminé, À faire, Verrouillé, Optionnel
+- **Barre de progression** globale
+- **Nouvelles routes** : `/hub` (Centre de Commandement), `/portrait` (Portrait autonome)
+- **Composant `BackToHub.tsx`** : Bouton réutilisable avec variantes (default, compact, footer)
+- **Boutons "Centre de Commandement"** ajoutés dans Step6Verdict et StrategyFlow
+
+---
+
 ## [2.1.0] - 2026-01-03
 
 ### ✨ Ajouté
