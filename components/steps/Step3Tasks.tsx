@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Clock, Trash2, ChevronDown, ChevronUp, Cpu, Users, Lightbulb, Brain, Cog, Timer } from 'lucide-react';
+import { Plus, Clock, Trash2, ChevronDown, ChevronUp, Cpu, Users, Lightbulb, Brain, Cog, Timer, Sparkles, Loader2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
@@ -15,10 +15,12 @@ const TEMPORALITIES: Temporality[] = ['quotidien', 'hebdomadaire', 'mensuel', 's
 export function Step3Tasks() {
   const t = useTranslations('step3');
   const locale = useLocale();
-  const { context, tasks, addTask, removeTask, updateTask, nextStep, prevStep } = useAuditStore();
+  const { context, tasks, addTask, addTasksFromAI, clearTasks, removeTask, updateTask, nextStep, prevStep } = useAuditStore();
   
   const [newTaskName, setNewTaskName] = useState('');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
 
   const canProceed = tasks.length > 0;
   const persona = context.persona || 'salarie';
@@ -73,6 +75,51 @@ export function Step3Tasks() {
     return tasks.reduce((acc, task) => acc + (task.hoursPerWeek || 4), 0);
   };
 
+  // Analyse IA du document
+  const handleAnalyzeWithAI = async () => {
+    if (!context.jobDescription && !context.jobTitle) {
+      setAnalyzeError(l === 'fr' 
+        ? 'Retournez à l\'étape 2 pour ajouter une description de poste.' 
+        : 'Go back to step 2 to add a job description.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setAnalyzeError(null);
+
+    try {
+      const response = await fetch('/api/analyze-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobDescription: context.jobDescription,
+          jobTitle: context.jobTitle,
+          industry: context.industry,
+          persona: context.persona,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.tasks.length > 0) {
+        // Optionnel: effacer les tâches existantes avant d'ajouter
+        // clearTasks();
+        addTasksFromAI(data.tasks);
+        // Déplier la première tâche ajoutée
+        if (data.tasks.length > 0) {
+          // Les nouvelles tâches seront en haut (triées par createdAt desc)
+        }
+      } else {
+        setAnalyzeError(data.error || (l === 'fr' ? 'Aucune tâche identifiée.' : 'No tasks identified.'));
+      }
+    } catch (error) {
+      console.error('Error analyzing job:', error);
+      setAnalyzeError(l === 'fr' ? 'Erreur de connexion. Réessayez.' : 'Connection error. Please retry.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -106,6 +153,64 @@ export function Step3Tasks() {
           {getLexiconValue(tasksLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
+
+      {/* AI Analysis Button */}
+      {context.jobDescription && (
+        <motion.div
+          className="apex-card p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-medium text-slate-200">
+                  {l === 'fr' ? 'Analyse IA disponible' : 'AI Analysis available'}
+                </h3>
+                <p className="text-sm text-slate-400">
+                  {l === 'fr' 
+                    ? 'Générez automatiquement vos tâches depuis votre fiche de poste' 
+                    : 'Automatically generate tasks from your job description'}
+                </p>
+              </div>
+            </div>
+            
+            <motion.button
+              onClick={handleAnalyzeWithAI}
+              disabled={isAnalyzing}
+              className="apex-button flex items-center gap-2 whitespace-nowrap bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {l === 'fr' ? 'Analyse...' : 'Analyzing...'}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  {l === 'fr' ? 'Générer les tâches' : 'Generate tasks'}
+                </>
+              )}
+            </motion.button>
+          </div>
+          
+          {analyzeError && (
+            <motion.p 
+              className="mt-3 text-sm text-rose-400"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {analyzeError}
+            </motion.p>
+          )}
+        </motion.div>
+      )}
 
       {/* Add Task Input */}
       <motion.div

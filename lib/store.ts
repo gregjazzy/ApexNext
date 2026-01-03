@@ -79,8 +79,15 @@ interface AuditStore {
   
   // Actions - Tasks
   addTask: (name: string) => string; // Retourne l'ID de la nouvelle tâche
+  addTasksFromAI: (tasks: Array<{
+    name: string;
+    hoursPerWeek: number;
+    temporalite: Temporality;
+    resilience: ResilienceScores;
+  }>) => void; // Bulk add depuis l'IA
   updateTask: (id: string, task: Partial<Task>) => void;
   removeTask: (id: string) => void;
+  clearTasks: () => void;
   
   // Actions - Talents
   toggleTalent: (id: string) => void;
@@ -262,6 +269,20 @@ export const useAuditStore = create<AuditStore>()(
       removeTask: (id) => set((state) => ({
         tasks: state.tasks.filter((t) => t.id !== id)
       })),
+      addTasksFromAI: (aiTasks) => set((state) => ({
+        tasks: [
+          ...state.tasks,
+          ...aiTasks.map((t) => ({
+            id: generateId(),
+            name: t.name,
+            temporalite: t.temporalite,
+            hoursPerWeek: t.hoursPerWeek,
+            resilience: t.resilience,
+            createdAt: Date.now(),
+          }))
+        ]
+      })),
+      clearTasks: () => set({ tasks: [] }),
 
       // Talents - 12 Actifs Stratégiques
       initializeTalents: () => set({

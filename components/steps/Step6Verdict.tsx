@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft } from 'lucide-react';
+import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar } from 'lucide-react';
+import { ResilienceRadar } from '@/components/ui/ResilienceRadar';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
 import { ScoreRing } from '@/components/ui/ScoreRing';
@@ -252,48 +253,67 @@ export function Step6Verdict() {
         </motion.div>
       </div>
 
-      {/* 5 Dimensions Resilience Breakdown */}
+      {/* 5 Dimensions Resilience Breakdown with Radar */}
       <motion.div
         className="apex-card p-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
       >
-        <h3 className="text-lg font-medium text-slate-200 mb-6">{t('resilienceBreakdown')}</h3>
+        <div className="flex items-center gap-2 mb-6">
+          <Radar className="w-5 h-5 text-blue-400" />
+          <h3 className="text-lg font-medium text-slate-200">{t('resilienceBreakdown')}</h3>
+        </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {dimensions.map(({ key, label, icon }) => {
-            const avg = tasks.length > 0
-              ? Math.round(tasks.reduce((acc, t) => acc + t.resilience[key as keyof typeof t.resilience], 0) / tasks.length)
-              : 0;
-            const color = getResilienceColor(avg);
-            
-            return (
-              <motion.div 
-                key={key} 
-                className="text-center p-4 bg-slate-800/30 rounded-lg"
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className={cn(
-                  'w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center',
-                  color === 'emerald' && 'bg-emerald-500/20 text-emerald-400',
-                  color === 'amber' && 'bg-amber-500/20 text-amber-400',
-                  color === 'rose' && 'bg-rose-500/20 text-rose-400'
-                )}>
-                  {icon}
-                </div>
-                <p className="text-xs text-slate-400 mb-1">{label}</p>
-                <p className={cn(
-                  'text-2xl font-bold',
-                  color === 'emerald' && 'text-emerald-400',
-                  color === 'amber' && 'text-amber-400',
-                  color === 'rose' && 'text-rose-400'
-                )}>
-                  {avg}%
-                </p>
-              </motion.div>
-            );
-          })}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          {/* Radar Chart */}
+          <div className="order-2 lg:order-1">
+            <ResilienceRadar 
+              data={{
+                donnees: tasks.length > 0 ? Math.round(tasks.reduce((acc, t) => acc + t.resilience.donnees, 0) / tasks.length) : 0,
+                decision: tasks.length > 0 ? Math.round(tasks.reduce((acc, t) => acc + t.resilience.decision, 0) / tasks.length) : 0,
+                relationnel: tasks.length > 0 ? Math.round(tasks.reduce((acc, t) => acc + t.resilience.relationnel, 0) / tasks.length) : 0,
+                creativite: tasks.length > 0 ? Math.round(tasks.reduce((acc, t) => acc + t.resilience.creativite, 0) / tasks.length) : 0,
+                execution: tasks.length > 0 ? Math.round(tasks.reduce((acc, t) => acc + t.resilience.execution, 0) / tasks.length) : 0,
+              }}
+            />
+          </div>
+          
+          {/* Dimension Cards */}
+          <div className="order-1 lg:order-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+            {dimensions.map(({ key, label, icon }) => {
+              const avg = tasks.length > 0
+                ? Math.round(tasks.reduce((acc, t) => acc + t.resilience[key as keyof typeof t.resilience], 0) / tasks.length)
+                : 0;
+              const color = getResilienceColor(avg);
+              
+              return (
+                <motion.div 
+                  key={key} 
+                  className="text-center p-3 bg-slate-800/30 rounded-lg"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className={cn(
+                    'w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center',
+                    color === 'emerald' && 'bg-emerald-500/20 text-emerald-400',
+                    color === 'amber' && 'bg-amber-500/20 text-amber-400',
+                    color === 'rose' && 'bg-rose-500/20 text-rose-400'
+                  )}>
+                    {icon}
+                  </div>
+                  <p className="text-xs text-slate-400 mb-1">{label}</p>
+                  <p className={cn(
+                    'text-xl font-bold',
+                    color === 'emerald' && 'text-emerald-400',
+                    color === 'amber' && 'text-amber-400',
+                    color === 'rose' && 'text-rose-400'
+                  )}>
+                    {avg}%
+                  </p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
