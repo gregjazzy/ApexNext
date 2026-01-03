@@ -1,9 +1,9 @@
-# HANDOVER — APEX Next v2.2
+# HANDOVER — APEX Next v2.3
 
 > Document de passation technique pour reprise du projet
 > 
 > **Date** : Janvier 2026
-> **Version** : 2.2
+> **Version** : 2.3
 > **Repo** : https://github.com/gregjazzy/ApexNext
 
 ---
@@ -101,7 +101,8 @@ apex-next/
 │   ├── PortraitMutation.tsx  # Module Portrait
 │   ├── CohortDashboard.tsx   # Gestion cohorte RH
 │   ├── EnterpriseTarget.tsx  # Module GPEC
-│   └── EmployeeMatchResults.tsx  # Résultats matching
+│   ├── EmployeeMatchResults.tsx  # Résultats matching (legacy)
+│   └── GPECMatchingMatrix.tsx    # Matrice Matching Décideur ★★
 │
 ├── lib/
 │   ├── store.ts              # ZUSTAND STORE (~2500 lignes) ⭐
@@ -132,8 +133,10 @@ apex-next/
 | Portrait de Mutation | ✅ | Parcours Pivot |
 | Mode Reclassement | ✅ | Nouveau parcours RH |
 | Module GPEC | ✅ | Métiers de Demain + Compétences |
-| Algorithme Matching | ✅ | Score compatibilité + gaps |
+| Algorithme Matching | ✅ | **v2.3 : Multi-critères enrichi** ★★ |
 | Gap de Compétences | ✅ | Affiché dans Roadmap |
+| **Matrice Matching GPEC** | ✅ | **v2.3 : Vue décideur RH** ★★ |
+| **Plan de Reskilling** | ✅ | **v2.3 : 3 phases intégrées** ★★ |
 | Internationalisation | ✅ | FR/EN |
 | Persistence | ✅ | localStorage via Zustand |
 
@@ -508,46 +511,150 @@ generatePDFReport({
 // - Plan d'Action
 ```
 
-### 7.4 Algorithme de Matching (GPEC)
+### 7.4 Moteur de Matching GPEC Enrichi (v2.3) ★★
 
 **Fichier** : `lib/store.ts` → `calculateEmployeeMatches()`
 
+L'algorithme de matching a été complètement refactorisé en v2.3 pour devenir un véritable **moteur multi-critères**.
+
+#### Sources de Données Analysées
+
+```
+OFFRE (Portrait du Salarié)          DEMANDE (Poste Cible)
+├── 12 Talents Stratégiques     ×     ├── Compétences Requises
+├── Scores de Résilience (5D)   ×     │   ├── Haptique
+│   ├── Données                       │   ├── Relationnelle
+│   ├── Décision                      │   └── Technique
+│   ├── Relationnel                   │
+│   ├── Créativité                    ├── Niveau Requis (1-5)
+│   └── Exécution                     ├── Score de Criticité
+├── Carré d'As (4 talents innés)      └── Résistance Automatisation
+└── Zone de Rejet (malus)
+```
+
+#### Logique de Calcul du Score
+
 ```typescript
-// Logique simplifiée
-calculateEmployeeMatches: () => {
-  const { enterpriseTargets, cohortData, talents } = get();
+calculateEmployeeMatches: () => set((state) => {
+  // 1. Calcul profil de résilience moyen des tâches
+  const avgResilience = calculateAverageResilience(state.tasks);
   
-  const matches: EmployeeMatch[] = [];
+  // 2. Extraction des talents innés du Carré d'As
+  const innateSkills = extractInnateSkills(state.userIntention.carreDAs);
   
-  cohortData.members.forEach(member => {
-    enterpriseTargets.futureJobs.forEach(job => {
-      // Calcul du score de compatibilité
-      const score = calculateCompatibility(member, job, talents);
-      
-      // Identification des gaps
-      const gaps = identifyGaps(member, job);
-      
-      // Recommandation
-      const recommendation = 
-        score >= 85 ? 'ideal' :
-        score >= 70 ? 'good' :
-        score >= 50 ? 'possible' : 'difficult';
-      
-      matches.push({
-        employeeId: member.id,
-        employeeName: member.name,
-        futureJobId: job.id,
-        futureJobTitle: job.title,
-        compatibilityScore: score,
-        recommendation,
-        strengths: [...],
-        competenceGaps: gaps,
-      });
-    });
-  });
+  // 3. Zone de rejet pour pénaliser les mauvais matchs
+  const rejectZone = state.userIntention.zoneDeRejet || [];
   
-  set({ enterpriseTargets: { ...state, employeeMatches: matches } });
-};
+  for (const member of cohortData.members) {
+    for (const job of enterpriseTargets.futureJobs) {
+      // Pour chaque compétence requise du poste :
+      for (const comp of job.requiredCompetences) {
+        let currentLevel = 2;  // Base
+        
+        // BONUS Talents Stratégiques (+1-2 niveaux)
+        if (talentMatchesCategory(selectedTalents, comp.category)) {
+          currentLevel += Math.floor(talent.level / 2);
+        }
+        
+        // BONUS Scores de Résilience (+1 niveau si > 70%)
+        if (avgResilience[comp.category] > 70) {
+          currentLevel += 1;
+        }
+        
+        // BONUS Carré d'As (+1 niveau si matching sémantique)
+        if (innateSkillMatches(innateSkills, comp.name)) {
+          currentLevel += 1;
+        }
+        
+        // MALUS Zone de Rejet (-1 niveau)
+        if (competenceInRejectZone(comp, job, rejectZone)) {
+          currentLevel -= 1;
+        }
+      }
+      
+      // BONUS Résistance à l'Automatisation
+      const resilienceBonus = (job.automationResistance / 100) * 10;
+      
+      // Score final
+      const compatibilityScore = baseScore + resilienceBonus;
+    }
+  }
+});
+```
+
+#### Heures de Formation
+
+```typescript
+// Calcul pondéré par criticité de la compétence
+const trainingHours = Math.abs(gap) * (20 + Math.floor(comp.criticalityScore / 20));
+// Gap de 1 niveau, criticité 80% → 36h de formation
+// Gap de 2 niveaux, criticité 100% → 80h de formation
+```
+
+### 7.5 Matrice de Matching GPEC (v2.3) ★★
+
+**Fichier** : `components/GPECMatchingMatrix.tsx`
+
+Nouvelle vue décideur pour les RH permettant de voir d'un coup d'œil quel salarié est le plus apte pour quel poste.
+
+#### Fonctionnalités
+
+| Fonction | Description |
+|----------|-------------|
+| **Dashboard KPIs** | Compteurs par recommandation (Idéal/Bon/Possible/Difficile) |
+| **Filtre par poste** | Sélectionner un poste cible spécifique |
+| **Filtre par recommandation** | Voir uniquement les candidats "Idéal", etc. |
+| **Vue par poste** | Candidats triés par score décroissant |
+| **Meilleur candidat** | Badge et mise en évidence pour chaque poste |
+| **Total formation** | Heures de formation agrégées |
+| **Modal détail** | Vue complète d'un match avec gaps détaillés |
+
+#### Structure du Composant
+
+```typescript
+interface MatchingMatrixProps {
+  onSelectMatch?: (match: EmployeeMatch) => void;
+}
+
+// Statistiques globales
+const stats = useMemo(() => ({
+  total: matches.length,
+  ideal: matches.filter(m => m.recommendation === 'ideal').length,
+  good: matches.filter(m => m.recommendation === 'good').length,
+  possible: matches.filter(m => m.recommendation === 'possible').length,
+  difficult: matches.filter(m => m.recommendation === 'difficult').length,
+  avgScore: Math.round(matches.reduce((acc, m) => acc + m.compatibilityScore, 0) / total),
+  totalTrainingHours: sumTrainingHours(matches),
+}), [matches]);
+```
+
+### 7.6 Plan de Reskilling (v2.3) ★★
+
+**Fichier** : `components/steps/Step8Roadmap.tsx`
+
+Nouvelle section "Stratégie de Reskilling Recommandée" intégrée au Roadmap pour le mode GPEC.
+
+#### 3 Phases
+
+| Phase | Durée | Description |
+|-------|-------|-------------|
+| **1. Évaluation** | 2-4 semaines | Validation des portraits avec entretiens individuels |
+| **2. Formation** | Variable | Parcours de reskilling personnalisés (budget = total heures) |
+| **3. Transition** | 1-3 mois | Affectation aux postes cibles avec accompagnement |
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  {/* Phase 1 : Évaluation */}
+  <div className="p-4 rounded-xl bg-blue-500/10">...</div>
+  
+  {/* Phase 2 : Formation */}
+  <div className="p-4 rounded-xl bg-amber-500/10">
+    Budget estimé: {totalTrainingHours}h
+  </div>
+  
+  {/* Phase 3 : Transition */}
+  <div className="p-4 rounded-xl bg-emerald-500/10">...</div>
+</div>
 ```
 
 ---

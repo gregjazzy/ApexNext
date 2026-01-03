@@ -302,8 +302,8 @@ export function StrategyHub() {
   }
   
   const completedCount = visibleNodes.filter(n => getNodeStatus(n.id) === 'completed').length;
-  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot (individuel), 5 pour GPEC, 4 pour Reclassement
-  const totalSteps = isAugmentation ? 3 : isGPEC ? 5 : 4;
+  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot, 5 pour GPEC (leader+pivot), 5 pour Reclassement
+  const totalSteps = isAugmentation ? 3 : (isReclassement || isGPEC) ? 5 : 4;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   // Labels personnalisés par persona
@@ -449,15 +449,7 @@ export function StrategyHub() {
 
           {/* Nodes Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {HUB_NODES
-              // Filtrer : masquer "Portrait de Mutation" si goal !== 'pivot'
-              .filter(node => {
-                if (node.id === 'portrait' && context.goal !== 'pivot') {
-                  return false;
-                }
-                return true;
-              })
-              .map((node, index) => {
+            {visibleNodes.map((node, index) => {
               const status = getNodeStatus(node.id);
               const badge = getStatusBadge(status);
               const isLocked = status === 'locked';

@@ -1,10 +1,10 @@
-# APEX Next v2.2
+# APEX Next v2.3
 
 > **GPS de la Mutation Professionnelle face à l'IA**
 
-APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé avec synchronisation totale des données Audit + Portrait Humain.
+APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé. En mode GPEC, il devient un outil de **planification stratégique RH** avec matching collaborateurs × postes cibles.
 
-![Version](https://img.shields.io/badge/version-2.2-blue)
+![Version](https://img.shields.io/badge/version-2.3-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-15-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -64,14 +64,38 @@ Interface pour définir les besoins de l'organisation :
   - Relationnelles (négociation, empathie)
   - Techniques (Python, Figma, etc.)
 
-### Algorithme de Matching ★
-Calcul automatique de la compatibilité collaborateur × poste cible :
-- **Score de Compatibilité** (0-100%)
+### Moteur de Matching Enrichi ★★
+Algorithme multi-critères pour calcul de compatibilité collaborateur × poste cible :
+
+**Sources de données analysées :**
+- 12 Talents Stratégiques (audit)
+- 5 Dimensions de Résilience (par tâche)
+- Carré d'As (4 talents innés du Portrait de Mutation)
+- Zone de Rejet (malus automatique)
+- Résistance à l'automatisation du poste cible
+
+**Résultats générés :**
+- **Score de Compatibilité** (0-100%) avec bonus/malus détaillés
 - **Recommandation** : Idéal / Bonne Affinité / Possible / Difficile
+- **Points Forts** identifiés (talents audit + innés)
 - **Gap de Compétences** avec :
   - Niveau actuel vs niveau requis
-  - Heures de formation estimées
-  - Catégorie de compétence
+  - Heures de formation estimées (pondérées par criticité)
+  - Catégorie de compétence (Haptique / Relationnelle / Technique)
+
+### Matrice de Matching GPEC (Vue Décideur) ★★
+Nouvelle vue `GPECMatchingMatrix.tsx` pour les RH :
+- **Dashboard KPIs** : Nombre de candidats Idéal/Bon/Possible/Difficile
+- **Filtres** : Par poste cible, par recommandation
+- **Vue par poste** : Liste des candidats triés par score
+- **Meilleur candidat** : Mis en évidence pour chaque poste
+- **Modal détail** : Points forts + Gap + Plan de formation
+
+### Stratégie de Reskilling ★★
+Plan en 3 phases intégré au Roadmap GPEC :
+1. **Évaluation** (2-4 semaines) : Validation des portraits avec entretiens
+2. **Formation** (XXXh) : Parcours personnalisés par collaborateur
+3. **Transition** (1-3 mois) : Affectation aux postes avec accompagnement
 
 ### Interface Améliorée
 - **Bouton "Nouvel Audit"** visible et explicite sur toutes les pages
@@ -125,7 +149,8 @@ apex-next/
 │   ├── PortraitMutation.tsx    # Module Portrait (Pivot)
 │   ├── CohortDashboard.tsx     # Tableau de Bord Cohorte ★
 │   ├── EnterpriseTarget.tsx    # Module GPEC ★
-│   └── EmployeeMatchResults.tsx # Résultats Matching GPEC ★
+│   ├── EmployeeMatchResults.tsx # Résultats Matching (legacy)
+│   └── GPECMatchingMatrix.tsx  # Matrice Matching Décideur ★★
 ├── lib/
 │   ├── store.ts                # Zustand store (~2500 lignes)
 │   ├── lexicon.ts              # Dictionnaire dynamique par persona
@@ -139,7 +164,8 @@ apex-next/
 └── i18n/                       # Configuration next-intl
 ```
 
-★ = Nouveaux fichiers v2.2
+★ = Fichiers v2.2
+★★ = Nouveaux fichiers v2.3
 
 ---
 
@@ -259,7 +285,7 @@ interface AuditStore {
 }
 ```
 
-### Interface EmployeeMatch (GPEC) ★
+### Interface EmployeeMatch (GPEC) ★★
 
 ```typescript
 interface EmployeeMatch {
@@ -267,19 +293,42 @@ interface EmployeeMatch {
   employeeName: string;
   futureJobId: string;
   futureJobTitle: string;
-  compatibilityScore: number;        // 0-100%
+  compatibilityScore: number;        // 0-100% (multi-critères)
   recommendation: 'ideal' | 'good' | 'possible' | 'difficult';
-  strengths: string[];
+  strengths: string[];               // Talents audit + innés
   competenceGaps: Array<{
     competenceId: string;
     competenceName: string;
     category: 'haptique' | 'relationnelle' | 'technique';
-    currentLevel: number;
+    currentLevel: number;            // Calculé selon audit + portrait
     requiredLevel: number;
-    gap: number;
-    trainingHours: number;
+    gap: number;                     // Négatif = formation nécessaire
+    trainingHours: number;           // Pondéré par criticité
   }>;
 }
+```
+
+### Algorithme de Matching (calculateEmployeeMatches) ★★
+
+```
+OFFRE (Portrait du Salarié)          DEMANDE (Poste Cible)
+├── 12 Talents Stratégiques     ×     ├── Compétences Requises
+├── Scores de Résilience (5D)   ×     │   ├── Haptique
+│   ├── Données                       │   ├── Relationnelle
+│   ├── Décision                      │   └── Technique
+│   ├── Relationnel                   │
+│   ├── Créativité                    ├── Niveau Requis (1-5)
+│   └── Exécution                     └── Score de Criticité
+├── Carré d'As (4 talents innés)
+└── Zone de Rejet (malus)
+
+CALCUL DU SCORE:
+- Niveau de base : 2/5
+- +1-2 niveaux si talent stratégique correspondant
+- +1 niveau si score de résilience > 70%
+- +1 niveau si matching sémantique Carré d'As ↔ Compétence
+- -1 niveau si compétence dans Zone de Rejet
+- Bonus final selon résistance à l'automatisation du poste
 ```
 
 ---
@@ -486,7 +535,7 @@ Analyse IA du document de poste (mock actuellement, prêt pour intégration).
 
 ## 📈 Roadmap
 
-### ✅ Complété
+### ✅ Complété v2.2
 - [x] Phase 1 : Diagnostic (6 étapes)
 - [x] Phase 2 : Stratégie (Ikigai + Roadmap)
 - [x] Authentification NextAuth
@@ -498,12 +547,27 @@ Analyse IA du document de poste (mock actuellement, prêt pour intégration).
 - [x] Synchronisation Totale Plan d'Action (Audit + Portrait Humain)
 - [x] Séparation Phase 1/Phase 2 avec routes distinctes
 - [x] KPIs de résilience et outils suggérés
-- [x] Centre de Commandement (StrategyHub) ★
-- [x] Mode Reclassement / PSE pour Leader RH ★
-- [x] Module GPEC (Exigences Stratégiques) ★
-- [x] Algorithme de Matching avec score de compatibilité ★
-- [x] Gap de Compétences dans le Roadmap ★
-- [x] Bouton Reset explicite et visible ★
+- [x] Centre de Commandement (StrategyHub)
+- [x] Mode Reclassement / PSE pour Leader RH
+- [x] Module GPEC (Exigences Stratégiques)
+- [x] Gap de Compétences dans le Roadmap
+- [x] Bouton Reset explicite et visible
+
+### ✅ Complété v2.3
+- [x] **Moteur de Matching Enrichi** — Algorithme multi-critères ★★
+  - Intégration des 12 talents stratégiques
+  - Scoring basé sur les 5 dimensions de résilience
+  - Bonus/malus Carré d'As et Zone de Rejet
+  - Pondération par résistance à l'automatisation
+- [x] **Matrice de Matching GPEC** — Vue décideur RH ★★
+  - Dashboard KPIs (Idéal/Bon/Possible/Difficile)
+  - Filtres par poste et recommandation
+  - Meilleur candidat par poste
+  - Modal détail avec plan de formation
+- [x] **Stratégie de Reskilling** — Plan en 3 phases ★★
+  - Évaluation (2-4 semaines)
+  - Formation (budget heures calculé)
+  - Transition (1-3 mois)
 
 ### 🔜 À venir
 - [ ] Intégration IA (OpenAI/Anthropic) pour analyse documents
@@ -512,6 +576,7 @@ Analyse IA du document de poste (mock actuellement, prêt pour intégration).
 - [ ] Export Excel du Gap de Compétences (GPEC)
 - [ ] Notifications email pour collaborateurs (Reclassement)
 - [ ] Benchmarking sectoriel
+- [ ] Backend Prisma + PostgreSQL
 
 ---
 
