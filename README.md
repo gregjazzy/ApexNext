@@ -1,47 +1,223 @@
-# APEX Next v2 - Deep Audit Engine
+# APEX Next v2
 
-> 🧭 GPS de la Mutation Professionnelle face à l'IA
+> **GPS de la Mutation Professionnelle face à l'IA**
 
-APEX Next est un outil de diagnostic professionnel qui évalue votre résilience face à l'automatisation et l'IA. Il vous guide à travers un audit complet de vos tâches, talents et compétences techniques pour identifier vos zones de vulnérabilité et vos points forts.
+APEX Next est un outil de diagnostic stratégique qui évalue la résilience professionnelle face à l'automatisation (IA + Robotique) et génère un plan d'action personnalisé.
 
-## ✨ Fonctionnalités
+![Version](https://img.shields.io/badge/version-2.0-blue)
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-### Étape 1 : Diagnostic (Implémenté)
+---
 
-- **La Matrice** : Définition du profil (Salarié, Freelance, Leader/RH) et de l'objectif (Augmentation ou Pivot)
-- **Context Mapping** : Saisie du poste, industrie et import optionnel de fiche de poste
-- **Audit Temporel** : Analyse des tâches avec 4 dimensions de résilience (Données, Décision, Relationnel, Créativité)
-- **Signature des Talents** : Sélection de 5 talents majeurs avec niveau de maîtrise
-- **Tech Scan** : Identification de 3 outils principaux et niveau d'expertise
-- **Le Verdict** : Dashboard de résilience avec score global et analyse détaillée
+## 🎯 Concept
 
-### Étape 2 : Ikigai (À venir)
+APEX Next analyse votre profil professionnel à travers **8 étapes** pour identifier vos vulnérabilités et opportunités face à la transformation digitale :
 
-Construction de la trajectoire professionnelle idéale basée sur le diagnostic.
+### Phase 1 : Diagnostic (Étapes 1-6)
+1. **La Matrice** - Sélection du profil (Salarié/Freelance/Leader) et objectif (Augmentation/Pivot)
+2. **Context Mapping** - Poste, secteur, description de missions
+3. **Audit des Processus** - Analyse des tâches avec 5 curseurs de résilience
+4. **Inventaire des Actifs** - Sélection de 5 talents parmi 12 compétences stratégiques
+5. **Tech Scan** - Évaluation de la maîtrise des outils (3 maximum)
+6. **Le Verdict** - Dashboard avec score global et radar de résilience
+
+### Phase 2 : Stratégie (Étapes 7-8)
+7. **Matrice Ikigai 2.0** - Visualisation 4 dimensions + Métiers Refuges
+8. **Plan d'Action** - Roadmap en 3 piliers avec actions prioritaires
+
+---
+
+## 🏗️ Architecture
+
+```
+apex-next/
+├── app/
+│   ├── api/
+│   │   ├── analyze-job/        # Endpoint IA (mock, prêt pour intégration)
+│   │   └── auth/               # NextAuth.js routes
+│   ├── auth/
+│   │   ├── signin/             # Page de connexion
+│   │   └── error/              # Page d'erreur auth
+│   ├── audit/                  # Page principale de l'audit
+│   ├── globals.css             # Design System "Expert Dark"
+│   ├── layout.tsx              # Root layout avec providers
+│   └── page.tsx                # Landing page
+├── components/
+│   ├── steps/                  # Composants des 8 étapes
+│   │   ├── Step1Matrix.tsx
+│   │   ├── Step2Context.tsx
+│   │   ├── Step3Tasks.tsx
+│   │   ├── Step4Talents.tsx
+│   │   ├── Step5Software.tsx
+│   │   ├── Step6Verdict.tsx
+│   │   ├── Step7Ikigai.tsx
+│   │   └── Step8Roadmap.tsx
+│   ├── ui/                     # Composants UI réutilisables
+│   │   ├── NavigationButtons.tsx
+│   │   ├── ResilienceRadar.tsx
+│   │   ├── ResilienceSlider.tsx
+│   │   ├── ScoreRing.tsx
+│   │   ├── SelectionCard.tsx
+│   │   ├── Stepper.tsx
+│   │   └── ...
+│   └── AuditFlow.tsx           # Orchestrateur du tunnel
+├── lib/
+│   ├── store.ts                # Zustand store avec persistence
+│   ├── lexicon.ts              # Dictionnaire dynamique par persona
+│   └── utils.ts                # Utilitaires (cn, getResilienceColor)
+├── messages/
+│   ├── fr.json                 # Traductions français
+│   └── en.json                 # Traductions anglais
+└── i18n/                       # Configuration next-intl
+```
+
+---
+
+## 🔧 Stack Technique
+
+| Technologie | Usage |
+|------------|-------|
+| **Next.js 15** | Framework React avec App Router |
+| **TypeScript** | Typage statique |
+| **Tailwind CSS** | Design System "Expert Dark" |
+| **Zustand** | State management avec persistence |
+| **Framer Motion** | Animations et transitions |
+| **Recharts** | Visualisations (Radar Chart) |
+| **NextAuth.js** | Authentification (Credentials, GitHub, Google) |
+| **next-intl** | Internationalisation (FR/EN) |
+| **Radix UI** | Composants accessibles (Slider, Select) |
+| **Lucide React** | Icônes |
+
+---
+
+## 📊 Modèle de Données
+
+### Store Zustand (`lib/store.ts`)
+
+```typescript
+interface AuditStore {
+  // Navigation
+  currentStep: number;  // 1-8
+  
+  // Context
+  context: {
+    persona: 'salarie' | 'freelance' | 'leader' | null;
+    goal: 'augmentation' | 'pivot' | null;
+    jobTitle: string;
+    industry: string;
+    jobDescription: string;
+  };
+  
+  // Tasks (5 dimensions de résilience)
+  tasks: Array<{
+    id: string;
+    name: string;
+    temporalite: 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
+    hoursPerWeek: number;
+    resilience: {
+      donnees: number;      // 0-100 : Vulnérabilité IA données
+      decision: number;     // 0-100 : Prise de décision
+      relationnel: number;  // 0-100 : Aspect humain
+      creativite: number;   // 0-100 : Innovation
+      execution: number;    // 0-100 : Vulnérabilité robotique
+    };
+  }>;
+  
+  // Talents (5 sur 12 actifs stratégiques)
+  talents: Array<{
+    id: string;
+    name: string;
+    description: string;
+    example: string;
+    level: number;  // 1-5
+    selected: boolean;
+  }>;
+  
+  // Software (3 max)
+  software: Array<{
+    id: string;
+    name: string;
+    level: 'debutant' | 'avance' | 'expert';
+  }>;
+  
+  // Strategy (Phase 2)
+  strategy: {
+    capitalActif: number;
+    zoneRisque: number;
+    opportunitesNiche: NicheOpportunity[];
+    levierEconomique: number;
+    roadmap: RoadmapAction[];
+    generatedAt: number | null;
+    parcours: 'augmentation' | 'pivot' | null;
+  };
+}
+```
+
+### Les 12 Actifs Stratégiques
+
+| ID | Nom | Description |
+|----|-----|-------------|
+| `arbitrage-incertitude` | Arbitrage en Incertitude | Décider quand les données sont incomplètes |
+| `synthese-strategique` | Synthèse Stratégique | Transformer l'information en vision claire |
+| `intelligence-negociation` | Intelligence de Négociation | Gérer conflits et accords complexes |
+| `pensee-systemique` | Pensée Systémique | Comprendre les impacts organisationnels |
+| `diagnostic-crise` | Diagnostic de Crise | Identifier et résoudre les problèmes inédits |
+| `tactique-relationnelle` | Tactique Relationnelle | Construire des réseaux d'influence |
+| `innovation-rupture` | Innovation de Rupture | Imaginer des concepts nouveaux |
+| `pilotage-ia` | Pilotage de l'IA (IA Ops) | Orchestrer des agents IA |
+| `ethique-gouvernance` | Éthique & Gouvernance | Responsabilité des décisions automatisées |
+| `leadership-transition` | Leadership de Transition | Mobiliser dans les phases de mutation |
+| `analyse-critique` | Analyse Critique & Biais | Détecter erreurs et biais IA |
+| `communication-influence` | Communication d'Influence | Convaincre des parties divergentes |
+
+---
 
 ## 🎨 Design System
 
-- **Thème** : Dark Consulting Premium (Slate 950)
-- **Typographie** : Playfair Display (titres) + Inter (UI)
-- **Composants** : Glass morphism avec backdrop-blur
-- **Grille** : Pattern technique de fond subtil
+### Thème "Expert Dark"
 
-## 🛠 Stack Technique
+```css
+/* Fond */
+background: slate-950 avec grille technique
 
-- **Framework** : Next.js 14 (App Router)
-- **Styling** : Tailwind CSS
-- **État** : Zustand avec persistence
-- **Animations** : Framer Motion
-- **UI Components** : Radix UI
-- **Icônes** : Lucide React
+/* Cartes */
+.apex-card {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgb(30, 41, 59);
+  backdrop-filter: blur(12px);
+}
 
-## 🚀 Démarrage
+/* Typographie */
+Titres: font-serif (autorité)
+UI/Data: font-sans (Inter)
+
+/* Couleurs sémantiques */
+Résilient (≥60%): emerald
+Vulnérable (40-59%): amber
+Critique (<40%): rose
+```
+
+---
+
+## 🚀 Installation
+
+### Prérequis
+- Node.js 18+
+- npm ou yarn
+
+### Démarrage
 
 ```bash
-# Installation des dépendances
+# Cloner le repo
+git clone https://github.com/gregjazzy/ApexNext.git
+cd ApexNext
+
+# Installer les dépendances
 npm install
 
-# Lancement en développement
+# Lancer en développement
 npm run dev
 
 # Build production
@@ -49,68 +225,165 @@ npm run build
 npm start
 ```
 
-## 📁 Structure
+### Variables d'environnement
 
+Créer un fichier `.env.local` :
+
+```env
+# NextAuth
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key
+
+# OAuth (optionnel)
+GITHUB_ID=your-github-id
+GITHUB_SECRET=your-github-secret
+GOOGLE_CLIENT_ID=your-google-id
+GOOGLE_CLIENT_SECRET=your-google-secret
+
+# IA (pour intégration future)
+OPENAI_API_KEY=your-openai-key
+# ou
+ANTHROPIC_API_KEY=your-anthropic-key
 ```
-/app
-  /globals.css      # Design system et styles globaux
-  /layout.tsx       # Layout principal
-  /page.tsx         # Point d'entrée
-
-/components
-  /ui               # Composants réutilisables
-  /steps            # Écrans du tunnel d'audit
-  AuditFlow.tsx     # Orchestration du flux
-
-/lib
-  store.ts          # Store Zustand (état global)
-  utils.ts          # Utilitaires
-```
-
-## 📊 Modèle de Données
-
-```typescript
-// Contexte utilisateur
-interface AuditContext {
-  persona: 'salarie' | 'freelance' | 'leader';
-  goal: 'augmentation' | 'pivot';
-  jobTitle: string;
-  industry: string;
-  jobDescription: string;
-}
-
-// Tâches avec scores de résilience
-interface Task {
-  name: string;
-  temporality: 'daily' | 'weekly' | 'monthly' | 'strategic';
-  resilience: {
-    donnees: number;      // 0-100
-    decision: number;     // 0-100
-    relationnel: number;  // 0-100
-    creativite: number;   // 0-100
-  };
-}
-
-// Talents sélectionnés (Top 5)
-interface Talent {
-  name: string;
-  category: string;
-  level: 1 | 2 | 3 | 4 | 5;
-}
-
-// Stack technique (Top 3)
-interface Software {
-  name: string;
-  level: 'debutant' | 'avance' | 'expert';
-}
-```
-
-## 🎯 Philosophie
-
-**Efficience** : Saisir la donnée une fois pour l'exploiter partout.
-
-Les données collectées dans l'Étape 1 (Diagnostic) alimenteront l'Étape 2 (Ikigai) sans ressaisie.
 
 ---
 
-Développé avec 💙 pour naviguer la transformation professionnelle.
+## 🔐 Authentification
+
+### Mode Démo
+- Email : n'importe quel email valide
+- Password : `demo123`
+
+### Providers OAuth
+- GitHub
+- Google
+
+---
+
+## 🌍 Internationalisation
+
+L'application supporte **Français** (défaut) et **Anglais**.
+
+Le sélecteur de langue est disponible dans le header. La préférence est persistée via cookie `NEXT_LOCALE`.
+
+---
+
+## 📁 Structure des Étapes
+
+### Étape 1 : La Matrice
+```
+Persona → Salarié | Freelance | Leader/RH
+Objectif → Augmentation (optimiser) | Pivot (transformer)
+```
+
+Le lexique UI s'adapte dynamiquement selon le persona sélectionné.
+
+### Étape 3 : Audit des Processus
+Chaque tâche est évaluée sur **5 dimensions** :
+1. **Données** - Vulnérabilité à l'automatisation IA
+2. **Décision** - Complexité du jugement requis
+3. **Relationnel** - Nécessité d'interactions humaines
+4. **Créativité** - Besoin d'innovation
+5. **Exécution Physique** - Vulnérabilité robotique
+
+### Étape 6 : Le Verdict
+- **Score Global** = (Résilience × 0.6) + (Talents × 0.4)
+- Radar Chart des 5 dimensions
+- Zones vulnérables vs résilientes
+
+### Étape 7 : Matrice Ikigai 2.0
+4 dimensions visualisées :
+1. **Capital Actif** - Force talents + tech
+2. **Zone de Risque** - Vulnérabilité automatisation
+3. **Opportunités** - Score moyen métiers refuges
+4. **Levier Économique** - Potentiel marché
+
+### Étape 8 : Plan d'Action
+3 piliers :
+1. **Délégation Technologique** - Automatiser le low-value
+2. **Renforcement de Signature** - Consolider les talents
+3. **Positionnement Marché** - Affirmer sa différenciation
+
+---
+
+## 🔌 API Endpoints
+
+### `POST /api/analyze-job`
+
+Analyse IA du document de poste (mock actuellement, prêt pour intégration).
+
+**Request:**
+```json
+{
+  "jobDescription": "...",
+  "jobTitle": "Chef de projet",
+  "industry": "tech",
+  "persona": "salarie"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "tasks": [
+    {
+      "name": "Coordination équipes",
+      "hoursPerWeek": 10,
+      "temporalite": "quotidien",
+      "resilience": {
+        "donnees": 30,
+        "decision": 60,
+        "relationnel": 85,
+        "creativite": 45,
+        "execution": 20
+      }
+    }
+  ],
+  "summary": "5 tâches identifiées"
+}
+```
+
+---
+
+## 🛠️ Scripts npm
+
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Serveur de développement |
+| `npm run build` | Build production |
+| `npm run start` | Démarrer en production |
+| `npm run lint` | Linter ESLint |
+
+---
+
+## 📈 Roadmap
+
+- [x] Phase 1 : Diagnostic (6 étapes)
+- [x] Phase 2 : Stratégie (Ikigai + Roadmap)
+- [x] Authentification NextAuth
+- [x] Internationalisation FR/EN
+- [x] Radar Chart résilience
+- [x] Lexique dynamique par persona
+- [ ] Intégration IA (OpenAI/Anthropic) pour analyse documents
+- [ ] Export PDF du diagnostic
+- [ ] Dashboard historique des audits
+- [ ] Pondération des scores par persona/objectif
+
+---
+
+## 📄 License
+
+MIT © 2024 APEX Next
+
+---
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Merci de créer une issue ou une pull request.
+
+---
+
+<p align="center">
+  <strong>APEX Next</strong> — Votre GPS de la Mutation Professionnelle
+</p>
