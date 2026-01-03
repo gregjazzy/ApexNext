@@ -16,30 +16,30 @@ export function Step1Matrix() {
   const canProceed = persona && goal;
   const l = locale === 'en' ? 'en' : 'fr';
 
-  // Personas with expert vocabulary
+  // Personas with expert vocabulary - Updated for Pivot intention
   const personas = [
     {
       id: 'salarie' as Persona,
       title: personaLabels.salarie[l],
       description: l === 'fr' 
-        ? "En poste, vous souhaitez évoluer et sécuriser votre trajectoire." 
-        : "Employed, you want to evolve and secure your trajectory.",
+        ? "En poste, vous voulez sécuriser votre rôle actuel ou piloter une réorientation stratégique." 
+        : "Employed, you want to secure your current role or lead a strategic reorientation.",
       icon: <User className="w-6 h-6" />,
     },
     {
       id: 'freelance' as Persona,
       title: personaLabels.freelance[l],
       description: l === 'fr'
-        ? "Indépendant, vous cherchez à scaler et optimiser votre activité."
-        : "Independent, you're looking to scale and optimize your business.",
+        ? "Indépendant, vous cherchez à optimiser votre activité ou pivoter vers un nouveau marché résilient."
+        : "Independent, you're looking to optimize your business or pivot to a resilient new market.",
       icon: <Briefcase className="w-6 h-6" />,
     },
     {
       id: 'leader' as Persona,
       title: personaLabels.leader[l],
       description: l === 'fr'
-        ? "Vous pilotez une équipe et anticipez les transformations."
-        : "You lead a team and anticipate transformations.",
+        ? "Vous pilotez une équipe et anticipez les mutations sectorielles."
+        : "You lead a team and anticipate sector transformations.",
       icon: <Users className="w-6 h-6" />,
     },
   ];

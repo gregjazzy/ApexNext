@@ -48,15 +48,15 @@
     "personas": {
       "salarie": {
         "title": "Salarié",
-        "description": "Vous êtes en poste et souhaitez sécuriser votre trajectoire"
+        "description": "En poste, sécurisez votre rôle ou pilotez une réorientation stratégique"
       },
       "freelance": {
         "title": "Freelance",
-        "description": "Indépendant cherchant à scaler et optimiser"
+        "description": "Optimisez votre activité ou pivotez vers un marché résilient"
       },
       "leader": {
         "title": "Leader / RH",
-        "description": "Vous pilotez les transformations organisationnelles"
+        "description": "Pilotez une équipe et anticipez les mutations sectorielles"
       }
     },
     "goals": {

@@ -48,15 +48,15 @@
     "personas": {
       "salarie": {
         "title": "Employee",
-        "description": "You're employed and want to secure your trajectory"
+        "description": "Secure your current role or lead a strategic reorientation"
       },
       "freelance": {
         "title": "Freelance",
-        "description": "Independent looking to scale and optimize"
+        "description": "Optimize your business or pivot to a resilient market"
       },
       "leader": {
         "title": "Leader / HR",
-        "description": "You drive organizational transformations"
+        "description": "Lead a team and anticipate sector transformations"
       }
     },
     "goals": {
