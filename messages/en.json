@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "APEX Next",
-    "tagline": "Your Professional Mutation GPS in the AI Era",
+    "tagline": "Your Professional Mutation GPS in the Automation Era",
     "version": "Deep Audit Engine v2",
     "step": "Step",
     "of": "of",
@@ -61,7 +61,7 @@
     },
     "goals": {
       "augmentation": {
-        "title": "AI Acceleration",
+        "title": "Productive Acceleration",
         "description": "Delegate execution to unlock your strategic value"
       },
       "pivot": {
@@ -125,7 +125,7 @@
     },
     "resilience": {
       "data": "Data",
-      "dataDesc": "Vulnerability to AI automation (structured data)",
+      "dataDesc": "Vulnerability to automation (structured data)",
       "decision": "Decision",
       "decisionDesc": "Complexity of judgment and decision-making",
       "relational": "Relational",
@@ -146,8 +146,8 @@
     "categories": {
       "strategique": "🎯 Strategy & Analysis",
       "influence": "💼 Influence & Negotiation",
-      "leadership": "👔 Leadership & Governance",
-      "innovation": "🚀 Innovation & AI"
+      "leadership": "👔 Leadership & Accountability",
+      "innovation": "🚀 Innovation & Tools"
     },
     "assets": {
       "arbitrage-incertitude": "Uncertainty Arbitrage",
@@ -159,9 +159,9 @@
       "communication-influence": "Influence Communication",
       "diagnostic-crise": "Crisis Diagnosis",
       "leadership-transition": "Transition Leadership",
-      "ethique-gouvernance": "Ethics & Governance",
+      "ethique-gouvernance": "Accountability & Compliance",
       "innovation-rupture": "Disruptive Innovation",
-      "pilotage-ia": "AI Piloting (AI Ops)"
+      "pilotage-ia": "Automated Tools Piloting"
     }
   },
   "step5": {
@@ -183,7 +183,7 @@
   },
   "step6": {
     "title": "The Verdict",
-    "subtitle": "Your AI & robotics resilience diagnostic",
+    "subtitle": "Your automation resilience diagnostic",
     "globalScore": "Global Score",
     "tasks": "Task Vulnerability",
     "talents": "Signature Strength",
@@ -192,10 +192,10 @@
     "resilienceBreakdown": "5 Dimensions Breakdown",
     "yourSignature": "Your Strategic Assets",
     "techStack": "Tech Stack",
-    "readyForStep2": "Ready for Step 2: Professional Ikigai",
-    "readyForStep2Desc": "Use this diagnostic to build your ideal trajectory, aligned with your assets and tomorrow's opportunities.",
+    "readyForStep2": "Ready for Step 2: Mutation Strategy",
+    "readyForStep2Desc": "Use this diagnostic to build your strategic trajectory, based on Blue Ocean framework and Business Model You.",
     "restartAudit": "Restart audit",
-    "accessIkigai": "Access Ikigai",
+    "accessIkigai": "Access Strategy",
     "comingSoon": "(Coming Soon)",
     "status": {
       "resilient": "Resilient",
@@ -203,7 +203,7 @@
       "critical": "Critical"
     },
     "dimensions": {
-      "data": "Data (AI)",
+      "data": "Data (Auto.)",
       "decision": "Decision",
       "relational": "Relational",
       "creativity": "Creativity",
@@ -211,26 +211,44 @@
     }
   },
   "step7": {
-    "title": "Ikigai Matrix 2.0",
-    "subtitle": "Strategic visualization of your positioning against intelligent automation.",
+    "title": "Strategic Ikigai Matrix",
+    "subtitle": "Positioning analysis and disruption strategy based on the Blue Ocean framework.",
     "parcours": {
-      "augmentation": "Augmentation Path",
-      "pivot": "Pivot Path"
+      "augmentation": "Augmented Position Reengineering",
+      "pivot": "Resilient Pivot Strategy"
     },
     "dimensions": {
-      "capital": "Active Capital",
-      "capitalDesc": "Combined strength of your 5 critical talents and tech mastery.",
-      "risk": "Risk Zone",
-      "riskDesc": "Exposure of your tasks to automation (AI + robotics).",
-      "opportunities": "Niche Opportunities",
-      "opportunitiesDesc": "Resilient sectors matching your signature.",
+      "engagement": "Strategic Engagement",
+      "engagementDesc": "Level of investment and motivation on your key assets.",
+      "expertise": "Distinctive Expertise",
+      "expertiseDesc": "Non-automatable differentiating skills.",
+      "demand": "Critical Market Demand",
+      "demandDesc": "Urgent market need for your skills.",
       "leverage": "Economic Leverage",
-      "leverageDesc": "Valuation potential in the transformed market."
+      "leverageDesc": "Valuation and monetization potential."
+    },
+    "valueCurve": {
+      "title": "Value Curve — Disruption Strategy",
+      "subtitle": "Comparison of your current vs target positioning (Blue Ocean methodology)",
+      "industry": "Industry",
+      "current": "Current",
+      "target": "Target"
+    },
+    "erac": {
+      "title": "ERAC Matrix — Transformation Actions",
+      "subtitle": "Eliminate · Reduce · Raise · Create",
+      "eliminate": "Eliminate",
+      "reduce": "Reduce",
+      "raise": "Raise",
+      "create": "Create",
+      "timeFreed": "h/week freed"
     },
     "niches": {
-      "title": "Identified Safe Haven Careers",
-      "subtitle": "High human-value functions matching your strategic assets.",
+      "title": "Identified Resilience Niches",
+      "subtitle": "Safe haven careers where your strategic assets are indispensable.",
       "match": "match",
+      "resistance": "automation resistance",
+      "demand": "demand",
       "growth": {
         "high": "High growth",
         "medium": "Medium growth",
@@ -240,28 +258,87 @@
     "signature": {
       "title": "Your Strategic Signature"
     },
+    "alignment": {
+      "optimal": "Optimal Zone",
+      "partial": "Partial Alignment",
+      "misaligned": "Misaligned"
+    },
     "nextButton": "View Action Plan →",
     "prevButton": "← Back to Verdict"
   },
   "step8": {
-    "title": "Strategic Action Plan",
-    "subtitle": "Your personalized roadmap to secure and enhance your professional position.",
-    "progress": "Progress",
-    "actions": "actions",
-    "allCompleted": "🎉 All actions completed!",
-    "percentComplete": "% of your plan completed",
+    "title": "Operational Action Plan",
+    "subtitle": "Personalized roadmap from your audit. Concrete actions, measurable KPIs.",
+    "scenario": {
+      "augmentation": {
+        "label": "AUGMENTED ROLE",
+        "focus": "Efficiency & Piloting"
+      },
+      "pivot": {
+        "label": "CAREER PIVOT",
+        "focus": "Transferability & Safe Haven"
+      }
+    },
+    "positioning": {
+      "title": "Positioning Diagnostic",
+      "subtitle": "Your value proposition in 4 dimensions",
+      "coreValue": {
+        "title": "Core Value",
+        "desc": "Intersection of your best talents and resilient tasks"
+      },
+      "targetAudience": {
+        "title": "Target Audience",
+        "desc": "Who benefits from your augmentation"
+      },
+      "differentiator": {
+        "title": "Differentiator",
+        "desc": "Why automation cannot replace you here"
+      },
+      "deliveryMethod": {
+        "title": "Delivery Method",
+        "desc": "Adopted stance: Arbitration, Supervision, Expertise"
+      }
+    },
+    "timeStats": {
+      "toFree": "Time to free",
+      "toHighValue": "On high value"
+    },
+    "gapAnalysis": {
+      "title": "The Bridge — Gap Analysis",
+      "subtitle": "Secure transition analysis",
+      "viability": "viability",
+      "currentPosition": "Current Position",
+      "targetPosition": "Safe Haven",
+      "transition": "Transition",
+      "strengths": "Strengths",
+      "timeline": "Timeline",
+      "risk": "Risk",
+      "toAcquire": "To acquire",
+      "transferable": "Transferable",
+      "demand": "Demand",
+      "levels": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
+    "progress": "Plan Progress",
     "pillars": {
       "delegation": {
-        "title": "Technological Delegation",
-        "description": "Automate low-value processes to free up your strategic time."
+        "title": "Delegation & Efficiency",
+        "subtitle": "The Cleanup",
+        "description": "Identify and automate low human-value tasks to free up productive time."
       },
       "reinforcement": {
         "title": "Signature Reinforcement",
-        "description": "Consolidate your strategic assets to maximize differentiation."
+        "subtitle": "The Muscle",
+        "description": "Skills development plan for non-automatable Strategic Assets."
       },
       "positioning": {
-        "title": "Market Positioning",
-        "description": "Assert your unique value against automated systems."
+        "title": "Positioning & Authority",
+        "subtitle": "The Exit",
+        "augmentation": "Writing an efficiency report demonstrating the value of the new workflow.",
+        "pivot": "Packaging transferable assets to approach the identified Safe Haven career."
       }
     },
     "priority": {
@@ -269,13 +346,21 @@
       "shortTerm": "1-3 months",
       "mediumTerm": "3-6 months"
     },
-    "final": {
-      "title": "Your Strategy is Ready",
-      "subtitle": "You now have a clear vision of your positioning and a concrete action plan to secure your professional future."
+    "erac": {
+      "eliminate": "E",
+      "reduce": "R",
+      "raise": "A",
+      "create": "C"
     },
-    "exportPdf": "Export as PDF",
+    "kpi": "KPI",
+    "noActions": "No actions generated for this pillar.",
+    "export": {
+      "title": "Export Your Strategic Summary",
+      "subtitle": "Compile the Audit + Ikigai Matrix + this Action Plan into a complete summary document.",
+      "button": "Export Summary"
+    },
     "newAudit": "New Audit",
-    "prevButton": "← Back to Matrix"
+    "prevButton": "← Back to Ikigai Matrix"
   },
   "language": {
     "fr": "Français",

@@ -1,7 +1,7 @@
 {
   "common": {
     "appName": "APEX Next",
-    "tagline": "GPS de la Mutation Professionnelle face à l'IA",
+    "tagline": "GPS de la Mutation Professionnelle face à l'Automatisation",
     "version": "Deep Audit Engine v2",
     "step": "Étape",
     "of": "sur",
@@ -61,7 +61,7 @@
     },
     "goals": {
       "augmentation": {
-        "title": "Accélération IA",
+        "title": "Accélération Productive",
         "description": "Déléguer l'exécution pour libérer votre valeur stratégique"
       },
       "pivot": {
@@ -125,7 +125,7 @@
     },
     "resilience": {
       "data": "Données",
-      "dataDesc": "Vulnérabilité à l'automatisation par IA (données structurées)",
+      "dataDesc": "Vulnérabilité à l'automatisation (données structurées)",
       "decision": "Décision",
       "decisionDesc": "Complexité du jugement et de la prise de décision",
       "relational": "Relationnel",
@@ -146,8 +146,8 @@
     "categories": {
       "strategique": "🎯 Stratégie & Analyse",
       "influence": "💼 Influence & Négociation",
-      "leadership": "👔 Leadership & Gouvernance",
-      "innovation": "🚀 Innovation & IA"
+      "leadership": "👔 Leadership & Responsabilité",
+      "innovation": "🚀 Innovation & Outils"
     },
     "assets": {
       "arbitrage-incertitude": "Arbitrage en Incertitude",
@@ -159,9 +159,9 @@
       "communication-influence": "Communication d'Influence",
       "diagnostic-crise": "Diagnostic de Crise",
       "leadership-transition": "Leadership de Transition",
-      "ethique-gouvernance": "Éthique & Gouvernance",
+      "ethique-gouvernance": "Responsabilité & Conformité",
       "innovation-rupture": "Innovation de Rupture",
-      "pilotage-ia": "Pilotage de l'IA (IA Ops)"
+      "pilotage-ia": "Pilotage des Outils Automatisés"
     }
   },
   "step5": {
@@ -183,7 +183,7 @@
   },
   "step6": {
     "title": "Le Verdict",
-    "subtitle": "Votre diagnostic de résilience face à l'IA & la robotique",
+    "subtitle": "Votre diagnostic de résilience face à l'automatisation",
     "globalScore": "Score Global",
     "tasks": "Vulnérabilité Tâches",
     "talents": "Force Signature",
@@ -192,10 +192,10 @@
     "resilienceBreakdown": "Répartition des 5 Dimensions",
     "yourSignature": "Vos Actifs Stratégiques",
     "techStack": "Stack Technique",
-    "readyForStep2": "Prêt pour l'Étape 2 : Ikigai Professionnel",
-    "readyForStep2Desc": "Utilisez ce diagnostic pour construire votre trajectoire idéale, alignée sur vos actifs et les opportunités de demain.",
+    "readyForStep2": "Prêt pour l'Étape 2 : Stratégie de Mutation",
+    "readyForStep2Desc": "Utilisez ce diagnostic pour construire votre trajectoire stratégique, basée sur le framework Blue Ocean et Business Model You.",
     "restartAudit": "Recommencer l'audit",
-    "accessIkigai": "Accéder à l'Ikigai",
+    "accessIkigai": "Accéder à la Stratégie",
     "comingSoon": "(Bientôt)",
     "status": {
       "resilient": "Résilient",
@@ -203,7 +203,7 @@
       "critical": "Critique"
     },
     "dimensions": {
-      "data": "Données (IA)",
+      "data": "Données (Auto.)",
       "decision": "Décision",
       "relational": "Relationnel",
       "creativity": "Créativité",
@@ -211,26 +211,44 @@
     }
   },
   "step7": {
-    "title": "Matrice Ikigai 2.0",
-    "subtitle": "Visualisation stratégique de votre positionnement face à l'automatisation intelligente.",
+    "title": "Matrice Ikigai Stratégique",
+    "subtitle": "Analyse de positionnement et stratégie de rupture basée sur le framework Blue Ocean.",
     "parcours": {
-      "augmentation": "Parcours Augmentation",
-      "pivot": "Parcours Pivot"
+      "augmentation": "Réingénierie du Poste Augmenté",
+      "pivot": "Stratégie de Pivot Résilient"
     },
     "dimensions": {
-      "capital": "Capital Actif",
-      "capitalDesc": "Force combinée de vos 5 talents critiques et maîtrise technologique.",
-      "risk": "Zone de Risque",
-      "riskDesc": "Exposition de vos tâches à l'automatisation (IA + robotique).",
-      "opportunities": "Opportunités de Niche",
-      "opportunitiesDesc": "Secteurs résilients correspondant à votre signature.",
+      "engagement": "Engagement Stratégique",
+      "engagementDesc": "Niveau d'investissement et motivation sur vos actifs clés.",
+      "expertise": "Expertise Distinctive",
+      "expertiseDesc": "Compétences différenciantes non-automatisables.",
+      "demand": "Demande Critique du Marché",
+      "demandDesc": "Besoin urgent du marché pour vos compétences.",
       "leverage": "Levier Économique",
-      "leverageDesc": "Potentiel de valorisation sur le marché transformé."
+      "leverageDesc": "Potentiel de valorisation et monétisation."
+    },
+    "valueCurve": {
+      "title": "Courbe de Valeur — Stratégie de Rupture",
+      "subtitle": "Comparaison de votre positionnement actuel vs cible (méthodologie Blue Ocean)",
+      "industry": "Industrie",
+      "current": "Actuel",
+      "target": "Cible"
+    },
+    "erac": {
+      "title": "Matrice ERAC — Actions de Transformation",
+      "subtitle": "Éliminer · Réduire · Augmenter · Créer",
+      "eliminate": "Éliminer",
+      "reduce": "Réduire",
+      "raise": "Augmenter",
+      "create": "Créer",
+      "timeFreed": "h/sem libérées"
     },
     "niches": {
-      "title": "Métiers Refuges Identifiés",
-      "subtitle": "Fonctions à haute valeur humaine correspondant à vos actifs stratégiques.",
+      "title": "Niches de Résilience Identifiées",
+      "subtitle": "Métiers refuges où vos actifs stratégiques sont indispensables.",
       "match": "match",
+      "resistance": "résistance automatisation",
+      "demand": "demande",
       "growth": {
         "high": "Forte croissance",
         "medium": "Croissance moyenne",
@@ -240,28 +258,87 @@
     "signature": {
       "title": "Votre Signature Stratégique"
     },
+    "alignment": {
+      "optimal": "Zone Optimale",
+      "partial": "Alignement Partiel",
+      "misaligned": "Désalignement"
+    },
     "nextButton": "Voir le Plan d'Action →",
     "prevButton": "← Retour au Verdict"
   },
   "step8": {
-    "title": "Plan d'Action Stratégique",
-    "subtitle": "Votre roadmap personnalisée pour sécuriser et valoriser votre position professionnelle.",
-    "progress": "Progression",
-    "actions": "actions",
-    "allCompleted": "🎉 Toutes les actions sont complétées !",
-    "percentComplete": "% de votre plan réalisé",
+    "title": "Plan d'Action Opérationnel",
+    "subtitle": "Roadmap personnalisée issue de votre audit. Actions concrètes, KPIs mesurables.",
+    "scenario": {
+      "augmentation": {
+        "label": "POSTE AUGMENTÉ",
+        "focus": "Efficience & Pilotage"
+      },
+      "pivot": {
+        "label": "MUTATION",
+        "focus": "Transférabilité & Métier Refuge"
+      }
+    },
+    "positioning": {
+      "title": "Diagnostic de Positionnement",
+      "subtitle": "Votre proposition de valeur en 4 dimensions",
+      "coreValue": {
+        "title": "Valeur Unique",
+        "desc": "Croisement de vos meilleurs talents et tâches résilientes"
+      },
+      "targetAudience": {
+        "title": "Audience Cible",
+        "desc": "Qui bénéficie de votre augmentation"
+      },
+      "differentiator": {
+        "title": "Différenciateur",
+        "desc": "Pourquoi l'automatisation ne peut pas vous remplacer ici"
+      },
+      "deliveryMethod": {
+        "title": "Mode de Livraison",
+        "desc": "Posture adoptée : Arbitrage, Supervision, Expertise"
+      }
+    },
+    "timeStats": {
+      "toFree": "Temps libérable",
+      "toHighValue": "Sur haute valeur"
+    },
+    "gapAnalysis": {
+      "title": "Le Pont — Gap Analysis",
+      "subtitle": "Analyse de transition sécurisée",
+      "viability": "viabilité",
+      "currentPosition": "Position Actuelle",
+      "targetPosition": "Métier Refuge",
+      "transition": "Transition",
+      "strengths": "Forces",
+      "timeline": "Durée estimée",
+      "risk": "Risque",
+      "toAcquire": "À acquérir",
+      "transferable": "Transférables",
+      "demand": "Demande",
+      "levels": {
+        "low": "Faible",
+        "medium": "Moyen",
+        "high": "Élevé"
+      }
+    },
+    "progress": "Progression du Plan",
     "pillars": {
       "delegation": {
-        "title": "Délégation Technologique",
-        "description": "Automatiser les processus à faible valeur ajoutée pour libérer votre temps stratégique."
+        "title": "Délégation & Efficience",
+        "subtitle": "Le Nettoyage",
+        "description": "Identifier et automatiser les tâches à faible valeur humaine pour libérer du temps productif."
       },
       "reinforcement": {
         "title": "Renforcement de Signature",
-        "description": "Consolider vos actifs stratégiques pour maximiser votre différenciation."
+        "subtitle": "Le Muscle",
+        "description": "Plan de montée en compétence sur les Actifs Stratégiques non-automatisables."
       },
       "positioning": {
-        "title": "Positionnement Marché",
-        "description": "Affirmer votre valeur unique face aux systèmes automatisés."
+        "title": "Positionnement & Autorité",
+        "subtitle": "La Sortie",
+        "augmentation": "Rédaction d'un rapport d'efficience démontrant la valeur du nouveau workflow.",
+        "pivot": "Packaging des actifs transférables pour approcher le Métier Refuge identifié."
       }
     },
     "priority": {
@@ -269,13 +346,21 @@
       "shortTerm": "1-3 mois",
       "mediumTerm": "3-6 mois"
     },
-    "final": {
-      "title": "Votre Stratégie est Prête",
-      "subtitle": "Vous avez maintenant une vision claire de votre positionnement et un plan d'action concret pour sécuriser votre avenir professionnel."
+    "erac": {
+      "eliminate": "É",
+      "reduce": "R",
+      "raise": "A",
+      "create": "C"
     },
-    "exportPdf": "Exporter en PDF",
+    "kpi": "KPI",
+    "noActions": "Aucune action générée pour ce pilier.",
+    "export": {
+      "title": "Exportez Votre Synthèse Stratégique",
+      "subtitle": "Compilez l'Audit + la Matrice Ikigai + ce Plan d'Action dans un document de synthèse complet.",
+      "button": "Exporter la Synthèse"
+    },
     "newAudit": "Nouvel Audit",
-    "prevButton": "← Retour à la Matrice"
+    "prevButton": "← Retour à la Matrice Ikigai"
   },
   "language": {
     "fr": "Français",

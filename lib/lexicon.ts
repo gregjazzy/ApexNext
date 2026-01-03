@@ -32,8 +32,8 @@ export const matrixLexicon = {
       },
       description: {
         salarie: {
-          fr: "Devenir l'expert augmenté capable de piloter l'IA sur votre périmètre stratégique.",
-          en: "Become the augmented expert capable of driving AI within your strategic scope."
+          fr: "Devenir l'expert augmenté capable de superviser l'automatisation sur votre périmètre.",
+          en: "Become the augmented expert capable of supervising automation within your scope."
         },
         freelance: {
           fr: "Passer de l'exécution concurrencée à une offre de conseil expert à haute marge.",
@@ -219,8 +219,8 @@ export const verdictLexicon = {
   },
   subtitle: {
     salarie: { 
-      fr: "Votre diagnostic de résilience face à l'IA.", 
-      en: "Your AI resilience diagnostic." 
+      fr: "Votre diagnostic de résilience face à l'automatisation.", 
+      en: "Your automation resilience diagnostic." 
     },
     freelance: { 
       fr: "Analyse de votre positionnement et potentiel d'optimisation.", 

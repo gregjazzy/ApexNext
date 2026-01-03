@@ -20,7 +20,7 @@ export interface Task {
   id: string;
   name: string;
   temporalite: Temporality;
-  hoursPerWeek: number; // Heures par semaine consacrées à cette tâche
+  hoursPerWeek: number;
   resilience: ResilienceScores;
   createdAt: number;
 }
@@ -29,7 +29,7 @@ export interface Talent {
   id: string;
   name: string;
   description: string;
-  example: string; // Exemple concret pour tooltip
+  example: string;
   icon: string;
   level: number; // 1-5
   selected: boolean;
@@ -41,39 +41,253 @@ export interface Software {
   level: SkillLevel;
 }
 
+// Moteurs de Mutation (pour parcours Pivot)
+export type MutationDriver = 
+  | 'exit_physical'           // Quitter l'exécution physique
+  | 'gain_autonomy'           // Gagner en autonomie décisionnelle
+  | 'human_impact'            // Basculer vers un secteur à fort impact humain
+  | 'creative_freedom'        // Libérer sa créativité
+  | 'strategic_influence'     // Accéder à l'influence stratégique
+  | 'work_life_balance'       // Équilibre vie pro/perso
+  | 'financial_security'      // Sécurité financière long terme
+  | 'meaning_purpose';        // Quête de sens
+
+export const MUTATION_DRIVERS: { id: MutationDriver; label: { fr: string; en: string }; description: { fr: string; en: string }; icon: string }[] = [
+  { id: 'exit_physical', label: { fr: 'Quitter l\'exécution physique', en: 'Exit physical execution' }, description: { fr: 'Évoluer vers des rôles de supervision et pilotage', en: 'Evolve toward supervision and piloting roles' }, icon: '🚀' },
+  { id: 'gain_autonomy', label: { fr: 'Gagner en autonomie décisionnelle', en: 'Gain decision autonomy' }, description: { fr: 'Devenir le référent qui tranche et arbitre', en: 'Become the go-to decision maker' }, icon: '🎯' },
+  { id: 'human_impact', label: { fr: 'Basculer vers l\'impact humain', en: 'Switch to human impact' }, description: { fr: 'Secteurs où le relationnel est critique', en: 'Sectors where relationships are critical' }, icon: '🤝' },
+  { id: 'creative_freedom', label: { fr: 'Libérer sa créativité', en: 'Unleash creativity' }, description: { fr: 'Rôles où l\'innovation est valorisée', en: 'Roles where innovation is valued' }, icon: '💡' },
+  { id: 'strategic_influence', label: { fr: 'Accéder à l\'influence stratégique', en: 'Access strategic influence' }, description: { fr: 'Participer aux décisions de haut niveau', en: 'Participate in high-level decisions' }, icon: '👑' },
+  { id: 'work_life_balance', label: { fr: 'Équilibre vie pro/perso', en: 'Work-life balance' }, description: { fr: 'Flexibilité et maîtrise de son temps', en: 'Flexibility and time control' }, icon: '⚖️' },
+  { id: 'financial_security', label: { fr: 'Sécurité financière', en: 'Financial security' }, description: { fr: 'Secteurs à forte rémunération long terme', en: 'High long-term compensation sectors' }, icon: '💰' },
+  { id: 'meaning_purpose', label: { fr: 'Quête de sens', en: 'Search for meaning' }, description: { fr: 'Contribution à un impact sociétal positif', en: 'Contribution to positive societal impact' }, icon: '🌍' },
+];
+
 export interface AuditContext {
   persona: Persona;
   goal: Goal;
   jobTitle: string;
   industry: string;
   jobDescription: string;
+  // Champs enrichis pour un diagnostic plus précis
+  yearsExperience?: number;        // Années d'expérience dans le poste
+  teamSize?: number;               // Taille de l'équipe supervisée (0 si contributeur individuel)
+  automationExposure?: 'low' | 'medium' | 'high'; // Exposition perçue à l'automatisation
+  budgetResponsibility?: number;   // Responsabilité budgétaire en K€
+  clientFacing?: boolean;          // Contact client direct
+  // Moteurs de Mutation (pour parcours Pivot uniquement)
+  mutationDrivers?: MutationDriver[];  // 2 moteurs sélectionnés max
 }
 
-// Phase 2 - Strategic Mutation Plan
+// ===============================================
+// PORTRAIT DE MUTATION (Parcours Pivot uniquement)
+// ===============================================
+// Module de saisie pour capturer l'identité humaine et les aspirations
+
+export interface UserIntention {
+  // SECTION 1 : Passions Concrètes (Texte Libre)
+  // "Qu'est-ce qui vous fait vibrer dans le concret ?"
+  passionsConcretes: string;
+  
+  // SECTION 2 : Le Carré d'As (4 Talents Naturels)
+  // "4 choses pour lesquelles vous êtes naturellement doué(e)"
+  carreDAs: {
+    talent1: string;
+    talent2: string;
+    talent3: string;
+    talent4: string;
+  };
+  
+  // SECTION 3 : La Zone de Rejet (Les 'Nuls')
+  // "Ce pour quoi vous êtes nul(le) ou ce qui vous vide de votre énergie"
+  zoneDeRejet: string[];
+  
+  // SECTION 4 : L'Horizon Cible (Vision)
+  // "Dans quel secteur vous voyez-vous ? Quels seraient vos 2 métiers idéaux ?"
+  horizonCible: {
+    secteurCible: string;
+    metierIdeal1: string;
+    metierIdeal2: string;
+  };
+  
+  // SECTION 5 : Le Manifeste Humain (Texte Libre)
+  // "Définissez ici l'humain que vous voulez devenir"
+  manifesteHumain: string;
+  
+  // Métadonnées
+  completedAt: number | null;
+  isComplete: boolean;
+}
+
+// KPIs Automatiques calculés
+export interface ComputedKPIs {
+  productivityGainPercent: number;      // Gain de productivité estimé (%)
+  timeROI: number;                      // ROI du temps libéré (heures/an)
+  riskReductionScore: number;           // Score de réduction du risque (0-100)
+  marketPositioningScore: number;       // Score de positionnement marché (0-100)
+  transitionReadinessScore: number;     // Score de préparation à la transition (0-100)
+}
+
+// ===============================================
+// PHASE 2 - MOTEUR DE STRATÉGIE INTÉGRÉ
+// ===============================================
+
+// Framework ERAC (Blue Ocean Strategy)
+export interface ERACAction {
+  id: string;
+  category: 'eliminate' | 'reduce' | 'raise' | 'create';
+  taskId?: string;
+  taskName?: string;
+  action: string;
+  rationale: string;
+  impact: 'high' | 'medium' | 'low';
+  timeFreed?: number; // heures libérées par semaine
+  sourceNote?: string; // Note technique de traçabilité
+  vulnerabilityScore?: number; // % de vulnérabilité de la tâche source
+}
+
+// Value Curve pour visualisation Blue Ocean
+export interface ValueCurvePoint {
+  factor: string;
+  current: number;    // Position actuelle (0-100)
+  target: number;     // Position cible après transformation (0-100)
+  industry: number;   // Moyenne industrie (benchmark)
+}
+
+// Business Model You - Proposition de Valeur
+export interface BusinessModelYou {
+  // Proposition de Valeur Augmentée
+  coreValue: string;           // Ce que vous apportez d'unique
+  targetAudience: string;      // À qui (interne/externe)
+  uniqueDifferentiator: string; // Ce que l'IA ne peut pas faire
+  deliveryMethod: string;      // Comment vous délivrez
+  
+  // Ressources Clés (talents mappés)
+  keyResources: string[];      // IDs des talents
+  keyActivities: string[];     // Activités à haute valeur
+  
+  // Canaux et Relations
+  channels: string[];
+  relationships: string[];
+}
+
+// Gap Analysis (Le Pont de Compétences) pour Pivot
+export interface GapAnalysis {
+  currentState: {
+    role: string;
+    strengths: string[];
+    vulnerabilities: string[];
+    marketPosition: number; // 0-100
+  };
+  targetState: {
+    role: string;
+    requiredSkills: string[];
+    marketDemand: number; // 0-100
+    growthPotential: 'high' | 'medium' | 'low';
+  };
+  // "Le Pont de Compétences" - Tableau comparatif
+  bridge: {
+    // À GARDER : Talents déjà maîtrisés et transférables
+    toKeep: { skill: string; currentLevel: number; transferability: 'high' | 'medium' | 'low'; rationale: string }[];
+    // À ACQUÉRIR : Compétences techniques spécifiques au nouveau secteur
+    toAcquire: { skill: string; priority: 'critical' | 'important' | 'nice_to_have'; timeToAcquire: string; method: string }[];
+    // À ABANDONNER : Réflexes liés au poste exposé
+    toAbandon: { habit: string; reason: string; replacement: string }[];
+    // Ancienne structure maintenue pour compatibilité
+    skillsToAcquire: string[];
+    skillsToTransfer: string[];
+    estimatedTimeline: string;
+    riskLevel: 'low' | 'medium' | 'high';
+    investmentRequired: 'low' | 'medium' | 'high';
+  };
+  viabilityScore: number; // 0-100
+  // Métriques de transition
+  transitionMetrics: {
+    financialRunway: string;        // Durée de sécurité financière
+    networkReadiness: number;       // 0-100 : Réseau dans le secteur cible
+    mentalReadiness: number;        // 0-100 : Préparation mentale
+  };
+}
+
+// Métier Refuge enrichi avec Core Transfer et Value Curve
 export interface NicheOpportunity {
   id: string;
   name: string;
   description: string;
-  matchScore: number; // 0-100
-  requiredTalents: string[]; // IDs des talents requis
+  matchScore: number;
+  requiredTalents: string[];
   growthPotential: 'high' | 'medium' | 'low';
+  marketDemand: number; // 0-100
+  automationResistance: number; // 0-100 (Indice de Protection)
+  salaryRange?: string;
+  // Core Transfer : Pourquoi ce talent est la clé
+  coreTransfer: {
+    keyTalent: string;          // Nom du talent pivot
+    transferRationale: string;  // Explication du transfert
+    competitiveEdge: string;    // Avantage concurrentiel
+  };
+  // Value Curve spécifique au métier refuge
+  valueCurve: {
+    factor: string;
+    userPosition: number;       // Position de l'utilisateur (0-100)
+    automationThreat: number;   // Niveau de menace automatisation (0-100)
+  }[];
+  // Métriques sectorielles
+  sectorMetrics: {
+    jobOpenings: number;        // Offres d'emploi (estimation)
+    averageAge: number;         // Âge moyen dans le secteur
+    growthRate: string;         // Taux de croissance annuel
+    entryBarrier: 'low' | 'medium' | 'high';
+  };
 }
 
+// Action Roadmap enrichie avec piliers Pivot + KPIs Résilience + Stack Technologique
 export interface RoadmapAction {
   id: string;
-  pillar: 'delegation' | 'reinforcement' | 'positioning';
+  // Piliers Augmentation : delegation | reinforcement | positioning
+  // Piliers Pivot : disengagement | oceanBleu | landing
+  pillar: 'delegation' | 'reinforcement' | 'positioning' | 'disengagement' | 'oceanBleu' | 'landing';
   title: string;
   description: string;
   priority: 'immediate' | 'short_term' | 'medium_term';
   completed: boolean;
+  eracCategory?: 'eliminate' | 'reduce' | 'raise' | 'create';
+  kpi?: string;
+  // Nouveaux champs pour synchronisation totale
+  resilienceScore?: number; // Score 1-10 montrant la protection contre le remplacement
+  suggestedTool?: string;   // Outil concret suggéré pour cette action
+  sourceData?: string;      // Source des données (audit, portrait humain, etc.)
 }
 
+// Ikigai Stratégique (4 dimensions "No-Bullshit")
+export interface IkigaiStrategique {
+  engagementStrategique: number;  // Ce que vous aimez faire → "Engagement Stratégique"
+  expertiseDistinctive: number;   // Ce que vous faites bien → "Expertise Distinctive"
+  demandeCritique: number;        // Ce dont le monde a besoin → "Demande Critique du Marché"
+  levierEconomique: number;       // Ce pour quoi on vous paie → "Levier Économique"
+  
+  // Zone d'alignement
+  alignmentScore: number;         // Score global d'alignement Ikigai
+  alignmentZone: 'optimal' | 'partial' | 'misaligned';
+}
+
+// Structure principale de la stratégie
 export interface StrategyData {
-  // Matrice Ikigai 2.0
-  capitalActif: number; // Score agrégé des 5 talents (0-100)
-  zoneRisque: number; // Score de vulnérabilité (0-100)
+  // Matrice Ikigai Stratégique 2.0
+  ikigai: IkigaiStrategique;
+  
+  // Framework ERAC (Blue Ocean)
+  eracActions: ERACAction[];
+  valueCurve: ValueCurvePoint[];
+  
+  // Business Model You
+  businessModel: BusinessModelYou;
+  
+  // Gap Analysis (pour Pivot)
+  gapAnalysis: GapAnalysis | null;
+  
+  // Opportunités de Niche
   opportunitesNiche: NicheOpportunity[];
-  levierEconomique: number; // Potentiel économique (0-100)
   
   // Roadmap
   roadmap: RoadmapAction[];
@@ -81,26 +295,21 @@ export interface StrategyData {
   // Métadonnées
   generatedAt: number | null;
   parcours: 'augmentation' | 'pivot' | null;
+  
+  // Scores agrégés
+  capitalActif: number;
+  zoneRisque: number;
 }
 
 interface AuditStore {
-  // Current step in the audit flow
   currentStep: number;
-  
-  // Context
   context: AuditContext;
-  
-  // Tasks
   tasks: Task[];
-  
-  // Talents (user's signature) - 5 sur 12 Actifs Stratégiques
   talents: Talent[];
-  
-  // Software stack
   software: Software[];
-  
-  // Phase 2 - Strategy
   strategy: StrategyData;
+  computedKPIs: ComputedKPIs;
+  userIntention: UserIntention;  // Portrait de Mutation (Pivot uniquement)
   
   // Actions - Navigation
   setStep: (step: number) => void;
@@ -113,15 +322,31 @@ interface AuditStore {
   setJobTitle: (title: string) => void;
   setIndustry: (industry: string) => void;
   setJobDescription: (description: string) => void;
+  // Actions - Context (Champs enrichis)
+  setYearsExperience: (years: number) => void;
+  setTeamSize: (size: number) => void;
+  setAutomationExposure: (exposure: 'low' | 'medium' | 'high') => void;
+  setBudgetResponsibility: (budget: number) => void;
+  setClientFacing: (facing: boolean) => void;
+  // Actions - Mutation Drivers (Pivot uniquement)
+  setMutationDrivers: (drivers: MutationDriver[]) => void;
+  
+  // Actions - Portrait de Mutation (Pivot uniquement)
+  setPassionsConcretes: (passions: string) => void;
+  setCarreDAs: (carreDAs: UserIntention['carreDAs']) => void;
+  setZoneDeRejet: (zones: string[]) => void;
+  setHorizonCible: (horizon: UserIntention['horizonCible']) => void;
+  setManifesteHumain: (manifeste: string) => void;
+  validateUserIntention: () => void;
   
   // Actions - Tasks
-  addTask: (name: string) => string; // Retourne l'ID de la nouvelle tâche
+  addTask: (name: string) => string;
   addTasksFromAI: (tasks: Array<{
     name: string;
     hoursPerWeek: number;
     temporalite: Temporality;
     resilience: ResilienceScores;
-  }>) => void; // Bulk add depuis l'IA
+  }>) => void;
   updateTask: (id: string, task: Partial<Task>) => void;
   removeTask: (id: string) => void;
   clearTasks: () => void;
@@ -144,12 +369,13 @@ interface AuditStore {
   // Actions - Strategy (Phase 2)
   generateStrategy: () => void;
   toggleRoadmapAction: (id: string) => void;
+  computeKPIs: () => void;
   
   // Reset
   reset: () => void;
 }
 
-// Les 12 Actifs Stratégiques Officiels avec descriptions et exemples concrets
+// Les 12 Actifs Stratégiques
 export const STRATEGIC_ASSETS: Omit<Talent, 'level' | 'selected'>[] = [
   { 
     id: 'arbitrage-incertitude', 
@@ -202,16 +428,16 @@ export const STRATEGIC_ASSETS: Omit<Talent, 'level' | 'selected'>[] = [
   },
   { 
     id: 'pilotage-ia', 
-    name: 'Pilotage de l\'IA (IA Ops)', 
-    description: 'Orchestrer et superviser des agents IA pour décupler la production.',
-    example: 'Ex: Utiliser ChatGPT pour rédiger plus vite, automatiser des tâches avec l\'IA, créer des prompts efficaces.',
+    name: 'Pilotage des Outils Automatisés', 
+    description: 'Orchestrer et superviser les outils de production pour décupler l\'efficacité.',
+    example: 'Ex: Utiliser ChatGPT pour rédiger plus vite, automatiser des tâches répétitives, créer des prompts efficaces.',
     icon: 'Bot'
   },
   { 
     id: 'ethique-gouvernance', 
-    name: 'Éthique & Gouvernance', 
+    name: 'Responsabilité & Conformité', 
     description: 'Porter la responsabilité morale et légale des décisions automatisées.',
-    example: 'Ex: Valider qu\'une décision IA est juste, s\'assurer du respect des règles RGPD, arbitrer un dilemme éthique.',
+    example: 'Ex: Valider qu\'une sortie algorithmique est juste, s\'assurer du respect des règles RGPD, arbitrer un dilemme.',
     icon: 'Shield'
   },
   { 
@@ -224,8 +450,8 @@ export const STRATEGIC_ASSETS: Omit<Talent, 'level' | 'selected'>[] = [
   { 
     id: 'analyse-critique', 
     name: 'Analyse Critique & Biais', 
-    description: 'Repérer les erreurs, les hallucinations et les biais des systèmes d\'IA.',
-    example: 'Ex: Vérifier qu\'un texte généré par IA est correct, détecter une info fausse, challenger un rapport.',
+    description: 'Repérer les erreurs, les incohérences et les biais des systèmes automatisés.',
+    example: 'Ex: Vérifier qu\'un contenu généré automatiquement est correct, détecter une info fausse, challenger un rapport.',
     icon: 'Search'
   },
   { 
@@ -237,173 +463,1187 @@ export const STRATEGIC_ASSETS: Omit<Talent, 'level' | 'selected'>[] = [
   },
 ];
 
-// Legacy export for compatibility
 export const AVAILABLE_TALENTS = STRATEGIC_ASSETS;
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
-// Générateur d'opportunités de niche selon profil
+// ===============================================
+// GÉNÉRATEURS DU MOTEUR DE STRATÉGIE
+// ===============================================
+
+// Génère les actions ERAC basées sur l'analyse des tâches
+// Avec traçabilité technique : source + % vulnérabilité
+// Intelligence de Câblage : utilise zoneDeRejet pour ÉLIMINER (Pivot)
+function generateERACActions(tasks: Task[], goal: Goal, userIntention?: UserIntention): ERACAction[] {
+  const actions: ERACAction[] = [];
+
+  // ÉLIMINER basé sur Zone de Rejet (Portrait de Mutation - Pivot uniquement)
+  if (goal === 'pivot' && userIntention?.zoneDeRejet && userIntention.zoneDeRejet.length > 0) {
+    userIntention.zoneDeRejet.forEach(rejet => {
+      actions.push({
+        id: generateId(),
+        category: 'eliminate',
+        action: `Éliminer "${rejet}" de votre trajectoire`,
+        rationale: 'Identifié comme source d\'épuisement ou incompatibilité profonde (Zone de Rejet).',
+        impact: 'high',
+        sourceNote: '[Source: Portrait de Mutation — Zone de Rejet]',
+      });
+    });
+  }
+
+  tasks.forEach(task => {
+    const avgResilience = (
+      task.resilience.donnees +
+      task.resilience.decision +
+      task.resilience.relationnel +
+      task.resilience.creativite +
+      task.resilience.execution
+    ) / 5;
+    
+    // Calcul du % de vulnérabilité (inverse de la résilience)
+    const vulnerabilityScore = Math.round(100 - avgResilience);
+    // Note technique de traçabilité
+    const sourceNote = `[Source: ${task.name} — ${vulnerabilityScore}% vulnérabilité]`;
+
+    // ÉLIMINER : Tâches à très faible résilience (<30) et peu d'heures
+    if (avgResilience < 30 && task.hoursPerWeek <= 5) {
+      actions.push({
+        id: generateId(),
+        category: 'eliminate',
+        taskId: task.id,
+        taskName: task.name,
+        action: `Supprimer "${task.name}" du périmètre`,
+        rationale: 'Tâche entièrement automatisable, valeur humaine quasi-nulle.',
+        impact: 'high',
+        timeFreed: task.hoursPerWeek,
+        sourceNote,
+        vulnerabilityScore,
+      });
+    }
+    // RÉDUIRE : Tâches à faible résilience (30-50) avec heures significatives
+    else if (avgResilience < 50 && task.hoursPerWeek > 2) {
+      actions.push({
+        id: generateId(),
+        category: 'reduce',
+        taskId: task.id,
+        taskName: task.name,
+        action: `Automatiser partiellement "${task.name}"`,
+        rationale: 'Déléguer l\'exécution aux outils, conserver la supervision humaine.',
+        impact: avgResilience < 40 ? 'high' : 'medium',
+        timeFreed: Math.round(task.hoursPerWeek * 0.6),
+        sourceNote,
+        vulnerabilityScore,
+      });
+    }
+    // AUGMENTER : Tâches à haute résilience relationnelle/décisionnelle
+    else if (task.resilience.relationnel > 70 || task.resilience.decision > 70) {
+      // Pour les tâches à augmenter, on affiche la résilience (pas vulnérabilité)
+      const resilienceNote = `[Source: ${task.name} — ${Math.round(avgResilience)}% résilience]`;
+      actions.push({
+        id: generateId(),
+        category: 'raise',
+        taskId: task.id,
+        taskName: task.name,
+        action: `Intensifier "${task.name}"`,
+        rationale: 'Haute valeur humaine, différenciateur clé face à l\'automatisation.',
+        impact: 'high',
+        sourceNote: resilienceNote,
+        vulnerabilityScore: vulnerabilityScore,
+      });
+    }
+  });
+
+  // CRÉER : Nouvelles activités selon le goal (pas de source car création)
+  if (goal === 'augmentation') {
+    actions.push({
+      id: generateId(),
+      category: 'create',
+      action: 'Devenir Superviseur des Systèmes Automatisés',
+      rationale: 'Nouvelle fonction : orchestrer, arbitrer et valider les sorties des outils automatisés.',
+      impact: 'high',
+      sourceNote: '[Création stratégique basée sur l\'objectif Augmentation]',
+    });
+    actions.push({
+      id: generateId(),
+      category: 'create',
+      action: 'Mettre en place un Audit Critique des Sorties Algorithmiques',
+      rationale: 'Vérifier, corriger et valider les productions automatisées avant diffusion.',
+      impact: 'medium',
+      sourceNote: '[Création stratégique basée sur l\'objectif Augmentation]',
+    });
+  } else {
+    actions.push({
+      id: generateId(),
+      category: 'create',
+      action: 'Packager votre expertise en offre de service',
+      rationale: 'Transformer vos compétences métier en prestation facturable.',
+      impact: 'high',
+      sourceNote: '[Création stratégique basée sur l\'objectif Pivot]',
+    });
+  }
+
+  return actions;
+}
+
+// Génère la Value Curve pour visualisation Blue Ocean
+function generateValueCurve(tasks: Task[], talents: Talent[], goal: Goal): ValueCurvePoint[] {
+  const selectedTalents = talents.filter(t => t.selected);
+  const avgResilience = tasks.length > 0
+    ? tasks.reduce((acc, t) => acc + (t.resilience.donnees + t.resilience.decision + t.resilience.relationnel + t.resilience.creativite + t.resilience.execution) / 5, 0) / tasks.length
+    : 50;
+
+  const curve: ValueCurvePoint[] = [
+    {
+      factor: 'Exécution Routinière',
+      current: 100 - avgResilience,
+      target: goal === 'augmentation' ? 20 : 10,
+      industry: 75,
+    },
+    {
+      factor: 'Arbitrage Décisionnel',
+      current: selectedTalents.some(t => t.id === 'pilotage-ia' || t.id === 'arbitrage-incertitude') ? 70 : 30,
+      target: goal === 'augmentation' ? 90 : 60,
+      industry: 35,
+    },
+    {
+      factor: 'Décision Complexe',
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.decision, 0) / tasks.length) : 50,
+      target: 85,
+      industry: 55,
+    },
+    {
+      factor: 'Relations Clés',
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.relationnel, 0) / tasks.length) : 50,
+      target: 90,
+      industry: 60,
+    },
+    {
+      factor: 'Création de Valeur',
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.creativite, 0) / tasks.length) : 50,
+      target: goal === 'pivot' ? 95 : 75,
+      industry: 45,
+    },
+    {
+      factor: 'Responsabilité Opérationnelle',
+      current: selectedTalents.some(t => t.id === 'ethique-gouvernance' || t.id === 'analyse-critique') ? 75 : 25,
+      target: 80,
+      industry: 30,
+    },
+  ];
+
+  return curve;
+}
+
+// Génère le Business Model You - Diagnostic de Positionnement
+function generateBusinessModel(
+  talents: Talent[],
+  tasks: Task[],
+  context: AuditContext,
+  goal: Goal
+): BusinessModelYou {
+  const selectedTalents = talents.filter(t => t.selected);
+  
+  // Tâches à haute résilience (score moyen > 60)
+  const highValueTasks = tasks.filter(t => {
+    const avg = (t.resilience.relationnel + t.resilience.decision + t.resilience.creativite) / 3;
+    return avg > 60;
+  }).sort((a, b) => {
+    const avgA = (a.resilience.relationnel + a.resilience.decision + a.resilience.creativite) / 3;
+    const avgB = (b.resilience.relationnel + b.resilience.decision + b.resilience.creativite) / 3;
+    return avgB - avgA;
+  });
+
+  // Top 2 talents (par niveau de maîtrise)
+  const topTalents = [...selectedTalents].sort((a, b) => b.level - a.level).slice(0, 2);
+
+  // === VALEUR UNIQUE : Croisement top talents + tâches haute résilience ===
+  let coreValue = '';
+  if (topTalents.length >= 2 && highValueTasks.length >= 1) {
+    coreValue = `${topTalents[0].name} × ${topTalents[1].name} appliqués à "${highValueTasks[0].name}"`;
+  } else if (topTalents.length >= 1) {
+    coreValue = `Expertise en ${topTalents[0].name}`;
+  } else {
+    coreValue = 'Profil polyvalent en repositionnement';
+  }
+
+  // === AUDIENCE CIBLE : Selon persona et goal ===
+  const audienceMap: Record<string, Record<string, string>> = {
+    augmentation: {
+      salarie: 'Direction opérationnelle, N+1, équipes projet internes',
+      freelance: 'Clients existants cherchant à optimiser leurs processus',
+      leader: 'COMEX, Directeurs de BU, Responsables Transformation',
+    },
+    pivot: {
+      salarie: 'Recruteurs sectoriels, Managers des métiers refuges identifiés',
+      freelance: 'Nouvelles cibles dans les niches de résilience',
+      leader: 'Boards, Cabinets de conseil en transformation',
+    },
+  };
+  const targetAudience = goal && context.persona 
+    ? audienceMap[goal][context.persona] 
+    : 'Décideurs en quête de valeur humaine irremplaçable';
+
+  // === DIFFÉRENCIATEUR : Pourquoi un système automatisé ne peut pas remplacer ===
+  const differentiatorMap: Record<string, string> = {
+    'arbitrage-incertitude': 'Capacité à trancher quand les données sont contradictoires ou absentes',
+    'synthese-strategique': 'Production de sens et de cap là où les algorithmes restent descriptifs',
+    'intelligence-negociation': 'Lecture des non-dits et adaptation tactique en temps réel',
+    'pensee-systemique': 'Anticipation des effets de bord qu\'aucun modèle ne peut prévoir',
+    'diagnostic-crise': 'Improvisation et créativité sous pression en situation inédite',
+    'tactique-relationnelle': 'Construction de confiance et d\'alliances impossibles à automatiser',
+    'innovation-rupture': 'Création de concepts absents des données d\'entraînement',
+    'pilotage-ia': 'Supervision critique et correction des sorties automatisées',
+    'ethique-gouvernance': 'Responsabilité morale et arbitrage éthique en zone grise',
+    'leadership-transition': 'Mobilisation humaine et gestion émotionnelle du changement',
+    'analyse-critique': 'Détection des biais et erreurs que les systèmes perpétuent',
+    'communication-influence': 'Persuasion et alignement de parties prenantes divergentes',
+  };
+  const topTalentId = topTalents[0]?.id || '';
+  const uniqueDifferentiator = differentiatorMap[topTalentId] 
+    || 'Jugement humain irremplaçable en situation complexe';
+
+  // === MODE DE LIVRAISON : Posture selon goal ===
+  const deliveryMap: Record<string, string> = {
+    augmentation: 'Posture de Superviseur : Arbitrage décisionnel, Audit critique des productions, Validation finale',
+    pivot: 'Posture d\'Expert : Diagnostic, Conseil opérationnel, Accompagnement de transition',
+  };
+  const deliveryMethod = goal ? deliveryMap[goal] : 'Production supervisée avec valeur ajoutée humaine';
+
+  return {
+    coreValue,
+    targetAudience,
+    uniqueDifferentiator,
+    deliveryMethod,
+    keyResources: selectedTalents.map(t => t.id),
+    keyActivities: highValueTasks.slice(0, 5).map(t => t.name),
+    channels: goal === 'augmentation'
+      ? ['Référent interne automatisation', 'Formation équipes', 'Projets pilotes']
+      : ['Réseau professionnel ciblé', 'Approche directe recruteurs', 'Événements sectoriels'],
+    relationships: ['Partenariats opérationnels', 'Mentorat croisé', 'Communautés métier'],
+  };
+}
+
+// Génère le Gap Analysis (Le Pont de Compétences) pour le Pivot
+function generateGapAnalysis(
+  tasks: Task[],
+  talents: Talent[],
+  context: AuditContext,
+  topNiche: NicheOpportunity | null
+): GapAnalysis | null {
+  if (!topNiche) return null;
+
+  const selectedTalents = talents.filter(t => t.selected);
+  const avgResilience = tasks.length > 0
+    ? tasks.reduce((acc, t) => acc + (t.resilience.donnees + t.resilience.decision + t.resilience.relationnel + t.resilience.creativite + t.resilience.execution) / 5, 0) / tasks.length
+    : 50;
+
+  const vulnerableTasks = tasks.filter(t => {
+    const avg = (t.resilience.donnees + t.resilience.execution) / 2;
+    return avg < 40;
+  });
+
+  // À GARDER : Talents transférables
+  const toKeep = selectedTalents
+    .filter(t => topNiche.requiredTalents.includes(t.id))
+    .map(t => ({
+      skill: t.name,
+      currentLevel: t.level,
+      transferability: t.level >= 4 ? 'high' as const : t.level >= 3 ? 'medium' as const : 'low' as const,
+      rationale: `Compétence clé pour ${topNiche.name}. Niveau actuel : ${t.level}/5.`,
+    }));
+
+  // À ACQUÉRIR : Compétences manquantes
+  const toAcquire = topNiche.requiredTalents
+    .filter(id => !selectedTalents.some(t => t.id === id))
+    .map(id => {
+      const talent = STRATEGIC_ASSETS.find(t => t.id === id);
+      return {
+        skill: talent?.name || id,
+        priority: 'critical' as const,
+        timeToAcquire: '3-6 mois',
+        method: 'Formation + Mentorat + Projets pratiques',
+      };
+    });
+
+  // À ABANDONNER : Habitudes du poste exposé
+  const toAbandon = vulnerableTasks.slice(0, 3).map(t => ({
+    habit: t.name,
+    reason: 'Tâche automatisable à forte vulnérabilité',
+    replacement: 'Focus sur la supervision et le pilotage stratégique',
+  }));
+
+  // Legacy fields for compatibility
+  const skillsToTransfer = toKeep.map(k => k.skill);
+  const skillsToAcquire = toAcquire.map(a => a.skill);
+
+  const gapSize = skillsToAcquire.length;
+  const matchRate = topNiche.matchScore;
+
+  // Métriques de transition
+  const yearsExp = context.yearsExperience || 5;
+  const networkScore = yearsExp >= 10 ? 75 : yearsExp >= 5 ? 55 : 35;
+  const mentalScore = selectedTalents.length >= 4 ? 70 : selectedTalents.length >= 2 ? 50 : 30;
+
+  return {
+    currentState: {
+      role: context.jobTitle || 'Position actuelle',
+      strengths: selectedTalents.slice(0, 3).map(t => t.name),
+      vulnerabilities: vulnerableTasks.slice(0, 3).map(t => t.name),
+      marketPosition: Math.round(avgResilience),
+    },
+    targetState: {
+      role: topNiche.name,
+      requiredSkills: topNiche.requiredTalents.map(id => {
+        const t = STRATEGIC_ASSETS.find(a => a.id === id);
+        return t?.name || id;
+      }),
+      marketDemand: topNiche.marketDemand,
+      growthPotential: topNiche.growthPotential,
+    },
+    bridge: {
+      toKeep,
+      toAcquire,
+      toAbandon,
+      skillsToAcquire,
+      skillsToTransfer,
+      estimatedTimeline: gapSize <= 1 ? '3-6 mois' : gapSize <= 2 ? '6-12 mois' : '12-18 mois',
+      riskLevel: matchRate >= 66 ? 'low' : matchRate >= 33 ? 'medium' : 'high',
+      investmentRequired: gapSize === 0 ? 'low' : gapSize <= 1 ? 'medium' : 'high',
+    },
+    viabilityScore: Math.round((matchRate * 0.6) + (avgResilience * 0.2) + (topNiche.marketDemand * 0.2)),
+    transitionMetrics: {
+      financialRunway: yearsExp >= 10 ? '12+ mois' : yearsExp >= 5 ? '6-9 mois' : '3-6 mois',
+      networkReadiness: networkScore,
+      mentalReadiness: mentalScore,
+    },
+  };
+}
+
+// Génère les opportunités de niche enrichies avec Core Transfer et Value Curve
+// Intelligence de Câblage : utilise les métiers idéaux du Portrait pour Pivot
 function generateNicheOpportunities(
   talents: Talent[], 
   goal: Goal, 
-  persona: Persona
+  persona: Persona,
+  userIntention?: UserIntention
 ): NicheOpportunity[] {
-  const talentIds = talents.map(t => t.id);
+  const selectedTalents = talents.filter(t => t.selected);
+  const talentIds = selectedTalents.map(t => t.id);
   
-  // Base d'opportunités (sera enrichie par IA plus tard)
+  // Fonction helper pour générer la Value Curve spécifique au métier
+  const generateValueCurve = (resistance: number): NicheOpportunity['valueCurve'] => [
+    { factor: 'Jugement Humain', userPosition: 75, automationThreat: 15 },
+    { factor: 'Relations Clés', userPosition: 70, automationThreat: 10 },
+    { factor: 'Arbitrage Complexe', userPosition: 80, automationThreat: 20 },
+    { factor: 'Innovation', userPosition: 65, automationThreat: 25 },
+    { factor: 'Exécution Répétitive', userPosition: 30, automationThreat: 90 },
+    { factor: 'Analyse Données', userPosition: 50, automationThreat: 85 },
+  ];
+
+  // Fonction helper pour générer les métriques sectorielles
+  const generateSectorMetrics = (demand: number, growth: 'high' | 'medium' | 'low'): NicheOpportunity['sectorMetrics'] => ({
+    jobOpenings: demand >= 85 ? 5000 : demand >= 70 ? 2500 : 1000,
+    averageAge: 42,
+    growthRate: growth === 'high' ? '+15%/an' : growth === 'medium' ? '+8%/an' : '+3%/an',
+    entryBarrier: growth === 'high' ? 'medium' : growth === 'medium' ? 'low' : 'high',
+  });
+
+  // Fonction helper pour trouver le talent clé
+  const findKeyTalent = (requiredTalents: string[]): { name: string; id: string } => {
+    const matchingTalent = selectedTalents.find(t => requiredTalents.includes(t.id));
+    if (matchingTalent) return { name: matchingTalent.name, id: matchingTalent.id };
+    const fallbackTalent = STRATEGIC_ASSETS.find(a => requiredTalents.includes(a.id));
+    return { name: fallbackTalent?.name || 'Compétence clé', id: fallbackTalent?.id || '' };
+  };
+  
   const allOpportunities: NicheOpportunity[] = [
     {
-      id: 'consultant-ia',
-      name: 'Consultant en Transformation IA',
-      description: 'Accompagner les entreprises dans l\'intégration de l\'automatisation intelligente.',
+      id: 'expert-integration-systemes',
+      name: 'Expert en Intégration de Systèmes Experts',
+      description: 'Optimiser les processus de production par l\'automatisation et superviser les outils déployés.',
       matchScore: 0,
       requiredTalents: ['pilotage-ia', 'pensee-systemique', 'communication-influence'],
       growthPotential: 'high',
+      marketDemand: 92,
+      automationResistance: 85,
+      salaryRange: '80-150K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['pilotage-ia', 'pensee-systemique']).name,
+        transferRationale: 'Votre capacité à comprendre les systèmes complexes vous positionne comme orchestrateur naturel des outils automatisés.',
+        competitiveEdge: 'Les entreprises cherchent des profils capables de faire le pont entre technique et stratégie.',
+      },
+      valueCurve: generateValueCurve(85),
+      sectorMetrics: generateSectorMetrics(92, 'high'),
     },
     {
       id: 'manager-transition',
       name: 'Manager de Transition',
-      description: 'Piloter des équipes lors de phases de mutation organisationnelle.',
+      description: 'Piloter des équipes et projets lors de phases de mutation organisationnelle critique.',
       matchScore: 0,
       requiredTalents: ['leadership-transition', 'diagnostic-crise', 'tactique-relationnelle'],
       growthPotential: 'high',
+      marketDemand: 88,
+      automationResistance: 90,
+      salaryRange: '90-180K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['leadership-transition', 'diagnostic-crise']).name,
+        transferRationale: 'Votre expérience en gestion de crise et mobilisation d\'équipes est irremplaçable en période de transformation.',
+        competitiveEdge: 'Le facteur humain en période de changement ne peut être automatisé.',
+      },
+      valueCurve: generateValueCurve(90),
+      sectorMetrics: generateSectorMetrics(88, 'high'),
     },
     {
       id: 'expert-negociation',
       name: 'Expert en Négociation Complexe',
-      description: 'Intervenir sur des deals à enjeux élevés nécessitant une expertise humaine.',
+      description: 'Intervenir sur des accords à enjeux élevés nécessitant jugement humain et finesse relationnelle.',
       matchScore: 0,
       requiredTalents: ['intelligence-negociation', 'arbitrage-incertitude', 'communication-influence'],
       growthPotential: 'medium',
+      marketDemand: 75,
+      automationResistance: 95,
+      salaryRange: '70-130K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['intelligence-negociation', 'arbitrage-incertitude']).name,
+        transferRationale: 'La négociation à haut niveau repose sur l\'intuition, l\'empathie et le timing — des compétences exclusivement humaines.',
+        competitiveEdge: 'Indice de protection de 95% : aucun algorithme ne peut lire les non-dits d\'une négociation.',
+      },
+      valueCurve: generateValueCurve(95),
+      sectorMetrics: generateSectorMetrics(75, 'medium'),
     },
     {
-      id: 'strategiste-innovation',
-      name: 'Stratégiste Innovation',
-      description: 'Concevoir des solutions disruptives au-delà des capacités génératives de l\'IA.',
+      id: 'concepteur-solutions',
+      name: 'Concepteur de Solutions Métier',
+      description: 'Concevoir des réponses sur-mesure aux problèmes complexes que les outils standards ne résolvent pas.',
       matchScore: 0,
       requiredTalents: ['innovation-rupture', 'synthese-strategique', 'pensee-systemique'],
       growthPotential: 'high',
+      marketDemand: 85,
+      automationResistance: 88,
+      salaryRange: '75-140K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['innovation-rupture', 'synthese-strategique']).name,
+        transferRationale: 'Votre capacité à innover et synthétiser vous permet de créer des solutions que les bases de données passées ne contiennent pas.',
+        competitiveEdge: 'L\'innovation de rupture nécessite une compréhension contextuelle que seul l\'humain possède.',
+      },
+      valueCurve: generateValueCurve(88),
+      sectorMetrics: generateSectorMetrics(85, 'high'),
     },
     {
-      id: 'responsable-ethique',
-      name: 'Responsable Éthique & Conformité IA',
-      description: 'Garantir la gouvernance et la responsabilité des systèmes automatisés.',
+      id: 'responsable-conformite-algo',
+      name: 'Responsable Conformité & Audit Algorithmique',
+      description: 'Garantir la fiabilité et la conformité des sorties des systèmes automatisés.',
       matchScore: 0,
       requiredTalents: ['ethique-gouvernance', 'analyse-critique', 'communication-influence'],
       growthPotential: 'high',
+      marketDemand: 90,
+      automationResistance: 92,
+      salaryRange: '85-160K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['ethique-gouvernance', 'analyse-critique']).name,
+        transferRationale: 'La responsabilité légale et éthique des décisions algorithmiques requiert un jugement humain certifié.',
+        competitiveEdge: 'Réglementation croissante (AI Act, RGPD) : demande en explosion pour les profils capables de certifier les productions.',
+      },
+      valueCurve: generateValueCurve(92),
+      sectorMetrics: generateSectorMetrics(90, 'high'),
     },
     {
-      id: 'coach-resilience',
-      name: 'Coach en Résilience Professionnelle',
-      description: 'Accompagner les individus dans leur mutation face à l\'automatisation.',
+      id: 'accompagnateur-reconversion',
+      name: 'Accompagnateur de Reconversion Métier',
+      description: 'Guider les professionnels dans leur transition vers des postes à plus forte valeur ajoutée.',
       matchScore: 0,
       requiredTalents: ['leadership-transition', 'tactique-relationnelle', 'diagnostic-crise'],
       growthPotential: 'medium',
+      marketDemand: 72,
+      automationResistance: 88,
+      salaryRange: '60-100K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['leadership-transition', 'tactique-relationnelle']).name,
+        transferRationale: 'Avoir vécu une mutation vous rend légitime pour accompagner d\'autres professionnels dans leur transition.',
+        competitiveEdge: 'L\'accompagnement humain en période de doute et de changement ne peut être délégué à une machine.',
+      },
+      valueCurve: generateValueCurve(88),
+      sectorMetrics: generateSectorMetrics(72, 'medium'),
+    },
+    {
+      id: 'arbitre-operationnel',
+      name: 'Arbitre Opérationnel',
+      description: 'Trancher les situations ambiguës où les données sont incomplètes ou contradictoires.',
+      matchScore: 0,
+      requiredTalents: ['arbitrage-incertitude', 'synthese-strategique', 'analyse-critique'],
+      growthPotential: 'high',
+      marketDemand: 78,
+      automationResistance: 91,
+      salaryRange: '90-170K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['arbitrage-incertitude', 'synthese-strategique']).name,
+        transferRationale: 'Votre capacité à décider avec des informations incomplètes est exactement ce que les algorithmes ne savent pas faire.',
+        competitiveEdge: 'Les entreprises ont besoin de décideurs capables de trancher quand la data ne suffit pas.',
+      },
+      valueCurve: generateValueCurve(91),
+      sectorMetrics: generateSectorMetrics(78, 'high'),
+    },
+    {
+      id: 'coordinateur-workflows',
+      name: 'Coordinateur de Workflows Hybrides',
+      description: 'Orchestrer les processus mêlant travail humain et outils automatisés dans les organisations.',
+      matchScore: 0,
+      requiredTalents: ['pensee-systemique', 'tactique-relationnelle', 'diagnostic-crise'],
+      growthPotential: 'medium',
+      marketDemand: 70,
+      automationResistance: 87,
+      salaryRange: '70-120K€',
+      coreTransfer: {
+        keyTalent: findKeyTalent(['pensee-systemique', 'tactique-relationnelle']).name,
+        transferRationale: 'Comprendre comment les humains et les machines interagissent est une compétence rare et recherchée.',
+        competitiveEdge: 'Les workflows hybrides sont l\'avenir — et ils nécessitent des coordinateurs humains.',
+      },
+      valueCurve: generateValueCurve(87),
+      sectorMetrics: generateSectorMetrics(70, 'medium'),
     },
   ];
-  
-  // Calcul des scores de correspondance
+
+  // === INTÉGRATION MÉTIERS IDÉAUX DU PORTRAIT ===
+  // Si des métiers idéaux sont définis, les ajouter avec un bonus de score
+  if (userIntention?.horizonCible) {
+    const { metierIdeal1, metierIdeal2, secteurCible } = userIntention.horizonCible;
+    
+    // Créer des opportunités personnalisées basées sur les métiers idéaux
+    const customOpportunities: NicheOpportunity[] = [];
+    
+    [metierIdeal1, metierIdeal2].forEach((metier, index) => {
+      if (metier && metier.trim().length > 2) {
+        // Trouver le talent le plus pertinent parmi les sélectionnés
+        const topTalent = selectedTalents.length > 0 
+          ? selectedTalents.reduce((best, t) => t.level > best.level ? t : best, selectedTalents[0])
+          : null;
+        
+        customOpportunities.push({
+          id: `custom-metier-${index + 1}`,
+          name: metier.trim(),
+          description: secteurCible 
+            ? `Métier idéal identifié dans le secteur ${secteurCible}. Aligné avec vos aspirations profondes.`
+            : 'Métier idéal identifié selon votre Portrait de Mutation.',
+          matchScore: 85 + (index === 0 ? 10 : 0), // Bonus pour le 1er métier idéal
+          requiredTalents: topTalent ? [topTalent.id] : [],
+          growthPotential: 'high' as const,
+          marketDemand: 80,
+          automationResistance: 88,
+          salaryRange: 'Variable selon expérience',
+          coreTransfer: {
+            keyTalent: topTalent?.name || 'Vos talents naturels',
+            transferRationale: 'Ce métier est directement aligné avec vos aspirations et votre Manifeste Humain.',
+            competitiveEdge: 'L\'alignement entre vos passions et votre expertise crée un positionnement unique.',
+          },
+          valueCurve: generateValueCurve(88),
+          sectorMetrics: {
+            jobOpenings: 2000,
+            averageAge: 40,
+            growthRate: '+10%/an',
+            entryBarrier: 'medium' as const,
+          },
+        });
+      }
+    });
+    
+    // Ajouter les métiers personnalisés en tête de liste
+    allOpportunities.unshift(...customOpportunities);
+  }
+
   return allOpportunities
     .map(opp => {
+      // Si c'est un métier personnalisé, garder le score original
+      if (opp.id.startsWith('custom-metier')) {
+        return opp;
+      }
       const matchCount = opp.requiredTalents.filter(t => talentIds.includes(t)).length;
       const matchScore = Math.round((matchCount / opp.requiredTalents.length) * 100);
       return { ...opp, matchScore };
     })
-    .filter(opp => opp.matchScore >= 33) // Au moins 1/3 de correspondance
+    .filter(opp => opp.matchScore >= 33)
     .sort((a, b) => b.matchScore - a.matchScore)
-    .slice(0, 4); // Top 4
+    .slice(0, 5);
 }
 
-// Générateur de roadmap selon profil
+// Génère l'Ikigai Stratégique
+// Intelligence de Câblage : pondération avec Portrait de Mutation pour Pivot
+function generateIkigai(
+  tasks: Task[],
+  talents: Talent[],
+  software: Software[],
+  niches: NicheOpportunity[],
+  userIntention?: UserIntention
+): IkigaiStrategique {
+  const selectedTalents = talents.filter(t => t.selected);
+
+  // === ENGAGEMENT STRATÉGIQUE ===
+  // Pondéré par les Passions Concrètes (si remplies) et croisement avec Horizon Cible
+  let engagementBase = selectedTalents.length > 0
+    ? Math.round(selectedTalents.reduce((acc, t) => acc + t.level * 20, 0) / selectedTalents.length)
+    : 30;
+  
+  // Bonus Engagement si les passions sont alignées avec le secteur cible
+  let passionBonus = 0;
+  if (userIntention?.passionsConcretes && userIntention.passionsConcretes.length > 20) {
+    // Bonus de 10 points pour avoir exprimé des passions claires
+    passionBonus += 10;
+    
+    // Bonus supplémentaire si le secteur cible est mentionné dans les passions
+    if (userIntention.horizonCible.secteurCible) {
+      const passionsLower = userIntention.passionsConcretes.toLowerCase();
+      const secteurLower = userIntention.horizonCible.secteurCible.toLowerCase();
+      if (passionsLower.includes(secteurLower) || secteurLower.split(' ').some(word => passionsLower.includes(word))) {
+        passionBonus += 5;
+      }
+    }
+  }
+  const engagementStrategique = Math.min(100, engagementBase + passionBonus);
+
+  // === EXPERTISE DISTINCTIVE ===
+  // Croisement des 4 Talents du Portrait avec les 5 Actifs de l'audit
+  const techBonus = software.reduce((acc, s) => {
+    return acc + (s.level === 'expert' ? 15 : s.level === 'avance' ? 8 : 3);
+  }, 0);
+  
+  let expertiseBase = Math.round(
+    (selectedTalents.reduce((acc, t) => acc + t.level * 18, 0) / Math.max(1, selectedTalents.length)) + techBonus / 3
+  );
+  
+  // Bonus Expertise si le Carré d'As est aligné avec les actifs sélectionnés
+  let carreDAsBonus = 0;
+  if (userIntention?.carreDAs) {
+    const carreDAsValues = [
+      userIntention.carreDAs.talent1,
+      userIntention.carreDAs.talent2,
+      userIntention.carreDAs.talent3,
+      userIntention.carreDAs.talent4
+    ].filter(t => t.trim().length > 0);
+    
+    // Vérifier les correspondances entre Carré d'As et talents sélectionnés
+    const talentNames = selectedTalents.map(t => t.name.toLowerCase());
+    const matchCount = carreDAsValues.filter(carreAs => 
+      talentNames.some(tn => 
+        tn.includes(carreAs.toLowerCase()) || carreAs.toLowerCase().includes(tn.split(' ')[0])
+      )
+    ).length;
+    
+    // Bonus de cohérence : jusqu'à 10 points
+    carreDAsBonus = Math.min(10, matchCount * 3);
+  }
+  const expertiseDistinctive = Math.min(100, expertiseBase + carreDAsBonus);
+
+  // === DEMANDE CRITIQUE DU MARCHÉ ===
+  const demandeCritique = niches.length > 0
+    ? Math.round(niches.reduce((acc, n) => acc + n.marketDemand, 0) / niches.length)
+    : 50;
+
+  // === LEVIER ÉCONOMIQUE ===
+  const avgResilience = tasks.length > 0
+    ? tasks.reduce((acc, t) => acc + (t.resilience.relationnel + t.resilience.decision + t.resilience.creativite) / 3, 0) / tasks.length
+    : 50;
+  const levierEconomique = Math.round((avgResilience * 0.5) + (demandeCritique * 0.3) + (expertiseDistinctive * 0.2));
+
+  // === SCORE D'ALIGNEMENT ===
+  const scores = [engagementStrategique, expertiseDistinctive, demandeCritique, levierEconomique];
+  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const variance = scores.reduce((acc, s) => acc + Math.pow(s - avg, 2), 0) / scores.length;
+  const alignmentScore = Math.round(avg - (Math.sqrt(variance) * 0.5));
+
+  let alignmentZone: 'optimal' | 'partial' | 'misaligned';
+  if (alignmentScore >= 65 && variance < 200) alignmentZone = 'optimal';
+  else if (alignmentScore >= 45) alignmentZone = 'partial';
+  else alignmentZone = 'misaligned';
+
+  return {
+    engagementStrategique,
+    expertiseDistinctive,
+    demandeCritique,
+    levierEconomique,
+    alignmentScore,
+    alignmentZone,
+  };
+}
+
+// Génère la Roadmap enrichie - Actions Opérationnelles Concrètes
+// SYNCHRONISATION TOTALE : Audit + Portrait Humain (userIntention)
 function generateRoadmap(
   tasks: Task[],
   talents: Talent[],
   software: Software[],
-  goal: Goal
+  goal: Goal,
+  eracActions: ERACAction[],
+  userIntention?: UserIntention
 ): RoadmapAction[] {
   const roadmap: RoadmapAction[] = [];
+  const selectedTalents = talents.filter(t => t.selected);
   
-  // Pilier 1: Délégation Technologique
-  // Trouver les tâches à faible résilience (< 40)
-  const lowResilienceTasks = tasks.filter(t => {
-    const avg = (t.resilience.donnees + t.resilience.decision + t.resilience.creativite) / 3;
-    return avg < 40;
+  // ===============================================
+  // EXTRACTION DES DONNÉES DU PORTRAIT HUMAIN (PIVOT)
+  // ===============================================
+  const carreDAs = userIntention?.carreDAs;
+  const zoneDeRejet = userIntention?.zoneDeRejet || [];
+  const passions = userIntention?.passionsConcretes || '';
+  const secteurCible = userIntention?.horizonCible?.secteurCible || '';
+  const metierIdeal1 = userIntention?.horizonCible?.metierIdeal1 || '';
+  const metierIdeal2 = userIntention?.horizonCible?.metierIdeal2 || '';
+  const hasPortraitData = userIntention?.isComplete;
+
+  // ===============================================
+  // CALCULS DYNAMIQUES BASÉS SUR LES DONNÉES DU STORE
+  // ===============================================
+
+  // Identifier les tâches avec leur score de vulnérabilité (score bas = plus vulnérable)
+  const tasksWithScores = [...tasks]
+    .map(t => ({
+      ...t,
+      avgScore: (t.resilience.donnees + t.resilience.decision + t.resilience.relationnel + t.resilience.creativite + t.resilience.execution) / 5,
+      vulnerabilityPercent: 100 - Math.round((t.resilience.donnees + t.resilience.decision + t.resilience.relationnel + t.resilience.creativite + t.resilience.execution) / 5)
+    }))
+    .sort((a, b) => a.avgScore - b.avgScore);
+
+  // La tâche LA PLUS vulnérable (score le plus bas)
+  const mostVulnerableTask = tasksWithScores[0] || null;
+  
+  // Les 2 tâches les plus vulnérables
+  const vulnerableTasks = tasksWithScores.slice(0, 2);
+
+  // Identifier les tâches à haute valeur (score > 60)
+  const highValueTasks = tasks.filter(t => {
+    const avg = (t.resilience.relationnel + t.resilience.decision + t.resilience.creativite) / 3;
+    return avg > 60;
   });
+
+  // Le talent avec le score LE PLUS BAS dans le Top 5 sélectionné
+  const lowestScoredTalent = selectedTalents.length > 0
+    ? [...selectedTalents].sort((a, b) => a.level - b.level)[0]
+    : null;
+
+  // Talents avec score < 4 (à renforcer)
+  const talentsToReinforce = selectedTalents.filter(t => t.level < 4);
+
+  // ===============================================
+  // CALCUL DE GAIN DE TEMPS DÉTAILLÉ
+  // ===============================================
   
-  if (lowResilienceTasks.length > 0) {
+  // Temps libérable par les tâches automatisables (vulnérabilité > 50%)
+  const automatizableTasks = tasksWithScores.filter(t => t.vulnerabilityPercent >= 50);
+  const timeToFreeFromAutomation = automatizableTasks.reduce((acc, t) => acc + t.hoursPerWeek, 0);
+  
+  // Temps des 2 tâches les plus vulnérables
+  const timeToFree = vulnerableTasks.reduce((acc, t) => acc + t.hoursPerWeek, 0);
+  
+  // Gain annuel estimé (52 semaines)
+  const annualTimeGain = timeToFree * 52;
+
+  // ===============================================
+  // PILIER 1: DÉLÉGATION & EFFICIENCE (Le Nettoyage)
+  // SYNCHRONISÉ avec Audit + Zone de Rejet (Portrait Humain)
+  // Verbes d'impact : Déléguer, Implémenter, Configurer
+  // ===============================================
+
+  // Construire le titre hybride (Tâche vulnérable + Zone de Rejet si disponible)
+  const rejetItem = zoneDeRejet.length > 0 ? zoneDeRejet[0] : null;
+  
+  // Action principale : Délégation technologique
+  if (mostVulnerableTask) {
+    const hybridTitle = rejetItem && goal === 'pivot'
+      ? `Déléguer "${mostVulnerableTask.name}" et éliminer "${rejetItem}"`
+      : `Déléguer technologiquement "${mostVulnerableTask.name}"`;
+    
+    const hybridDesc = rejetItem && goal === 'pivot'
+      ? `Automatisation prioritaire de "${mostVulnerableTask.name}" (vulnérabilité ${mostVulnerableTask.vulnerabilityPercent}%) + retrait définitif de "${rejetItem}" (identifié comme source d'épuisement). Gain estimé : ${Math.round(mostVulnerableTask.hoursPerWeek * 0.8)}h/semaine.`
+      : `Cette tâche présente une vulnérabilité de ${mostVulnerableTask.vulnerabilityPercent}%. Automatisation prioritaire — Gain estimé : ${mostVulnerableTask.hoursPerWeek}h/semaine (${mostVulnerableTask.hoursPerWeek * 52}h/an).`;
+    
     roadmap.push({
       id: generateId(),
       pillar: 'delegation',
-      title: 'Automatiser les processus à faible valeur',
-      description: `Identifier des outils d'automatisation intelligente pour ${lowResilienceTasks.length} tâche(s) à faible intensité humaine.`,
+      title: hybridTitle,
+      description: hybridDesc,
       priority: 'immediate',
       completed: false,
+      eracCategory: 'eliminate',
+      kpi: `${Math.round(mostVulnerableTask.hoursPerWeek * 0.8)}h/sem libérées`,
+      resilienceScore: 9, // Score élevé : éliminer les tâches vulnérables protège fortement
+      suggestedTool: mostVulnerableTask.resilience.donnees > 60 ? 'Zapier / Make (automatisation)' : 'ChatGPT / Claude (traitement)',
+      sourceData: rejetItem ? 'Audit Tâches + Portrait Humain (Zone de Rejet)' : 'Audit Tâches',
     });
   }
   
-  roadmap.push({
-    id: generateId(),
-    pillar: 'delegation',
-    title: 'Maîtriser un outil d\'IA générative',
-    description: 'Atteindre le niveau "Expert" sur au moins un assistant IA (ChatGPT, Claude, Copilot).',
-    priority: 'short_term',
-    completed: false,
-  });
-  
-  // Pilier 2: Renforcement de Signature
-  const weakTalents = talents.filter(t => t.selected && t.level <= 2);
-  if (weakTalents.length > 0) {
+  // Action secondaire si plus d'une tâche vulnérable
+  if (vulnerableTasks.length > 1) {
+    const secondTask = vulnerableTasks[1];
+    const secondRejet = zoneDeRejet.length > 1 ? zoneDeRejet[1] : null;
+    
     roadmap.push({
       id: generateId(),
-      pillar: 'reinforcement',
-      title: 'Plan de montée en compétence critique',
-      description: `Renforcer ${weakTalents.map(t => t.name).join(', ')} via formation ou mentorat.`,
+      pillar: 'delegation',
+      title: secondRejet && goal === 'pivot'
+        ? `Configurer l'automatisation de "${secondTask.name}" + retrait de "${secondRejet}"`
+        : `Implémenter l'automatisation secondaire : "${secondTask.name}"`,
+      description: `Vulnérabilité de ${secondTask.vulnerabilityPercent}%. Gain additionnel : ${secondTask.hoursPerWeek}h/semaine. Total cumulé : ${timeToFree}h/semaine.`,
       priority: 'short_term',
       completed: false,
+      eracCategory: 'reduce',
+      kpi: `+${secondTask.hoursPerWeek}h/sem (cumul: ${timeToFree}h)`,
+      resilienceScore: 8,
+      suggestedTool: 'No-code (Notion, Airtable, ou outil métier)',
+      sourceData: secondRejet ? 'Audit + Portrait Humain' : 'Audit Tâches',
     });
   }
   
-  roadmap.push({
-    id: generateId(),
-    pillar: 'reinforcement',
-    title: 'Documenter vos réussites à haute valeur humaine',
-    description: 'Constituer un portfolio de cas démontrant votre impact non-automatisable.',
-    priority: 'medium_term',
-    completed: false,
-  });
-  
-  // Pilier 3: Positionnement Marché
-  if (goal === 'augmentation') {
+  // Action tertiaire : Déployer un outil d'automatisation
+  if (!software.some(s => s.level === 'expert')) {
     roadmap.push({
       id: generateId(),
-      pillar: 'positioning',
-      title: 'Devenir le référent IA de votre périmètre',
-      description: 'Proposer un pilote d\'automatisation à votre management pour démontrer votre valeur augmentée.',
-      priority: 'short_term',
+      pillar: 'delegation',
+      title: 'Implémenter un assistant de production au niveau Expert',
+      description: 'Sélectionner un assistant (ChatGPT, Claude, Copilot, ou outil métier) et l\'intégrer dans votre workflow quotidien.',
+      priority: 'immediate',
       completed: false,
+      kpi: 'Usage quotidien documenté',
+      resilienceScore: 7,
+      suggestedTool: 'ChatGPT Plus / Claude Pro / GitHub Copilot',
+      sourceData: 'Audit Logiciels',
     });
   } else {
     roadmap.push({
       id: generateId(),
-      pillar: 'positioning',
-      title: 'Explorer les métiers refuges identifiés',
-      description: 'Réaliser des entretiens exploratoires avec des professionnels des niches à fort potentiel.',
+      pillar: 'delegation',
+      title: 'Configurer des workflows automatisés documentés',
+      description: `Documenter vos workflows automatisés. Objectif : maximiser le gain des ${timeToFree}h/semaine identifiées.`,
+      priority: 'short_term',
+      completed: false,
+      kpi: 'Rapport d\'efficience produit',
+      resilienceScore: 7,
+      suggestedTool: 'Notion / Confluence (documentation)',
+      sourceData: 'Audit Logiciels',
+    });
+  }
+
+  // ===============================================
+  // PILIER 2: RENFORCEMENT DE SIGNATURE (Le Muscle)
+  // SYNCHRONISÉ avec Audit + Carré d'As + Passions (Portrait Humain)
+  // Verbes d'impact : Déployer, Arbitrer, Sécuriser
+  // ===============================================
+
+  // Identifier le talent du Carré d'As à mettre en avant (si disponible)
+  const carreDAsTalent = carreDAs?.talent1 || carreDAs?.talent2 || null;
+  const passionResume = passions.length > 50 ? passions.substring(0, 50) + '...' : passions;
+
+  // Action principale : Renforcement critique de l'actif
+  if (lowestScoredTalent) {
+    // Si Portrait Humain disponible, croiser avec le Carré d'As
+    const hybridTitle = carreDAsTalent && hasPortraitData
+      ? `Déployer l'actif stratégique : "${lowestScoredTalent.name}" × "${carreDAsTalent}"`
+      : `Déployer l'actif critique : "${lowestScoredTalent.name}"`;
+    
+    const hybridDesc = passions && hasPortraitData
+      ? `Niveau actuel : ${lowestScoredTalent.level}/5. Appliquer ce talent à votre passion concrète ("${passionResume}") pour créer une proposition de valeur unique. Objectif : Niveau Référent (4/5).`
+      : `Niveau actuel : ${lowestScoredTalent.level}/5. Objectif : atteindre le niveau Référent (4/5) sur cet actif stratégique prioritaire.`;
+    
+    roadmap.push({
+      id: generateId(),
+      pillar: 'reinforcement',
+      title: hybridTitle,
+      description: hybridDesc,
       priority: 'immediate',
       completed: false,
+      eracCategory: 'raise',
+      kpi: `${lowestScoredTalent.name} → Niveau 4`,
+      resilienceScore: 9, // Score très élevé : les talents humains sont non-automatisables
+      suggestedTool: 'Mentorat / Formation certifiante / Coaching professionnel',
+      sourceData: hasPortraitData ? 'Audit Talents + Portrait Humain (Carré d\'As + Passions)' : 'Audit Talents',
+    });
+  }
+
+  // Action secondaire : Plan global sur les autres talents < 4
+  const otherTalentsToReinforce = talentsToReinforce.filter(t => t.id !== lowestScoredTalent?.id);
+  if (otherTalentsToReinforce.length > 0) {
+    // Croiser avec les autres talents du Carré d'As si disponibles
+    const carreDAsList = [carreDAs?.talent2, carreDAs?.talent3, carreDAs?.talent4].filter(Boolean);
+    
+    roadmap.push({
+      id: generateId(),
+      pillar: 'reinforcement',
+      title: carreDAsList.length > 0 && hasPortraitData
+        ? `Sécuriser vos actifs secondaires (alignés avec "${carreDAsList[0]}")`
+        : 'Sécuriser vos actifs secondaires en montée de compétence',
+      description: `Objectif Niveau 4/5 également sur : ${otherTalentsToReinforce.map(t => `${t.name} (${t.level}/5)`).join(', ')}.`,
+      priority: 'short_term',
+      completed: false,
+      eracCategory: 'raise',
+      kpi: `${otherTalentsToReinforce.length} actif(s) renforcés`,
+      resilienceScore: 8,
+      suggestedTool: 'Plateformes e-learning (Coursera, LinkedIn Learning)',
+      sourceData: hasPortraitData ? 'Audit Talents + Portrait Humain' : 'Audit Talents',
     });
   }
   
+  // Action tertiaire : Réallouer le temps libéré vers les activités différenciantes
+  if (highValueTasks.length > 0 && timeToFree > 0) {
+    roadmap.push({
+      id: generateId(),
+      pillar: 'reinforcement',
+      title: `Arbitrer le réinvestissement des ${timeToFree}h libérées`,
+      description: `Consacrer le temps gagné aux tâches à haute valeur : ${highValueTasks.slice(0, 2).map(t => t.name).join(', ')}.`,
+      priority: 'immediate',
+      completed: false,
+      eracCategory: 'raise',
+      kpi: `${timeToFree}h/sem → haute valeur`,
+      resilienceScore: 8,
+      suggestedTool: 'Time-blocking (Calendly, Google Calendar)',
+      sourceData: 'Audit Tâches (haute valeur)',
+    });
+  }
+
+  // Action tertiaire : Documentation des succès
   roadmap.push({
     id: generateId(),
-    pillar: 'positioning',
-    title: 'Affiner votre argumentaire de valeur',
-    description: 'Construire un pitch percutant expliquant votre différenciation face aux systèmes automatisés.',
+    pillar: 'reinforcement',
+    title: 'Sécuriser un portfolio de cas d\'impact',
+    description: 'Documenter 5 situations où votre jugement humain a fait la différence (arbitrage, résolution de crise, négociation).',
     priority: 'medium_term',
     completed: false,
+    kpi: '5+ cas documentés',
+    resilienceScore: 10, // Score maximal : preuves d'impact humain irremplaçable
+    suggestedTool: 'Notion / Obsidian (second cerveau)',
+    sourceData: 'Expérience terrain',
   });
+
+  // ===============================================
+  // PILIER 3: POSITIONNEMENT & AUTORITÉ (La Sortie)
+  // SYNCHRONISÉ avec Audit + Horizon Cible (Portrait Humain)
+  // Verbes d'impact : Négocier, Implémenter, Arbitrer
+  // ===============================================
+
+  if (goal === 'augmentation') {
+    // === SCÉNARIO AUGMENTATION : Gain d'efficience et pilotage ===
+    
+    roadmap.push({
+      id: generateId(),
+      pillar: 'positioning',
+      title: 'Négocier un positionnement de superviseur des flux automatisés',
+      description: 'Démontrer la valeur du nouveau workflow de production : temps gagné, erreurs évitées, qualité maintenue. Rédiger un rapport pour votre management.',
+      priority: 'short_term',
+      completed: false,
+      eracCategory: 'create',
+      kpi: 'Rapport présenté au N+1',
+      resilienceScore: 9, // Superviseur = rôle humain critique
+      suggestedTool: 'PowerPoint / Google Slides (présentation)',
+      sourceData: 'Audit + KPIs calculés',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'positioning',
+      title: 'Implémenter un projet pilote d\'automatisation supervisée',
+      description: 'Identifier un processus à optimiser et piloter sa transformation avec votre supervision. Arbitrer les décisions critiques.',
+      priority: 'short_term',
+      completed: false,
+      kpi: '1 pilote validé',
+      resilienceScore: 8,
+      suggestedTool: 'Trello / Asana (gestion de projet)',
+      sourceData: 'Audit Tâches (automatisables)',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'positioning',
+      title: 'Arbitrer en tant que référent automatisation du périmètre',
+      description: 'Former vos collègues aux bonnes pratiques et devenir le point de contact pour les questions d\'efficience.',
+      priority: 'medium_term',
+      completed: false,
+      kpi: '5+ collègues accompagnés',
+      resilienceScore: 10, // Formation = rôle humain irremplaçable
+      suggestedTool: 'Loom / Notion (documentation vidéo)',
+      sourceData: 'Expérience terrain',
+    });
+
+  } else {
+    // ===============================================
+    // SCÉNARIO PIVOT : MUTATION RADICALE
+    // SYNCHRONISÉ avec Audit + Portrait Humain (Horizon Cible)
+    // Verbes d'impact : Sécuriser, Implémenter, Négocier
+    // ===============================================
+
+    // Construire les références au métier cible
+    const metierCible = metierIdeal1 || metierIdeal2 || 'Métier Refuge identifié';
+    const secteurRef = secteurCible || 'secteur cible';
+
+    // -----------------------------------------------
+    // PILIER 1: DÉSENGAGEMENT DU SECTEUR EXPOSÉ
+    // -----------------------------------------------
+    
+    roadmap.push({
+      id: generateId(),
+      pillar: 'disengagement',
+      title: 'Sécuriser un audit financier de sortie',
+      description: 'Calculer votre runway financier : épargne, indemnités, droits au chômage. Objectif : 6 mois de sécurité minimum.',
+      priority: 'immediate',
+      completed: false,
+      kpi: 'Runway calculé',
+      resilienceScore: 10, // Sécurité financière = fondation critique
+      suggestedTool: 'Excel / Notion (simulateur budget)',
+      sourceData: 'Situation personnelle',
+    });
+
+    // Titre hybride avec Zone de Rejet
+    const disengageTitle = zoneDeRejet.length > 0
+      ? `Déléguer avant départ : "${mostVulnerableTask?.name || 'tâches automatisables'}" + éliminer "${zoneDeRejet[0]}"`
+      : `Déléguer avant départ : "${mostVulnerableTask?.name || 'les tâches automatisables'}"`;
+    
+    roadmap.push({
+      id: generateId(),
+      pillar: 'disengagement',
+      title: disengageTitle,
+      description: `Transférer progressivement vos responsabilités vers des collègues ou des outils. Retrait définitif des tâches de la Zone de Rejet.`,
+      priority: 'immediate',
+      completed: false,
+      eracCategory: 'eliminate',
+      kpi: 'Transfert planifié',
+      resilienceScore: 8,
+      suggestedTool: 'Documentation + Handover meeting',
+      sourceData: zoneDeRejet.length > 0 ? 'Audit + Portrait Humain (Zone de Rejet)' : 'Audit Tâches',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'disengagement',
+      title: 'Négocier une sortie optimisée vers ' + secteurRef,
+      description: `Explorer les options : rupture conventionnelle, transition interne, ou démission stratégique avec préavis aménagé. Objectif : transition vers "${metierCible}".`,
+      priority: 'short_term',
+      completed: false,
+      kpi: 'Accord de sortie',
+      resilienceScore: 7,
+      suggestedTool: 'Entretien RH / Conseil juridique',
+      sourceData: hasPortraitData ? 'Portrait Humain (Horizon Cible)' : 'Objectif utilisateur',
+    });
+
+    // -----------------------------------------------
+    // PILIER 2: IMMERSION DANS L'OCÉAN BLEU
+    // Stratégie d'entrée vers [Métier Idéal / Secteur Cible]
+    // -----------------------------------------------
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'oceanBleu',
+      title: hasPortraitData 
+        ? `Implémenter une stratégie d'entrée vers "${metierCible}"`
+        : 'Cartographier les métiers refuges accessibles',
+      description: hasPortraitData
+        ? `Réaliser 5 entretiens exploratoires avec des professionnels du secteur "${secteurRef}". Valider l'adéquation avec vos aspirations.`
+        : 'Réaliser 5 entretiens exploratoires avec des professionnels des niches identifiées. Valider l\'adéquation réelle.',
+      priority: 'immediate',
+      completed: false,
+      kpi: '5+ entretiens',
+      resilienceScore: 9,
+      suggestedTool: 'LinkedIn (networking) / Calendly (prise de RDV)',
+      sourceData: hasPortraitData ? 'Portrait Humain (Horizon Cible)' : 'Niches de Résilience',
+    });
+
+    if (lowestScoredTalent) {
+      // Croiser avec Carré d'As si disponible
+      const talentCroise = carreDAsTalent ? ` × "${carreDAsTalent}"` : '';
+      
+      roadmap.push({
+        id: generateId(),
+        pillar: 'oceanBleu',
+        title: `Déployer l'actif "${lowestScoredTalent.name}"${talentCroise} vers ${secteurRef}`,
+        description: `Niveau actuel ${lowestScoredTalent.level}/5. Plan de montée en compétence accéléré pour intégrer le secteur "${secteurRef}".`,
+        priority: 'immediate',
+        completed: false,
+        eracCategory: 'raise',
+        kpi: `Niveau 4+ en 3 mois`,
+        resilienceScore: 9,
+        suggestedTool: 'Formation certifiante / Mentorat sectoriel',
+        sourceData: hasPortraitData ? 'Audit + Portrait Humain (Carré d\'As)' : 'Audit Talents',
+      });
+    }
+  
+    roadmap.push({
+      id: generateId(),
+      pillar: 'oceanBleu',
+      title: `Acquérir les compétences spécifiques au secteur "${secteurRef}"`,
+      description: hasPortraitData
+        ? `Combler l'écart entre votre profil actuel et "${metierCible}". Budget : 1000-3000€ en formation.`
+        : 'Identifier et suivre les formations clés du secteur cible. Budget : 1000-3000€ en formation.',
+      priority: 'short_term',
+      completed: false,
+      eracCategory: 'create',
+      kpi: 'Certifications acquises',
+      resilienceScore: 8,
+      suggestedTool: 'Coursera / Udemy / Formation professionnelle',
+      sourceData: hasPortraitData ? 'Portrait Humain (Horizon Cible) + Gap Analysis' : 'Gap Analysis',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'oceanBleu',
+      title: `Sécuriser une crédibilité dans le secteur "${secteurRef}"`,
+      description: `Produire du contenu (articles, posts LinkedIn) démontrant votre expertise naissante dans le domaine "${secteurRef}".`,
+      priority: 'short_term',
+      completed: false,
+      kpi: '10+ publications',
+      resilienceScore: 7,
+      suggestedTool: 'LinkedIn / Medium / Newsletter (Substack)',
+      sourceData: hasPortraitData ? 'Portrait Humain (Manifeste Humain)' : 'Positionnement',
+    });
+
+    // -----------------------------------------------
+    // PILIER 3: ATTERRISSAGE vers [Métier Idéal]
+    // -----------------------------------------------
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'landing',
+      title: hasPortraitData
+        ? `Packager vos actifs pour "${metierCible}"`
+        : 'Packager vos actifs transférables',
+      description: `Formaliser une offre claire basée sur vos talents : ${selectedTalents.slice(0, 2).map(t => t.name).join(' + ')}.`,
+      priority: 'short_term',
+      completed: false,
+      eracCategory: 'create',
+      kpi: 'Pitch de 30 secondes',
+      resilienceScore: 8,
+      suggestedTool: 'Canva (CV visuel) / Notion (portfolio)',
+      sourceData: 'Audit Talents + Portrait Humain',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'landing',
+      title: `Négocier l'accès au réseau du secteur "${secteurRef}"`,
+      description: `Contacter 10 décideurs du secteur "${secteurRef}" avec votre proposition de valeur ciblée "${metierCible}". Approche directe et personnalisée.`,
+      priority: 'medium_term',
+      completed: false,
+      kpi: '10+ contacts qualifiés',
+      resilienceScore: 9,
+      suggestedTool: 'LinkedIn Sales Navigator / Emails personnalisés',
+      sourceData: hasPortraitData ? 'Portrait Humain (Horizon Cible)' : 'Niches de Résilience',
+    });
+
+    roadmap.push({
+      id: generateId(),
+      pillar: 'landing',
+      title: hasPortraitData
+        ? `Implémenter une mission pilote vers "${metierCible}"`
+        : 'Lancer un projet pilote / mission test',
+      description: `Valider votre positionnement avec une première mission (freelance, CDD, ou projet bénévole) dans le métier "${metierCible}".`,
+      priority: 'medium_term',
+      completed: false,
+      kpi: '1 mission réalisée',
+      resilienceScore: 10, // Mission réelle = validation ultime
+      suggestedTool: 'Malt / Freelance.com / Réseau direct',
+      sourceData: hasPortraitData ? 'Portrait Humain (Horizon Cible)' : 'Métiers Refuges',
+    });
+  }
   
   return roadmap;
 }
+
+// ===============================================
+// STORE ZUSTAND
+// ===============================================
 
 const initialContext: AuditContext = {
   persona: null,
@@ -411,16 +1651,72 @@ const initialContext: AuditContext = {
   jobTitle: '',
   industry: '',
   jobDescription: '',
+  yearsExperience: undefined,
+  teamSize: undefined,
+  automationExposure: undefined,
+  budgetResponsibility: undefined,
+  clientFacing: undefined,
+};
+
+const initialUserIntention: UserIntention = {
+  passionsConcretes: '',
+  carreDAs: {
+    talent1: '',
+    talent2: '',
+    talent3: '',
+    talent4: '',
+  },
+  zoneDeRejet: [],
+  horizonCible: {
+    secteurCible: '',
+    metierIdeal1: '',
+    metierIdeal2: '',
+  },
+  manifesteHumain: '',
+  completedAt: null,
+  isComplete: false,
+};
+
+const initialKPIs: ComputedKPIs = {
+  productivityGainPercent: 0,
+  timeROI: 0,
+  riskReductionScore: 0,
+  marketPositioningScore: 0,
+  transitionReadinessScore: 0,
+};
+
+const initialIkigai: IkigaiStrategique = {
+  engagementStrategique: 0,
+  expertiseDistinctive: 0,
+  demandeCritique: 0,
+  levierEconomique: 0,
+  alignmentScore: 0,
+  alignmentZone: 'misaligned',
+};
+
+const initialBusinessModel: BusinessModelYou = {
+  coreValue: '',
+  targetAudience: '',
+  uniqueDifferentiator: '',
+  deliveryMethod: '',
+  keyResources: [],
+  keyActivities: [],
+  channels: [],
+  relationships: [],
 };
 
 const initialStrategy: StrategyData = {
-  capitalActif: 0,
-  zoneRisque: 0,
+  ikigai: initialIkigai,
+  eracActions: [],
+  valueCurve: [],
+  businessModel: initialBusinessModel,
+  gapAnalysis: null,
   opportunitesNiche: [],
-  levierEconomique: 0,
   roadmap: [],
   generatedAt: null,
   parcours: null,
+  capitalActif: 0,
+  zoneRisque: 0,
 };
 
 export const useAuditStore = create<AuditStore>()(
@@ -432,8 +1728,10 @@ export const useAuditStore = create<AuditStore>()(
       talents: [],
       software: [],
       strategy: initialStrategy,
+      computedKPIs: initialKPIs,
+      userIntention: initialUserIntention,
 
-      // Navigation (8 étapes: 1-6 Audit + 7-8 Stratégie)
+      // Navigation (8 étapes)
       setStep: (step) => set({ currentStep: step }),
       nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 8) })),
       prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
@@ -454,8 +1752,64 @@ export const useAuditStore = create<AuditStore>()(
       setJobDescription: (jobDescription) => set((state) => ({
         context: { ...state.context, jobDescription }
       })),
+      // Context - Champs enrichis
+      setYearsExperience: (yearsExperience) => set((state) => ({
+        context: { ...state.context, yearsExperience }
+      })),
+      setTeamSize: (teamSize) => set((state) => ({
+        context: { ...state.context, teamSize }
+      })),
+      setAutomationExposure: (automationExposure) => set((state) => ({
+        context: { ...state.context, automationExposure }
+      })),
+      setBudgetResponsibility: (budgetResponsibility) => set((state) => ({
+        context: { ...state.context, budgetResponsibility }
+      })),
+      setClientFacing: (clientFacing) => set((state) => ({
+        context: { ...state.context, clientFacing }
+      })),
+      setMutationDrivers: (mutationDrivers) => set((state) => ({
+        context: { ...state.context, mutationDrivers: mutationDrivers.slice(0, 2) } // Max 2 drivers
+      })),
 
-      // Tasks - avec 5 curseurs de résilience
+      // Portrait de Mutation (Pivot uniquement)
+      setPassionsConcretes: (passions) => set((state) => ({
+        userIntention: { ...state.userIntention, passionsConcretes: passions }
+      })),
+      setCarreDAs: (carreDAs) => set((state) => ({
+        userIntention: { ...state.userIntention, carreDAs }
+      })),
+      setZoneDeRejet: (zones) => set((state) => ({
+        userIntention: { ...state.userIntention, zoneDeRejet: zones }
+      })),
+      setHorizonCible: (horizon) => set((state) => ({
+        userIntention: { ...state.userIntention, horizonCible: horizon }
+      })),
+      setManifesteHumain: (manifeste) => set((state) => ({
+        userIntention: { ...state.userIntention, manifesteHumain: manifeste }
+      })),
+      validateUserIntention: () => set((state) => {
+        const { passionsConcretes, carreDAs, horizonCible, manifesteHumain } = state.userIntention;
+        const isComplete = 
+          passionsConcretes.trim().length > 0 &&
+          carreDAs.talent1.trim().length > 0 &&
+          carreDAs.talent2.trim().length > 0 &&
+          carreDAs.talent3.trim().length > 0 &&
+          carreDAs.talent4.trim().length > 0 &&
+          horizonCible.secteurCible.trim().length > 0 &&
+          (horizonCible.metierIdeal1.trim().length > 0 || horizonCible.metierIdeal2.trim().length > 0) &&
+          manifesteHumain.trim().length > 0;
+        
+        return {
+          userIntention: {
+            ...state.userIntention,
+            isComplete,
+            completedAt: isComplete ? Date.now() : null
+          }
+        };
+      }),
+
+      // Tasks
       addTask: (name) => {
         const taskId = generateId();
         set((state) => ({
@@ -463,7 +1817,7 @@ export const useAuditStore = create<AuditStore>()(
             id: taskId,
             name,
             temporalite: 'quotidien' as Temporality,
-            hoursPerWeek: 4, // Valeur par défaut: 4h/semaine
+            hoursPerWeek: 4,
             resilience: {
               donnees: 50,
               decision: 50,
@@ -499,7 +1853,7 @@ export const useAuditStore = create<AuditStore>()(
       })),
       clearTasks: () => set({ tasks: [] }),
 
-      // Talents - 12 Actifs Stratégiques
+      // Talents
       initializeTalents: () => set({
         talents: STRATEGIC_ASSETS.map((t) => ({
           ...t,
@@ -511,7 +1865,6 @@ export const useAuditStore = create<AuditStore>()(
         const selectedCount = state.talents.filter(t => t.selected).length;
         const talent = state.talents.find(t => t.id === id);
         
-        // Can't select more than 5
         if (!talent?.selected && selectedCount >= 5) {
           return state;
         }
@@ -543,15 +1896,17 @@ export const useAuditStore = create<AuditStore>()(
         software: state.software.filter((s) => s.id !== id)
       })),
 
-      // Computed - Vulnérabilité moyenne sur 5 dimensions
+      // Computed
       getSelectedTalents: () => get().talents.filter(t => t.selected),
       
       getResilienceScore: () => {
         const tasks = get().tasks;
         if (tasks.length === 0) return 0;
         
-        const totalScores = tasks.reduce((acc, task) => {
-          // Moyenne des 5 curseurs de résilience
+        let totalWeight = 0;
+        let weightedSum = 0;
+
+        tasks.forEach(task => {
           const taskScore = (
             task.resilience.donnees +
             task.resilience.decision +
@@ -559,10 +1914,13 @@ export const useAuditStore = create<AuditStore>()(
             task.resilience.creativite +
             task.resilience.execution
           ) / 5;
-          return acc + taskScore;
-        }, 0);
-        
-        return Math.round(totalScores / tasks.length);
+
+          const weight = task.hoursPerWeek;
+          weightedSum += taskScore * weight;
+          totalWeight += weight;
+        });
+
+        return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
       },
       
       getTalentScore: () => {
@@ -573,7 +1931,7 @@ export const useAuditStore = create<AuditStore>()(
         return Math.round((totalLevel / (selectedTalents.length * 5)) * 100);
       },
 
-      // Strategy (Phase 2)
+      // Strategy Generation
       generateStrategy: () => {
         const state = get();
         const { goal, persona } = state.context;
@@ -581,34 +1939,52 @@ export const useAuditStore = create<AuditStore>()(
         const talentScore = state.getTalentScore();
         const selectedTalents = state.getSelectedTalents();
         
-        // Calcul Capital Actif (basé sur talents + maîtrise tech)
+        // Récupérer le Portrait de Mutation (pour Pivot)
+        const intention = goal === 'pivot' ? state.userIntention : undefined;
+        
+        // Générer les actions ERAC (avec Zone de Rejet pour Pivot)
+        const eracActions = generateERACActions(state.tasks, goal, intention);
+
+        // Générer la Value Curve
+        const valueCurve = generateValueCurve(state.tasks, state.talents, goal);
+
+        // Générer les opportunités de niche (avec métiers idéaux pour Pivot)
+        const opportunitesNiche = generateNicheOpportunities(state.talents, goal, persona, intention);
+
+        // Générer l'Ikigai Stratégique (avec passions pour Pivot)
+        const ikigai = generateIkigai(state.tasks, state.talents, state.software, opportunitesNiche, intention);
+
+        // Générer le Business Model You
+        const businessModel = generateBusinessModel(state.talents, state.tasks, state.context, goal);
+
+        // Générer le Gap Analysis (seulement pour Pivot)
+        const gapAnalysis = goal === 'pivot'
+          ? generateGapAnalysis(state.tasks, state.talents, state.context, opportunitesNiche[0] || null)
+          : null;
+
+        // Générer la Roadmap (avec Portrait Humain pour Pivot)
+        const roadmap = generateRoadmap(state.tasks, state.talents, state.software, goal, eracActions, intention);
+
+        // Calculs agrégés
         const techBonus = state.software.reduce((acc, s) => {
-          const levelScore = s.level === 'expert' ? 20 : s.level === 'avance' ? 12 : 5;
-          return acc + levelScore;
+          return acc + (s.level === 'expert' ? 20 : s.level === 'avance' ? 12 : 5);
         }, 0);
         const capitalActif = Math.min(100, talentScore + Math.round(techBonus / 3));
-        
-        // Zone de Risque (inverse du score de résilience)
         const zoneRisque = 100 - resilienceScore;
-        
-        // Levier Économique (combinaison capital actif + adéquation marché)
-        const levierEconomique = Math.round((capitalActif * 0.6) + (resilienceScore * 0.4));
-        
-        // Opportunités de Niche (générées selon talents sélectionnés)
-        const opportunitesNiche = generateNicheOpportunities(selectedTalents, goal, persona);
-        
-        // Roadmap d'actions
-        const roadmap = generateRoadmap(state.tasks, selectedTalents, state.software, goal);
         
         set({
           strategy: {
-            capitalActif,
-            zoneRisque,
+            ikigai,
+            eracActions,
+            valueCurve,
+            businessModel,
+            gapAnalysis,
             opportunitesNiche,
-            levierEconomique,
             roadmap,
             generatedAt: Date.now(),
             parcours: goal,
+            capitalActif,
+            zoneRisque,
           }
         });
       },
@@ -622,6 +1998,67 @@ export const useAuditStore = create<AuditStore>()(
         }
       })),
 
+      // Calcul des KPIs automatiques
+      computeKPIs: () => {
+        const state = get();
+        const { tasks, talents, context, strategy } = state;
+        
+        // Temps total des tâches
+        const totalHoursPerWeek = tasks.reduce((acc, t) => acc + t.hoursPerWeek, 0);
+        
+        // Temps libérable via ERAC
+        const timeFreed = strategy.eracActions
+          .filter(a => a.category === 'eliminate' || a.category === 'reduce')
+          .reduce((acc, a) => acc + (a.timeFreed || 0), 0);
+        
+        // Score de résilience moyen
+        const avgResilience = tasks.length > 0
+          ? tasks.reduce((acc, t) => {
+              const taskAvg = (t.resilience.donnees + t.resilience.decision + t.resilience.relationnel + t.resilience.creativite + t.resilience.execution) / 5;
+              return acc + taskAvg;
+            }, 0) / tasks.length
+          : 50;
+        
+        // Nombre de talents sélectionnés et niveau moyen
+        const selectedTalents = talents.filter(t => t.selected);
+        const avgTalentLevel = selectedTalents.length > 0
+          ? selectedTalents.reduce((acc, t) => acc + t.level, 0) / selectedTalents.length
+          : 0;
+        
+        // Calcul des KPIs
+        const productivityGainPercent = totalHoursPerWeek > 0
+          ? Math.round((timeFreed / totalHoursPerWeek) * 100)
+          : 0;
+        
+        const timeROI = timeFreed * 52; // Heures par an
+        
+        const riskReductionScore = Math.min(100, Math.round(
+          avgResilience * 0.4 + 
+          (selectedTalents.length * 5) + 
+          (avgTalentLevel * 10)
+        ));
+        
+        const marketPositioningScore = Math.round(
+          (strategy.ikigai.alignmentScore * 0.4) +
+          (avgTalentLevel * 12) +
+          (selectedTalents.length * 3)
+        );
+        
+        const transitionReadinessScore = context.goal === 'pivot' && strategy.gapAnalysis
+          ? strategy.gapAnalysis.viabilityScore
+          : Math.round(productivityGainPercent * 0.5 + riskReductionScore * 0.5);
+        
+        set({
+          computedKPIs: {
+            productivityGainPercent,
+            timeROI,
+            riskReductionScore: Math.min(100, riskReductionScore),
+            marketPositioningScore: Math.min(100, marketPositioningScore),
+            transitionReadinessScore: Math.min(100, transitionReadinessScore),
+          }
+        });
+      },
+
       // Reset
       reset: () => set({
         currentStep: 1,
@@ -634,10 +2071,12 @@ export const useAuditStore = create<AuditStore>()(
         })),
         software: [],
         strategy: initialStrategy,
+        computedKPIs: initialKPIs,
+        userIntention: initialUserIntention,
       }),
     }),
     {
-      name: 'apex-audit-storage-v4', // Version bump pour Phase 2
+      name: 'apex-audit-storage-v6', // Version bump pour Portrait de Mutation
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
@@ -645,6 +2084,7 @@ export const useAuditStore = create<AuditStore>()(
         talents: state.talents,
         software: state.software,
         strategy: state.strategy,
+        userIntention: state.userIntention,
       }),
     }
   )

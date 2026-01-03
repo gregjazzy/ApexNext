@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar, Rocket, Zap, Compass } from 'lucide-react';
 import { ResilienceRadar } from '@/components/ui/ResilienceRadar';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
@@ -14,7 +15,8 @@ export function Step6Verdict() {
   const tStep4 = useTranslations('step4');
   const tStep5 = useTranslations('step5');
   const locale = useLocale();
-  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep, prevStep, nextStep } = useAuditStore();
+  const router = useRouter();
+  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep, prevStep } = useAuditStore();
   
   const resilienceScore = getResilienceScore();
   const talentScore = getTalentScore();
@@ -409,44 +411,101 @@ export function Step6Verdict() {
         <div />
       </motion.div>
 
-      {/* Call to Action */}
+      {/* Call to Action - Transition vers Phase 2 */}
       <motion.div
-        className="apex-card p-8 text-center bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border-blue-500/30"
+        className={cn(
+          "apex-card p-8 text-center relative overflow-hidden",
+          context.goal === 'augmentation' 
+            ? "bg-gradient-to-br from-emerald-500/10 via-slate-900/50 to-teal-500/10 border-emerald-500/30"
+            : "bg-gradient-to-br from-indigo-500/10 via-slate-900/50 to-purple-500/10 border-indigo-500/30"
+        )}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <TrendingUp className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-        <h3 className="text-xl font-serif text-slate-100 mb-2">
-          {t('readyForStep2')}
-        </h3>
-        <p className="text-slate-400 mb-6 max-w-xl mx-auto">
-          {t('readyForStep2Desc')}
-        </p>
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={cn(
+            "absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20",
+            context.goal === 'augmentation' ? "bg-emerald-500" : "bg-indigo-500"
+          )} />
+          <div className={cn(
+            "absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20",
+            context.goal === 'augmentation' ? "bg-teal-500" : "bg-purple-500"
+          )} />
+        </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <motion.button
-            onClick={() => {
-              reset();
-              setStep(1);
-            }}
-            className="apex-button-outline flex items-center justify-center gap-2"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+        <div className="relative z-10">
+          {/* Phase 2 Badge */}
+          <motion.div
+            className={cn(
+              "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4",
+              context.goal === 'augmentation'
+                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                : "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30"
+            )}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.9 }}
           >
-            <RefreshCw className="w-4 h-4" />
-            {t('restartAudit')}
-          </motion.button>
+            <Rocket className="w-4 h-4" />
+            {l === 'fr' ? 'Phase 2 Disponible' : 'Phase 2 Available'}
+          </motion.div>
+
+          <div className={cn(
+            "w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center",
+            context.goal === 'augmentation'
+              ? "bg-gradient-to-br from-emerald-600 to-teal-600"
+              : "bg-gradient-to-br from-indigo-600 to-purple-600"
+          )}>
+            {context.goal === 'augmentation' 
+              ? <Zap className="w-8 h-8 text-white" />
+              : <Compass className="w-8 h-8 text-white" />
+            }
+          </div>
+
+          <h3 className="text-2xl font-serif text-slate-100 mb-2">
+            {context.goal === 'augmentation'
+              ? (l === 'fr' ? 'Prêt pour la Réingénierie' : 'Ready for Reengineering')
+              : (l === 'fr' ? 'Prêt pour le Pivot Stratégique' : 'Ready for Strategic Pivot')
+            }
+          </h3>
+          <p className="text-slate-400 mb-6 max-w-xl mx-auto">
+            {t('readyForStep2Desc')}
+          </p>
           
-          <motion.button
-            onClick={nextStep}
-            className="apex-button flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            {t('accessIkigai')}
-            <TrendingUp className="w-4 h-4" />
-          </motion.button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.button
+              onClick={() => {
+                reset();
+                setStep(1);
+              }}
+              className="apex-button-outline flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <RefreshCw className="w-4 h-4" />
+              {t('restartAudit')}
+            </motion.button>
+            
+            <motion.button
+              onClick={() => {
+                setStep(7);
+                router.push('/strategy');
+              }}
+              className={cn(
+                "apex-button flex items-center justify-center gap-2 text-white font-medium",
+                context.goal === 'augmentation'
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+                  : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500"
+              )}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Rocket className="w-4 h-4" />
+              {l === 'fr' ? 'Lancer la Phase 2' : 'Launch Phase 2'}
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     </motion.div>

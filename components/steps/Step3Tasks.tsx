@@ -75,7 +75,7 @@ export function Step3Tasks() {
     return tasks.reduce((acc, task) => acc + (task.hoursPerWeek || 4), 0);
   };
 
-  // Analyse IA du document
+  // Analyse automatique du document
   const handleAnalyzeWithAI = async () => {
     if (!context.jobDescription && !context.jobTitle) {
       setAnalyzeError(l === 'fr' 
@@ -169,7 +169,7 @@ export function Step3Tasks() {
               </div>
               <div>
                 <h3 className="font-medium text-slate-200">
-                  {l === 'fr' ? 'Analyse IA disponible' : 'AI Analysis available'}
+                  {l === 'fr' ? 'Analyse automatique disponible' : 'Automatic analysis available'}
                 </h3>
                 <p className="text-sm text-slate-400">
                   {l === 'fr' 
@@ -377,7 +377,7 @@ export function Step3Tasks() {
                                 <span>20h</span>
                               </div>
                             </div>
-                            {/* 1. Données (IA) */}
+                            {/* 1. Données (Automatisation) */}
                             <ResilienceSlider
                               label={t('resilience.data')}
                               description={t('resilience.dataDesc')}
