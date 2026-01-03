@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Briefcase, Users, Zap, Shuffle, Rocket } from 'lucide-react';
+import { User, Briefcase, Users, Zap, Shuffle, Compass } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { useAuditStore, Persona, Goal } from '@/lib/store';
 import { SelectionCard } from '@/components/ui/SelectionCard';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
@@ -10,11 +11,17 @@ import { matrixLexicon, personaLabels, getGoalTitle, getGoalDescription } from '
 
 export function Step1Matrix() {
   const locale = useLocale();
-  const { context, setPersona, setGoal, nextStep } = useAuditStore();
+  const router = useRouter();
+  const { context, setPersona, setGoal } = useAuditStore();
   const { persona, goal } = context;
 
   const canProceed = persona && goal;
   const l = locale === 'en' ? 'en' : 'fr';
+
+  // Redirect to Strategy Hub after persona + goal selection
+  const handleLaunchHub = () => {
+    router.push('/hub');
+  };
 
   // Personas with expert vocabulary - Updated for Pivot intention
   const personas = [
@@ -188,10 +195,10 @@ export function Step1Matrix() {
 
       <NavigationButtons
         showPrev={false}
-        onNext={nextStep}
+        onNext={handleLaunchHub}
         nextDisabled={!canProceed}
-        nextLabel={matrixLexicon.launchButton[l]}
-        nextIcon={<Rocket className="w-4 h-4" />}
+        nextLabel={l === 'fr' ? 'Accéder au Centre de Commandement →' : 'Access Command Center →'}
+        nextIcon={<Compass className="w-4 h-4" />}
       />
     </motion.div>
   );
