@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useAuditStore, MUTATION_DRIVERS, MutationDriver } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
+import { EmployeeMatchResults } from '@/components/EmployeeMatchResults';
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, 
   PolarRadiusAxis, ResponsiveContainer, Legend,
@@ -64,6 +65,7 @@ export function Step7Ikigai() {
   const selectedTalents = getSelectedTalents();
   const isAugmentation = context.goal === 'augmentation';
   const isPivot = context.goal === 'pivot';
+  const isReclassement = context.goal === 'reclassement';
   const colors = isAugmentation ? SCENARIO_COLORS.augmentation : SCENARIO_COLORS.pivot;
   
   // État local pour le filtre d'aspiration (Pivot uniquement)
@@ -546,6 +548,37 @@ export function Step7Ikigai() {
           </ComposedChart>
         </ResponsiveContainer>
       </motion.div>
+
+      {/* =============================================== */}
+      {/* MODULE GPEC - Résultats de Matching */}
+      {/* Affiché uniquement en mode Reclassement */}
+      {/* =============================================== */}
+      {isReclassement && (
+        <motion.div
+          className="apex-card p-6 border-2 border-rose-500/30 bg-gradient-to-br from-rose-900/10 to-violet-900/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
+              <Users className="w-5 h-5 text-rose-400" />
+            </div>
+            <div>
+              <h2 className="font-serif text-xl text-slate-200">
+                {l === 'fr' ? 'Analyse de Réemployabilité GPEC' : 'GPEC Redeployability Analysis'}
+              </h2>
+              <p className="text-sm text-rose-300/70">
+                {l === 'fr' 
+                  ? 'Matching collaborateurs × Métiers de Demain avec Gap de Compétences'
+                  : 'Employees × Future Jobs matching with Competency Gap'}
+              </p>
+            </div>
+          </div>
+
+          <EmployeeMatchResults />
+        </motion.div>
+      )}
 
       {/* ERAC Framework - Actions de Transformation */}
       <motion.div

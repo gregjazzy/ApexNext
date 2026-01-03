@@ -4,9 +4,21 @@ import { useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { useAuditStore } from '@/lib/store';
+import { useAuditStore, CompetenceCategory } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { generatePDFReport } from '@/lib/reportGenerator';
+
+// Configuration couleurs catégories de compétences
+const COMPETENCE_COLORS: Record<CompetenceCategory, { bg: string; text: string; border: string }> = {
+  haptique: { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30' },
+  relationnelle: { bg: 'bg-rose-500/20', text: 'text-rose-400', border: 'border-rose-500/30' },
+  technique: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' },
+};
+const COMPETENCE_LABELS: Record<CompetenceCategory, { fr: string; en: string }> = {
+  haptique: { fr: 'Haptique', en: 'Haptic' },
+  relationnelle: { fr: 'Relationnelle', en: 'Relational' },
+  technique: { fr: 'Technique', en: 'Technical' },
+};
 import {
   Cpu, Target, Megaphone, CheckCircle2, Circle,
   Zap, Clock, Calendar, RotateCcw, Download,
@@ -182,7 +194,8 @@ export function Step8Roadmap() {
     toggleRoadmapAction,
     setStep,
     reset,
-    computeKPIs
+    computeKPIs,
+    enterpriseTargets,
   } = useAuditStore();
   
   // Recalculer les KPIs à chaque rendu
@@ -192,7 +205,12 @@ export function Step8Roadmap() {
 
   const isAugmentation = context.goal === 'augmentation';
   const isPivot = context.goal === 'pivot';
+  const isReclassement = context.goal === 'reclassement';
   const colors = isAugmentation ? SCENARIO_CONFIG.augmentation : SCENARIO_CONFIG.pivot;
+  
+  // Données GPEC - Employee Matches avec gaps de compétences
+  const employeeMatches = enterpriseTargets.employeeMatches || [];
+  const matchesWithGaps = employeeMatches.filter(m => m.competenceGaps.length > 0);
 
   // Définir les piliers selon le parcours
   const pillarKeys = useMemo(() => {
@@ -831,6 +849,117 @@ export function Step8Roadmap() {
                 </p>
               </div>
             </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* =============================================== */}
+      {/* GAP DE COMPÉTENCES GPEC - RECLASSEMENT ONLY */}
+      {/* Exigences entreprise vs Profils collaborateurs */}
+      {/* =============================================== */}
+      {isReclassement && matchesWithGaps.length > 0 && (
+        <motion.div
+          className="apex-card p-6 border-2 border-rose-500/30 bg-gradient-to-br from-rose-900/10 to-violet-900/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.42 }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/30 to-violet-500/30 flex items-center justify-center border border-rose-400/30">
+                <Map className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <h2 className="font-serif text-xl text-slate-200">
+                  {l === 'fr' ? 'Gap de Compétences — Exigences GPEC' : 'Competency Gap — GPEC Requirements'}
+                </h2>
+                <p className="text-sm text-rose-300/70">
+                  {l === 'fr' 
+                    ? `${matchesWithGaps.length} collaborateur(s) avec écarts identifiés`
+                    : `${matchesWithGaps.length} employee(s) with identified gaps`
+                  }
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              <div className="text-right">
+                <p className="text-lg font-bold text-amber-400">
+                  {matchesWithGaps.reduce((acc, m) => acc + m.competenceGaps.reduce((a, g) => a + g.trainingHours, 0), 0)}h
+                </p>
+                <p className="text-xs text-slate-400">
+                  {l === 'fr' ? 'Formation totale' : 'Total training'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Liste des collaborateurs avec leurs gaps */}
+          <div className="space-y-4">
+            {matchesWithGaps.slice(0, 5).map((match) => (
+              <div 
+                key={`${match.employeeId}-${match.futureJobId}`}
+                className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/50"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+                      <User className="w-5 h-5 text-slate-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-slate-200">{match.employeeName}</h4>
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
+                        <Target className="w-3 h-3" /> {match.futureJobTitle}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                      match.compatibilityScore >= 70 ? 'bg-emerald-500/20 text-emerald-400' :
+                      match.compatibilityScore >= 50 ? 'bg-amber-500/20 text-amber-400' :
+                      'bg-rose-500/20 text-rose-400'
+                    }`}>
+                      {match.compatibilityScore}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Gaps du collaborateur */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {match.competenceGaps.map((gap) => {
+                    const catColor = COMPETENCE_COLORS[gap.category];
+                    return (
+                      <div 
+                        key={gap.competenceId}
+                        className={`p-3 rounded-lg bg-slate-800/30 border ${catColor.border}`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${catColor.bg} ${catColor.text}`}>
+                            {COMPETENCE_LABELS[gap.category][l]}
+                          </span>
+                          <span className="text-xs text-amber-400 font-medium">{gap.trainingHours}h</span>
+                        </div>
+                        <p className="text-sm text-slate-300 font-medium mb-1">{gap.competenceName}</p>
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span>Niveau {gap.currentLevel}</span>
+                          <ArrowRight className="w-3 h-3" />
+                          <span className="text-emerald-400">Niveau {gap.requiredLevel}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {matchesWithGaps.length > 5 && (
+            <p className="text-center text-sm text-slate-500 mt-4">
+              {l === 'fr' 
+                ? `+ ${matchesWithGaps.length - 5} autres collaborateurs avec gaps`
+                : `+ ${matchesWithGaps.length - 5} more employees with gaps`
+              }
+            </p>
           )}
         </motion.div>
       )}

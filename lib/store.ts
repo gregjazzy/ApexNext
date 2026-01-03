@@ -170,6 +170,70 @@ export interface CohortData {
 }
 
 // ===============================================
+// MODE GPEC - EXIGENCES STRATÉGIQUES ENTREPRISE
+// ===============================================
+// Module pour définir les "Métiers de Demain" et calculer le matching
+
+export type CompetenceCategory = 'haptique' | 'relationnelle' | 'technique';
+
+export interface TargetCompetence {
+  id: string;
+  name: string;
+  category: CompetenceCategory;
+  requiredLevel: number;  // 1-5 niveau requis
+  description: string;
+  criticalityScore: number;  // 0-100 importance pour le poste
+}
+
+export interface FutureJob {
+  id: string;
+  title: string;                      // Ex: "Superviseur IA de Production"
+  department: string;                  // Ex: "Production", "Logistique"
+  description: string;
+  headcount: number;                   // Nombre de postes à pourvoir
+  urgency: 'immediate' | 'short_term' | 'medium_term';  // Horizon temporel
+  automationResistance: number;        // 0-100 résistance à l'automatisation
+  requiredCompetences: TargetCompetence[];
+  createdAt: number;
+}
+
+export interface EmployeeMatch {
+  employeeId: string;                  // ID du salarié (ou membre cohorte)
+  employeeName: string;
+  futureJobId: string;
+  futureJobTitle: string;
+  compatibilityScore: number;          // 0-100 score d'affinité
+  competenceGaps: {
+    competenceId: string;
+    competenceName: string;
+    category: CompetenceCategory;
+    currentLevel: number;              // Niveau actuel estimé
+    requiredLevel: number;             // Niveau requis
+    gap: number;                       // Écart (negative = besoin formation)
+    trainingHours: number;             // Heures de formation estimées
+  }[];
+  strengths: string[];                 // Points forts identifiés
+  recommendation: 'ideal' | 'good' | 'possible' | 'difficult';
+}
+
+export interface EnterpriseTargets {
+  // Configuration
+  organizationName: string;
+  strategicHorizon: '6_months' | '1_year' | '3_years';
+  
+  // Métiers de Demain
+  futureJobs: FutureJob[];
+  
+  // Résultats de matching (calculés)
+  employeeMatches: EmployeeMatch[];
+  
+  // Métadonnées
+  createdAt: number | null;
+  lastUpdatedAt: number | null;
+  isConfigured: boolean;
+}
+
+// ===============================================
 // PHASE 2 - MOTEUR DE STRATÉGIE INTÉGRÉ
 // ===============================================
 
@@ -352,6 +416,7 @@ interface AuditStore {
   computedKPIs: ComputedKPIs;
   userIntention: UserIntention;  // Portrait de Mutation (Pivot uniquement)
   cohortData: CohortData;        // Données de cohorte (Reclassement/PSE uniquement)
+  enterpriseTargets: EnterpriseTargets;  // Exigences stratégiques (GPEC uniquement)
   
   // Actions - Navigation
   setStep: (step: number) => void;
@@ -389,6 +454,17 @@ interface AuditStore {
   removeCohortMember: (id: string) => void;
   inviteCohortMembers: (memberIds: string[]) => void;
   updateCohortStats: () => void;
+  
+  // Actions - Enterprise Targets (GPEC uniquement)
+  setOrganizationName: (name: string) => void;
+  setStrategicHorizon: (horizon: EnterpriseTargets['strategicHorizon']) => void;
+  addFutureJob: (job: Omit<FutureJob, 'id' | 'createdAt'>) => string;
+  updateFutureJob: (id: string, updates: Partial<FutureJob>) => void;
+  removeFutureJob: (id: string) => void;
+  addCompetenceToJob: (jobId: string, competence: Omit<TargetCompetence, 'id'>) => void;
+  removeCompetenceFromJob: (jobId: string, competenceId: string) => void;
+  calculateEmployeeMatches: () => void;
+  markEnterpriseTargetsConfigured: () => void;
   
   // Actions - Tasks
   addTask: (name: string) => string;
@@ -1324,16 +1400,16 @@ function generateRoadmap(
   if (vulnerableTasks.length > 1) {
     const secondTask = vulnerableTasks[1];
     const secondRejet = zoneDeRejet.length > 1 ? zoneDeRejet[1] : null;
-    
-    roadmap.push({
-      id: generateId(),
-      pillar: 'delegation',
+  
+  roadmap.push({
+    id: generateId(),
+    pillar: 'delegation',
       title: secondRejet && goal === 'pivot'
         ? `Configurer l'automatisation de "${secondTask.name}" + retrait de "${secondRejet}"`
         : `Implémenter l'automatisation secondaire : "${secondTask.name}"`,
       description: `Vulnérabilité de ${secondTask.vulnerabilityPercent}%. Gain additionnel : ${secondTask.hoursPerWeek}h/semaine. Total cumulé : ${timeToFree}h/semaine.`,
-      priority: 'short_term',
-      completed: false,
+    priority: 'short_term',
+    completed: false,
       eracCategory: 'reduce',
       kpi: `+${secondTask.hoursPerWeek}h/sem (cumul: ${timeToFree}h)`,
       resilienceScore: 8,
@@ -1432,9 +1508,9 @@ function generateRoadmap(
   
   // Action tertiaire : Réallouer le temps libéré vers les activités différenciantes
   if (highValueTasks.length > 0 && timeToFree > 0) {
-    roadmap.push({
-      id: generateId(),
-      pillar: 'reinforcement',
+  roadmap.push({
+    id: generateId(),
+    pillar: 'reinforcement',
       title: `Arbitrer le réinvestissement des ${timeToFree}h libérées`,
       description: `Consacrer le temps gagné aux tâches à haute valeur : ${highValueTasks.slice(0, 2).map(t => t.name).join(', ')}.`,
       priority: 'immediate',
@@ -1608,11 +1684,11 @@ function generateRoadmap(
         resilienceScore: 9,
         suggestedTool: 'Formation certifiante / Mentorat sectoriel',
         sourceData: hasPortraitData ? 'Audit + Portrait Humain (Carré d\'As)' : 'Audit Talents',
-      });
-    }
+    });
+  }
   
-    roadmap.push({
-      id: generateId(),
+  roadmap.push({
+    id: generateId(),
       pillar: 'oceanBleu',
       title: `Acquérir les compétences spécifiques au secteur "${secteurRef}"`,
       description: hasPortraitData
@@ -1665,8 +1741,8 @@ function generateRoadmap(
       pillar: 'landing',
       title: `Négocier l'accès au réseau du secteur "${secteurRef}"`,
       description: `Contacter 10 décideurs du secteur "${secteurRef}" avec votre proposition de valeur ciblée "${metierCible}". Approche directe et personnalisée.`,
-      priority: 'medium_term',
-      completed: false,
+    priority: 'medium_term',
+    completed: false,
       kpi: '10+ contacts qualifiés',
       resilienceScore: 9,
       suggestedTool: 'LinkedIn Sales Navigator / Emails personnalisés',
@@ -1753,6 +1829,16 @@ const initialCohortData: CohortData = {
   lastUpdatedAt: null,
 };
 
+const initialEnterpriseTargets: EnterpriseTargets = {
+  organizationName: '',
+  strategicHorizon: '1_year',
+  futureJobs: [],
+  employeeMatches: [],
+  createdAt: null,
+  lastUpdatedAt: null,
+  isConfigured: false,
+};
+
 const initialIkigai: IkigaiStrategique = {
   engagementStrategique: 0,
   expertiseDistinctive: 0,
@@ -1799,6 +1885,7 @@ export const useAuditStore = create<AuditStore>()(
       computedKPIs: initialKPIs,
       userIntention: initialUserIntention,
       cohortData: initialCohortData,
+      enterpriseTargets: initialEnterpriseTargets,
 
       // Navigation (8 étapes)
       setStep: (step) => set({ currentStep: step }),
@@ -1956,6 +2043,173 @@ export const useAuditStore = create<AuditStore>()(
           }
         };
       }),
+
+      // Enterprise Targets (GPEC)
+      setOrganizationName: (organizationName) => set((state) => ({
+        enterpriseTargets: { ...state.enterpriseTargets, organizationName, lastUpdatedAt: Date.now() }
+      })),
+      setStrategicHorizon: (strategicHorizon) => set((state) => ({
+        enterpriseTargets: { ...state.enterpriseTargets, strategicHorizon, lastUpdatedAt: Date.now() }
+      })),
+      addFutureJob: (job) => {
+        const jobId = generateId();
+        set((state) => ({
+          enterpriseTargets: {
+            ...state.enterpriseTargets,
+            futureJobs: [...state.enterpriseTargets.futureJobs, {
+              ...job,
+              id: jobId,
+              createdAt: Date.now(),
+            }],
+            createdAt: state.enterpriseTargets.createdAt || Date.now(),
+            lastUpdatedAt: Date.now(),
+          }
+        }));
+        return jobId;
+      },
+      updateFutureJob: (id, updates) => set((state) => ({
+        enterpriseTargets: {
+          ...state.enterpriseTargets,
+          futureJobs: state.enterpriseTargets.futureJobs.map(j =>
+            j.id === id ? { ...j, ...updates } : j
+          ),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      removeFutureJob: (id) => set((state) => ({
+        enterpriseTargets: {
+          ...state.enterpriseTargets,
+          futureJobs: state.enterpriseTargets.futureJobs.filter(j => j.id !== id),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      addCompetenceToJob: (jobId, competence) => set((state) => ({
+        enterpriseTargets: {
+          ...state.enterpriseTargets,
+          futureJobs: state.enterpriseTargets.futureJobs.map(j =>
+            j.id === jobId ? {
+              ...j,
+              requiredCompetences: [...j.requiredCompetences, { ...competence, id: generateId() }]
+            } : j
+          ),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      removeCompetenceFromJob: (jobId, competenceId) => set((state) => ({
+        enterpriseTargets: {
+          ...state.enterpriseTargets,
+          futureJobs: state.enterpriseTargets.futureJobs.map(j =>
+            j.id === jobId ? {
+              ...j,
+              requiredCompetences: j.requiredCompetences.filter(c => c.id !== competenceId)
+            } : j
+          ),
+          lastUpdatedAt: Date.now(),
+        }
+      })),
+      calculateEmployeeMatches: () => set((state) => {
+        const { futureJobs } = state.enterpriseTargets;
+        const { members } = state.cohortData;
+        const selectedTalents = state.talents.filter(t => t.selected);
+        
+        // Calculer les matches pour chaque combinaison employé/poste
+        const matches: EmployeeMatch[] = [];
+        
+        for (const member of members) {
+          for (const job of futureJobs) {
+            // Calcul du score de compatibilité basé sur les compétences
+            let totalScore = 0;
+            let maxScore = 0;
+            const gaps: EmployeeMatch['competenceGaps'] = [];
+            
+            for (const comp of job.requiredCompetences) {
+              const weight = comp.criticalityScore / 100;
+              maxScore += 5 * weight;
+              
+              // Estimation du niveau actuel basé sur les talents sélectionnés
+              let currentLevel = 2; // Niveau par défaut
+              
+              // Bonus si un talent correspond à la catégorie
+              if (comp.category === 'relationnelle') {
+                const hasRelationalTalent = selectedTalents.some(t => 
+                  ['intelligence-negociation', 'leadership-adaptatif', 'gestion-crise'].includes(t.id)
+                );
+                if (hasRelationalTalent) currentLevel = Math.min(5, currentLevel + 2);
+              } else if (comp.category === 'technique') {
+                const hasTechnicalTalent = selectedTalents.some(t =>
+                  ['synthese-strategique', 'pensee-systemique', 'audit-critique'].includes(t.id)
+                );
+                if (hasTechnicalTalent) currentLevel = Math.min(5, currentLevel + 2);
+              } else if (comp.category === 'haptique') {
+                const hasHaptiqueTalent = selectedTalents.some(t =>
+                  ['intuition-operationnelle', 'sens-craft', 'precision-execution'].includes(t.id)
+                );
+                if (hasHaptiqueTalent) currentLevel = Math.min(5, currentLevel + 2);
+              }
+              
+              totalScore += Math.min(currentLevel, comp.requiredLevel) * weight;
+              
+              const gap = currentLevel - comp.requiredLevel;
+              if (gap < 0) {
+                gaps.push({
+                  competenceId: comp.id,
+                  competenceName: comp.name,
+                  category: comp.category,
+                  currentLevel,
+                  requiredLevel: comp.requiredLevel,
+                  gap,
+                  trainingHours: Math.abs(gap) * 20, // Estimation: 20h par niveau
+                });
+              }
+            }
+            
+            const compatibilityScore = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+            
+            // Déterminer la recommandation
+            let recommendation: EmployeeMatch['recommendation'] = 'difficult';
+            if (compatibilityScore >= 85) recommendation = 'ideal';
+            else if (compatibilityScore >= 70) recommendation = 'good';
+            else if (compatibilityScore >= 50) recommendation = 'possible';
+            
+            // Identifier les points forts
+            const strengths: string[] = [];
+            for (const talent of selectedTalents) {
+              if (talent.level >= 4) {
+                strengths.push(talent.name);
+              }
+            }
+            
+            matches.push({
+              employeeId: member.id,
+              employeeName: member.name,
+              futureJobId: job.id,
+              futureJobTitle: job.title,
+              compatibilityScore,
+              competenceGaps: gaps,
+              strengths: strengths.slice(0, 3),
+              recommendation,
+            });
+          }
+        }
+        
+        // Trier par score de compatibilité
+        matches.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
+        
+        return {
+          enterpriseTargets: {
+            ...state.enterpriseTargets,
+            employeeMatches: matches,
+            lastUpdatedAt: Date.now(),
+          }
+        };
+      }),
+      markEnterpriseTargetsConfigured: () => set((state) => ({
+        enterpriseTargets: {
+          ...state.enterpriseTargets,
+          isConfigured: true,
+          lastUpdatedAt: Date.now(),
+        }
+      })),
 
       // Tasks
       addTask: (name) => {
@@ -2222,10 +2476,11 @@ export const useAuditStore = create<AuditStore>()(
         computedKPIs: initialKPIs,
         userIntention: initialUserIntention,
         cohortData: initialCohortData,
+        enterpriseTargets: initialEnterpriseTargets,
       }),
     }),
     {
-      name: 'apex-audit-storage-v7', // Version bump pour Mode Reclassement/PSE
+      name: 'apex-audit-storage-v8', // Version bump pour Module GPEC Enterprise Targets
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
@@ -2235,6 +2490,7 @@ export const useAuditStore = create<AuditStore>()(
         strategy: state.strategy,
         userIntention: state.userIntention,
         cohortData: state.cohortData,
+        enterpriseTargets: state.enterpriseTargets,
       }),
     }
   )

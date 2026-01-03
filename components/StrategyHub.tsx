@@ -113,6 +113,20 @@ const COHORT_NODE: HubNode = {
   gradientTo: 'to-indigo-500',
 };
 
+// Node spécial pour le mode GPEC (Leader + Pivot)
+const GPEC_NODE: HubNode = {
+  id: 'gpec',
+  step: 2,
+  title: { fr: 'Exigences Stratégiques', en: 'Strategic Requirements' },
+  subtitle: { fr: 'Métiers de Demain', en: 'Jobs of Tomorrow' },
+  description: { fr: 'Définissez les postes cibles et compétences clés de l\'organisation', en: 'Define target positions and key competencies for your organization' },
+  icon: Target,
+  route: '/gpec',
+  color: 'emerald',
+  gradientFrom: 'from-emerald-500',
+  gradientTo: 'to-teal-500',
+};
+
 // ===============================================
 // COMPOSANT PRINCIPAL
 // ===============================================
@@ -130,7 +144,8 @@ export function StrategyHub() {
     getSelectedTalents,
     strategy,
     userIntention,
-    cohortData
+    cohortData,
+    enterpriseTargets
   } = useAuditStore();
 
   const [isClient, setIsClient] = useState(false);
@@ -177,6 +192,13 @@ export function StrategyHub() {
           cohortData.stats.completedCount === cohortData.members.length;
         if (allMembersCompleted) return 'completed';
         if (hasCompletedMembers) return 'current';
+        return 'todo';
+      
+      case 'gpec':
+        // Mode GPEC : Exigences stratégiques entreprise
+        if (!hasDiagnostic) return 'locked';
+        if (enterpriseTargets.isConfigured) return 'completed';
+        if (enterpriseTargets.futureJobs.length > 0) return 'current';
         return 'todo';
       
       case 'strategy':
@@ -269,9 +291,18 @@ export function StrategyHub() {
     }
   }
   
+  // En mode GPEC (Leader + Pivot), ajouter le node Exigences Stratégiques après Portrait
+  const isGPEC = isPivot && context.persona === 'leader';
+  if (isGPEC) {
+    const portraitIndex = visibleNodes.findIndex(n => n.id === 'portrait');
+    if (portraitIndex !== -1) {
+      visibleNodes.splice(portraitIndex + 1, 0, GPEC_NODE);
+    }
+  }
+  
   const completedCount = visibleNodes.filter(n => getNodeStatus(n.id) === 'completed').length;
-  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot/Reclassement
-  const totalSteps = isAugmentation ? 3 : 4;
+  // Nombre d'étapes : 3 pour Augmentation, 4 pour Pivot (individuel), 5 pour GPEC, 4 pour Reclassement
+  const totalSteps = isAugmentation ? 3 : isGPEC ? 5 : 4;
   const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   // Labels personnalisés par persona
