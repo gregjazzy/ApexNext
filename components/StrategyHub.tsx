@@ -283,16 +283,17 @@ export function StrategyHub() {
       return node;
     });
   
-  // En mode Reclassement, ajouter le node Cohort après Diagnostic
+  // En mode Reclassement, ajouter le node Cohort ET GPEC après Diagnostic
   if (isReclassement) {
     const diagnosticIndex = visibleNodes.findIndex(n => n.id === 'diagnostic');
     if (diagnosticIndex !== -1) {
-      visibleNodes.splice(diagnosticIndex + 1, 0, COHORT_NODE);
+      // Ajouter Cohort puis GPEC après Diagnostic
+      visibleNodes.splice(diagnosticIndex + 1, 0, COHORT_NODE, GPEC_NODE);
     }
   }
   
-  // En mode GPEC (Leader + Pivot), ajouter le node Exigences Stratégiques après Portrait
-  const isGPEC = isPivot && context.persona === 'leader';
+  // En mode Leader + Pivot (non reclassement), ajouter le node Exigences Stratégiques après Portrait
+  const isGPEC = isPivot && context.persona === 'leader' && !isReclassement;
   if (isGPEC) {
     const portraitIndex = visibleNodes.findIndex(n => n.id === 'portrait');
     if (portraitIndex !== -1) {

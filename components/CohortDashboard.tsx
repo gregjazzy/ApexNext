@@ -20,6 +20,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuditStore, CohortMember } from '@/lib/store';
+import { BackToHub } from '@/components/ui/BackToHub';
 
 // ===============================================
 // TABLEAU DE BORD DE COHORTE
@@ -329,6 +330,16 @@ export function CohortDashboard() {
             ))}
           </div>
         )}
+      </motion.div>
+
+      {/* Navigation */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="flex justify-start pt-4"
+      >
+        <BackToHub />
       </motion.div>
 
       {/* Add Member Modal */}

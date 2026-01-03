@@ -21,15 +21,19 @@ export default function GPECPage() {
   const { context } = useAuditStore();
   const [isClient, setIsClient] = useState(false);
 
+  // GPEC accessible en mode Reclassement OU (Leader + Pivot)
+  const isGPECAllowed = context.goal === 'reclassement' || 
+    (context.goal === 'pivot' && context.persona === 'leader');
+
   useEffect(() => {
     setIsClient(true);
-    // Vérifier que l'utilisateur est en mode pivot (GPEC)
-    if (context.goal !== 'pivot' || context.persona !== 'leader') {
+    // Vérifier que l'utilisateur a accès au mode GPEC
+    if (!isGPECAllowed) {
       router.push('/hub');
     }
-  }, [context.goal, context.persona, router]);
+  }, [isGPECAllowed, router]);
 
-  if (!isClient || context.goal !== 'pivot' || context.persona !== 'leader') {
+  if (!isClient || !isGPECAllowed) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">

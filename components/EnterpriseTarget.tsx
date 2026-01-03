@@ -78,6 +78,7 @@ export function EnterpriseTarget() {
     removeFutureJob,
     addCompetenceToJob,
     removeCompetenceFromJob,
+    calculateEmployeeMatches,
     markEnterpriseTargetsConfigured,
   } = useAuditStore();
 
@@ -137,6 +138,9 @@ export function EnterpriseTarget() {
   };
 
   const handleValidate = () => {
+    // Calculer les matches employés × postes cibles
+    calculateEmployeeMatches();
+    // Marquer comme configuré
     markEnterpriseTargetsConfigured();
     router.push('/hub');
   };
