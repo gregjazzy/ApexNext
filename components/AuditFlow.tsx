@@ -16,6 +16,8 @@ import {
   Step4Talents,
   Step5Software,
   Step6Verdict,
+  Step7Ikigai,
+  Step8Roadmap,
 } from '@/components/steps';
 
 const stepComponents: Record<number, React.ComponentType> = {
@@ -25,6 +27,8 @@ const stepComponents: Record<number, React.ComponentType> = {
   4: Step4Talents,
   5: Step5Software,
   6: Step6Verdict,
+  7: Step7Ikigai,
+  8: Step8Roadmap,
 };
 
 export function AuditFlow() {

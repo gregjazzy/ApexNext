@@ -33,7 +33,9 @@
     "tasks": "Processes",
     "talents": "Assets",
     "tech": "Tech",
-    "verdict": "Verdict"
+    "verdict": "Verdict",
+    "ikigai": "Ikigai",
+    "roadmap": "Action"
   },
   "step1": {
     "title": "Strategic Initialization",
@@ -207,6 +209,73 @@
       "creativity": "Creativity",
       "execution": "Physical (Robot)"
     }
+  },
+  "step7": {
+    "title": "Ikigai Matrix 2.0",
+    "subtitle": "Strategic visualization of your positioning against intelligent automation.",
+    "parcours": {
+      "augmentation": "Augmentation Path",
+      "pivot": "Pivot Path"
+    },
+    "dimensions": {
+      "capital": "Active Capital",
+      "capitalDesc": "Combined strength of your 5 critical talents and tech mastery.",
+      "risk": "Risk Zone",
+      "riskDesc": "Exposure of your tasks to automation (AI + robotics).",
+      "opportunities": "Niche Opportunities",
+      "opportunitiesDesc": "Resilient sectors matching your signature.",
+      "leverage": "Economic Leverage",
+      "leverageDesc": "Valuation potential in the transformed market."
+    },
+    "niches": {
+      "title": "Identified Safe Haven Careers",
+      "subtitle": "High human-value functions matching your strategic assets.",
+      "match": "match",
+      "growth": {
+        "high": "High growth",
+        "medium": "Medium growth",
+        "low": "Low growth"
+      }
+    },
+    "signature": {
+      "title": "Your Strategic Signature"
+    },
+    "nextButton": "View Action Plan →",
+    "prevButton": "← Back to Verdict"
+  },
+  "step8": {
+    "title": "Strategic Action Plan",
+    "subtitle": "Your personalized roadmap to secure and enhance your professional position.",
+    "progress": "Progress",
+    "actions": "actions",
+    "allCompleted": "🎉 All actions completed!",
+    "percentComplete": "% of your plan completed",
+    "pillars": {
+      "delegation": {
+        "title": "Technological Delegation",
+        "description": "Automate low-value processes to free up your strategic time."
+      },
+      "reinforcement": {
+        "title": "Signature Reinforcement",
+        "description": "Consolidate your strategic assets to maximize differentiation."
+      },
+      "positioning": {
+        "title": "Market Positioning",
+        "description": "Assert your unique value against automated systems."
+      }
+    },
+    "priority": {
+      "immediate": "Immediate",
+      "shortTerm": "1-3 months",
+      "mediumTerm": "3-6 months"
+    },
+    "final": {
+      "title": "Your Strategy is Ready",
+      "subtitle": "You now have a clear vision of your positioning and a concrete action plan to secure your professional future."
+    },
+    "exportPdf": "Export as PDF",
+    "newAudit": "New Audit",
+    "prevButton": "← Back to Matrix"
   },
   "language": {
     "fr": "Français",

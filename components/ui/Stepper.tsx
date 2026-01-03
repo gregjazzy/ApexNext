@@ -104,4 +104,6 @@ export const AUDIT_STEPS: Step[] = [
   { number: 4, title: 'Signature Talents', shortTitle: 'talents' },
   { number: 5, title: 'Tech Scan', shortTitle: 'tech' },
   { number: 6, title: 'Le Verdict', shortTitle: 'verdict' },
+  { number: 7, title: 'Matrice Ikigai', shortTitle: 'ikigai' },
+  { number: 8, title: 'Plan d\'Action', shortTitle: 'roadmap' },
 ];

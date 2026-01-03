@@ -49,6 +49,40 @@ export interface AuditContext {
   jobDescription: string;
 }
 
+// Phase 2 - Strategic Mutation Plan
+export interface NicheOpportunity {
+  id: string;
+  name: string;
+  description: string;
+  matchScore: number; // 0-100
+  requiredTalents: string[]; // IDs des talents requis
+  growthPotential: 'high' | 'medium' | 'low';
+}
+
+export interface RoadmapAction {
+  id: string;
+  pillar: 'delegation' | 'reinforcement' | 'positioning';
+  title: string;
+  description: string;
+  priority: 'immediate' | 'short_term' | 'medium_term';
+  completed: boolean;
+}
+
+export interface StrategyData {
+  // Matrice Ikigai 2.0
+  capitalActif: number; // Score agrégé des 5 talents (0-100)
+  zoneRisque: number; // Score de vulnérabilité (0-100)
+  opportunitesNiche: NicheOpportunity[];
+  levierEconomique: number; // Potentiel économique (0-100)
+  
+  // Roadmap
+  roadmap: RoadmapAction[];
+  
+  // Métadonnées
+  generatedAt: number | null;
+  parcours: 'augmentation' | 'pivot' | null;
+}
+
 interface AuditStore {
   // Current step in the audit flow
   currentStep: number;
@@ -64,6 +98,9 @@ interface AuditStore {
   
   // Software stack
   software: Software[];
+  
+  // Phase 2 - Strategy
+  strategy: StrategyData;
   
   // Actions - Navigation
   setStep: (step: number) => void;
@@ -103,6 +140,10 @@ interface AuditStore {
   getSelectedTalents: () => Talent[];
   getResilienceScore: () => number;
   getTalentScore: () => number;
+  
+  // Actions - Strategy (Phase 2)
+  generateStrategy: () => void;
+  toggleRoadmapAction: (id: string) => void;
   
   // Reset
   reset: () => void;
@@ -201,12 +242,185 @@ export const AVAILABLE_TALENTS = STRATEGIC_ASSETS;
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
+// Générateur d'opportunités de niche selon profil
+function generateNicheOpportunities(
+  talents: Talent[], 
+  goal: Goal, 
+  persona: Persona
+): NicheOpportunity[] {
+  const talentIds = talents.map(t => t.id);
+  
+  // Base d'opportunités (sera enrichie par IA plus tard)
+  const allOpportunities: NicheOpportunity[] = [
+    {
+      id: 'consultant-ia',
+      name: 'Consultant en Transformation IA',
+      description: 'Accompagner les entreprises dans l\'intégration de l\'automatisation intelligente.',
+      matchScore: 0,
+      requiredTalents: ['pilotage-ia', 'pensee-systemique', 'communication-influence'],
+      growthPotential: 'high',
+    },
+    {
+      id: 'manager-transition',
+      name: 'Manager de Transition',
+      description: 'Piloter des équipes lors de phases de mutation organisationnelle.',
+      matchScore: 0,
+      requiredTalents: ['leadership-transition', 'diagnostic-crise', 'tactique-relationnelle'],
+      growthPotential: 'high',
+    },
+    {
+      id: 'expert-negociation',
+      name: 'Expert en Négociation Complexe',
+      description: 'Intervenir sur des deals à enjeux élevés nécessitant une expertise humaine.',
+      matchScore: 0,
+      requiredTalents: ['intelligence-negociation', 'arbitrage-incertitude', 'communication-influence'],
+      growthPotential: 'medium',
+    },
+    {
+      id: 'strategiste-innovation',
+      name: 'Stratégiste Innovation',
+      description: 'Concevoir des solutions disruptives au-delà des capacités génératives de l\'IA.',
+      matchScore: 0,
+      requiredTalents: ['innovation-rupture', 'synthese-strategique', 'pensee-systemique'],
+      growthPotential: 'high',
+    },
+    {
+      id: 'responsable-ethique',
+      name: 'Responsable Éthique & Conformité IA',
+      description: 'Garantir la gouvernance et la responsabilité des systèmes automatisés.',
+      matchScore: 0,
+      requiredTalents: ['ethique-gouvernance', 'analyse-critique', 'communication-influence'],
+      growthPotential: 'high',
+    },
+    {
+      id: 'coach-resilience',
+      name: 'Coach en Résilience Professionnelle',
+      description: 'Accompagner les individus dans leur mutation face à l\'automatisation.',
+      matchScore: 0,
+      requiredTalents: ['leadership-transition', 'tactique-relationnelle', 'diagnostic-crise'],
+      growthPotential: 'medium',
+    },
+  ];
+  
+  // Calcul des scores de correspondance
+  return allOpportunities
+    .map(opp => {
+      const matchCount = opp.requiredTalents.filter(t => talentIds.includes(t)).length;
+      const matchScore = Math.round((matchCount / opp.requiredTalents.length) * 100);
+      return { ...opp, matchScore };
+    })
+    .filter(opp => opp.matchScore >= 33) // Au moins 1/3 de correspondance
+    .sort((a, b) => b.matchScore - a.matchScore)
+    .slice(0, 4); // Top 4
+}
+
+// Générateur de roadmap selon profil
+function generateRoadmap(
+  tasks: Task[],
+  talents: Talent[],
+  software: Software[],
+  goal: Goal
+): RoadmapAction[] {
+  const roadmap: RoadmapAction[] = [];
+  
+  // Pilier 1: Délégation Technologique
+  // Trouver les tâches à faible résilience (< 40)
+  const lowResilienceTasks = tasks.filter(t => {
+    const avg = (t.resilience.donnees + t.resilience.decision + t.resilience.creativite) / 3;
+    return avg < 40;
+  });
+  
+  if (lowResilienceTasks.length > 0) {
+    roadmap.push({
+      id: generateId(),
+      pillar: 'delegation',
+      title: 'Automatiser les processus à faible valeur',
+      description: `Identifier des outils d'automatisation intelligente pour ${lowResilienceTasks.length} tâche(s) à faible intensité humaine.`,
+      priority: 'immediate',
+      completed: false,
+    });
+  }
+  
+  roadmap.push({
+    id: generateId(),
+    pillar: 'delegation',
+    title: 'Maîtriser un outil d\'IA générative',
+    description: 'Atteindre le niveau "Expert" sur au moins un assistant IA (ChatGPT, Claude, Copilot).',
+    priority: 'short_term',
+    completed: false,
+  });
+  
+  // Pilier 2: Renforcement de Signature
+  const weakTalents = talents.filter(t => t.selected && t.level <= 2);
+  if (weakTalents.length > 0) {
+    roadmap.push({
+      id: generateId(),
+      pillar: 'reinforcement',
+      title: 'Plan de montée en compétence critique',
+      description: `Renforcer ${weakTalents.map(t => t.name).join(', ')} via formation ou mentorat.`,
+      priority: 'short_term',
+      completed: false,
+    });
+  }
+  
+  roadmap.push({
+    id: generateId(),
+    pillar: 'reinforcement',
+    title: 'Documenter vos réussites à haute valeur humaine',
+    description: 'Constituer un portfolio de cas démontrant votre impact non-automatisable.',
+    priority: 'medium_term',
+    completed: false,
+  });
+  
+  // Pilier 3: Positionnement Marché
+  if (goal === 'augmentation') {
+    roadmap.push({
+      id: generateId(),
+      pillar: 'positioning',
+      title: 'Devenir le référent IA de votre périmètre',
+      description: 'Proposer un pilote d\'automatisation à votre management pour démontrer votre valeur augmentée.',
+      priority: 'short_term',
+      completed: false,
+    });
+  } else {
+    roadmap.push({
+      id: generateId(),
+      pillar: 'positioning',
+      title: 'Explorer les métiers refuges identifiés',
+      description: 'Réaliser des entretiens exploratoires avec des professionnels des niches à fort potentiel.',
+      priority: 'immediate',
+      completed: false,
+    });
+  }
+  
+  roadmap.push({
+    id: generateId(),
+    pillar: 'positioning',
+    title: 'Affiner votre argumentaire de valeur',
+    description: 'Construire un pitch percutant expliquant votre différenciation face aux systèmes automatisés.',
+    priority: 'medium_term',
+    completed: false,
+  });
+  
+  return roadmap;
+}
+
 const initialContext: AuditContext = {
   persona: null,
   goal: null,
   jobTitle: '',
   industry: '',
   jobDescription: '',
+};
+
+const initialStrategy: StrategyData = {
+  capitalActif: 0,
+  zoneRisque: 0,
+  opportunitesNiche: [],
+  levierEconomique: 0,
+  roadmap: [],
+  generatedAt: null,
+  parcours: null,
 };
 
 export const useAuditStore = create<AuditStore>()(
@@ -217,10 +431,11 @@ export const useAuditStore = create<AuditStore>()(
       tasks: [],
       talents: [],
       software: [],
+      strategy: initialStrategy,
 
-      // Navigation
+      // Navigation (8 étapes: 1-6 Audit + 7-8 Stratégie)
       setStep: (step) => set({ currentStep: step }),
-      nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 6) })),
+      nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 8) })),
       prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 1) })),
 
       // Context
@@ -358,6 +573,55 @@ export const useAuditStore = create<AuditStore>()(
         return Math.round((totalLevel / (selectedTalents.length * 5)) * 100);
       },
 
+      // Strategy (Phase 2)
+      generateStrategy: () => {
+        const state = get();
+        const { goal, persona } = state.context;
+        const resilienceScore = state.getResilienceScore();
+        const talentScore = state.getTalentScore();
+        const selectedTalents = state.getSelectedTalents();
+        
+        // Calcul Capital Actif (basé sur talents + maîtrise tech)
+        const techBonus = state.software.reduce((acc, s) => {
+          const levelScore = s.level === 'expert' ? 20 : s.level === 'avance' ? 12 : 5;
+          return acc + levelScore;
+        }, 0);
+        const capitalActif = Math.min(100, talentScore + Math.round(techBonus / 3));
+        
+        // Zone de Risque (inverse du score de résilience)
+        const zoneRisque = 100 - resilienceScore;
+        
+        // Levier Économique (combinaison capital actif + adéquation marché)
+        const levierEconomique = Math.round((capitalActif * 0.6) + (resilienceScore * 0.4));
+        
+        // Opportunités de Niche (générées selon talents sélectionnés)
+        const opportunitesNiche = generateNicheOpportunities(selectedTalents, goal, persona);
+        
+        // Roadmap d'actions
+        const roadmap = generateRoadmap(state.tasks, selectedTalents, state.software, goal);
+        
+        set({
+          strategy: {
+            capitalActif,
+            zoneRisque,
+            opportunitesNiche,
+            levierEconomique,
+            roadmap,
+            generatedAt: Date.now(),
+            parcours: goal,
+          }
+        });
+      },
+      
+      toggleRoadmapAction: (id) => set((state) => ({
+        strategy: {
+          ...state.strategy,
+          roadmap: state.strategy.roadmap.map(action =>
+            action.id === id ? { ...action, completed: !action.completed } : action
+          )
+        }
+      })),
+
       // Reset
       reset: () => set({
         currentStep: 1,
@@ -369,16 +633,18 @@ export const useAuditStore = create<AuditStore>()(
           selected: false,
         })),
         software: [],
+        strategy: initialStrategy,
       }),
     }),
     {
-      name: 'apex-audit-storage-v3', // Version bump pour reset du localStorage
+      name: 'apex-audit-storage-v4', // Version bump pour Phase 2
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
         tasks: state.tasks,
         talents: state.talents,
         software: state.software,
+        strategy: state.strategy,
       }),
     }
   )

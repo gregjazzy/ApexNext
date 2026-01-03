@@ -33,7 +33,9 @@
     "tasks": "Processus",
     "talents": "Actifs",
     "tech": "Tech",
-    "verdict": "Verdict"
+    "verdict": "Verdict",
+    "ikigai": "Ikigai",
+    "roadmap": "Action"
   },
   "step1": {
     "title": "Initialisation Stratégique",
@@ -207,6 +209,73 @@
       "creativity": "Créativité",
       "execution": "Physique (Robot)"
     }
+  },
+  "step7": {
+    "title": "Matrice Ikigai 2.0",
+    "subtitle": "Visualisation stratégique de votre positionnement face à l'automatisation intelligente.",
+    "parcours": {
+      "augmentation": "Parcours Augmentation",
+      "pivot": "Parcours Pivot"
+    },
+    "dimensions": {
+      "capital": "Capital Actif",
+      "capitalDesc": "Force combinée de vos 5 talents critiques et maîtrise technologique.",
+      "risk": "Zone de Risque",
+      "riskDesc": "Exposition de vos tâches à l'automatisation (IA + robotique).",
+      "opportunities": "Opportunités de Niche",
+      "opportunitiesDesc": "Secteurs résilients correspondant à votre signature.",
+      "leverage": "Levier Économique",
+      "leverageDesc": "Potentiel de valorisation sur le marché transformé."
+    },
+    "niches": {
+      "title": "Métiers Refuges Identifiés",
+      "subtitle": "Fonctions à haute valeur humaine correspondant à vos actifs stratégiques.",
+      "match": "match",
+      "growth": {
+        "high": "Forte croissance",
+        "medium": "Croissance moyenne",
+        "low": "Croissance faible"
+      }
+    },
+    "signature": {
+      "title": "Votre Signature Stratégique"
+    },
+    "nextButton": "Voir le Plan d'Action →",
+    "prevButton": "← Retour au Verdict"
+  },
+  "step8": {
+    "title": "Plan d'Action Stratégique",
+    "subtitle": "Votre roadmap personnalisée pour sécuriser et valoriser votre position professionnelle.",
+    "progress": "Progression",
+    "actions": "actions",
+    "allCompleted": "🎉 Toutes les actions sont complétées !",
+    "percentComplete": "% de votre plan réalisé",
+    "pillars": {
+      "delegation": {
+        "title": "Délégation Technologique",
+        "description": "Automatiser les processus à faible valeur ajoutée pour libérer votre temps stratégique."
+      },
+      "reinforcement": {
+        "title": "Renforcement de Signature",
+        "description": "Consolider vos actifs stratégiques pour maximiser votre différenciation."
+      },
+      "positioning": {
+        "title": "Positionnement Marché",
+        "description": "Affirmer votre valeur unique face aux systèmes automatisés."
+      }
+    },
+    "priority": {
+      "immediate": "Immédiat",
+      "shortTerm": "1-3 mois",
+      "mediumTerm": "3-6 mois"
+    },
+    "final": {
+      "title": "Votre Stratégie est Prête",
+      "subtitle": "Vous avez maintenant une vision claire de votre positionnement et un plan d'action concret pour sécuriser votre avenir professionnel."
+    },
+    "exportPdf": "Exporter en PDF",
+    "newAudit": "Nouvel Audit",
+    "prevButton": "← Retour à la Matrice"
   },
   "language": {
     "fr": "Français",

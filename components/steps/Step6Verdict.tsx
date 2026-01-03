@@ -14,7 +14,7 @@ export function Step6Verdict() {
   const tStep4 = useTranslations('step4');
   const tStep5 = useTranslations('step5');
   const locale = useLocale();
-  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep, prevStep } = useAuditStore();
+  const { context, tasks, getSelectedTalents, software, getResilienceScore, getTalentScore, reset, setStep, prevStep, nextStep } = useAuditStore();
   
   const resilienceScore = getResilienceScore();
   const talentScore = getTalentScore();
@@ -439,12 +439,13 @@ export function Step6Verdict() {
           </motion.button>
           
           <motion.button
-            className="apex-button flex items-center justify-center gap-2"
+            onClick={nextStep}
+            className="apex-button flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             {t('accessIkigai')}
-            <span className="text-xs opacity-75">{t('comingSoon')}</span>
+            <TrendingUp className="w-4 h-4" />
           </motion.button>
         </div>
       </motion.div>
