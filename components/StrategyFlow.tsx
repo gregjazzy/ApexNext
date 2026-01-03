@@ -9,6 +9,7 @@ import { useLocale } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { UserMenu } from '@/components/ui/UserMenu';
+import { ResetButton } from '@/components/ui/ResetButton';
 import { Step7Ikigai, Step8Roadmap } from '@/components/steps';
 import PortraitMutation from '@/components/PortraitMutation';
 
@@ -201,6 +202,8 @@ export function StrategyFlow() {
                   {currentStepInfo?.title[l]}
                 </p>
               </div>
+
+              <ResetButton variant="text" />
 
               <LanguageSwitcher />
 

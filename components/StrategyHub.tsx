@@ -25,6 +25,7 @@ import {
 import { useAuditStore } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { UserMenu } from '@/components/ui/UserMenu';
+import { ResetButton } from '@/components/ui/ResetButton';
 
 // ===============================================
 // CONFIGURATION DU HUB STRATÉGIQUE
@@ -302,6 +303,8 @@ export function StrategyHub() {
                   </span>
                 </div>
               )}
+
+              <ResetButton variant="text" />
 
               <LanguageSwitcher />
 

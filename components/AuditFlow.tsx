@@ -10,6 +10,7 @@ import { useAuditStore } from '@/lib/store';
 import { Stepper, AUDIT_STEPS } from '@/components/ui/Stepper';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { UserMenu } from '@/components/ui/UserMenu';
+import { ResetButton } from '@/components/ui/ResetButton';
 import {
   Step1Matrix,
   Step2Context,
@@ -88,6 +89,8 @@ export function AuditFlow() {
                   {translatedSteps.find(s => s.number === displayStep)?.title}
                 </p>
               </div>
+              
+              <ResetButton variant="text" />
               
               <LanguageSwitcher />
               
