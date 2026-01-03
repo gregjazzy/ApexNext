@@ -19,10 +19,10 @@ const COMPETENCE_LABELS: Record<CompetenceCategory, { fr: string; en: string }> 
   relationnelle: { fr: 'Relationnelle', en: 'Relational' },
   technique: { fr: 'Technique', en: 'Technical' },
 };
-import {
+import { 
   Cpu, Target, Megaphone, CheckCircle2, Circle,
   Zap, Clock, Calendar, RotateCcw, Download,
-  ArrowRight, TrendingUp, Compass,
+  ArrowRight, TrendingUp, Compass, GraduationCap,
   User, Users, Shield, ChevronRight,
   Briefcase, Gauge, Crosshair, Hammer, 
   FileOutput, AlertTriangle, Rocket, Settings,
@@ -183,13 +183,13 @@ export function Step8Roadmap() {
   const locale = useLocale();
   const l = locale === 'fr' ? 'fr' : 'en';
   const router = useRouter();
-
-  const {
-    context,
+  
+  const { 
+    context, 
     tasks,
     talents,
     software,
-    strategy,
+    strategy, 
     computedKPIs,
     toggleRoadmapAction,
     setStep,
@@ -202,7 +202,7 @@ export function Step8Roadmap() {
   useEffect(() => {
     computeKPIs();
   }, [computeKPIs, tasks, talents, strategy]);
-
+  
   const isAugmentation = context.goal === 'augmentation';
   const isPivot = context.goal === 'pivot';
   const isReclassement = context.goal === 'reclassement';
@@ -228,13 +228,13 @@ export function Step8Roadmap() {
     ['delegation', 'reinforcement', 'positioning', 'disengagement', 'oceanBleu', 'landing'].forEach(p => {
       grouped[p] = [];
     });
-
+    
     strategy.roadmap.forEach(action => {
       if (grouped[action.pillar]) {
         grouped[action.pillar].push(action);
       }
     });
-
+    
     return grouped;
   }, [strategy.roadmap]);
 
@@ -309,18 +309,18 @@ export function Step8Roadmap() {
 
     return {
       // Piliers Augmentation
-      delegation: {
+    delegation: {
         value: delegationTimeGain,
         unit: 'h/sem',
         label: { fr: 'Potentiel gain de temps', en: 'Time saving potential' },
-      },
-      reinforcement: {
+    },
+    reinforcement: {
         value: talentsToReinforce,
         unit: l === 'fr' ? 'actifs' : 'assets',
         label: { fr: 'Actifs à développer', en: 'Assets to develop' },
         secondary: { value: highValueTasksCount, label: { fr: 'tâches haute valeur', en: 'high-value tasks' } },
-      },
-      positioning: {
+    },
+    positioning: {
         value: authorityScore,
         unit: '%',
         label: isAugmentation 
@@ -430,12 +430,12 @@ export function Step8Roadmap() {
           <span className="w-px h-4 bg-current opacity-30" />
           <span className="font-normal opacity-80">{colors.focus[l]}</span>
         </motion.div>
-
+        
         <h1 className="apex-title text-3xl mb-3">
           {l === 'fr' ? 'Plan d\'Action Opérationnel' : 'Operational Action Plan'}
         </h1>
         <p className="text-slate-400 max-w-2xl mx-auto">
-          {l === 'fr'
+          {l === 'fr' 
             ? 'Roadmap personnalisée issue de votre audit. Actions concrètes, KPIs mesurables.'
             : 'Personalized roadmap from your audit. Concrete actions, measurable KPIs.'}
         </p>
@@ -632,19 +632,19 @@ export function Step8Roadmap() {
                 <Hammer className="w-3.5 h-3.5 text-rose-400" />
                 <span className="text-slate-400">
                   {l === 'fr' ? 'Cible prioritaire :' : 'Priority target:'}
-                </span>
+          </span>
                 <span className="text-rose-300 font-medium">{mostVulnerableTask.name}</span>
                 <span className="text-slate-500">({mostVulnerableTask.vulnerabilityPercent}% {l === 'fr' ? 'vulnérable' : 'vulnerable'})</span>
               </div>
               {lowestScoredTalent && (
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
                   <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-slate-400">
+          <span className="text-slate-400">
                     {l === 'fr' ? 'Actif à renforcer :' : 'Asset to reinforce:'}
-                  </span>
+          </span>
                   <span className="text-blue-300 font-medium">{lowestScoredTalent.name}</span>
                   <span className="text-slate-500">({lowestScoredTalent.level}/5)</span>
-                </div>
+        </div>
               )}
             </div>
           )}
@@ -656,7 +656,7 @@ export function Step8Roadmap() {
       {/* Tableau comparatif enrichi */}
       {/* =============================================== */}
       {isPivot && strategy.gapAnalysis && (
-        <motion.div
+          <motion.div
           className="apex-card p-6 border-2 border-indigo-500/30 bg-gradient-to-br from-indigo-900/10 to-purple-900/10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -961,6 +961,70 @@ export function Step8Roadmap() {
               }
             </p>
           )}
+
+          {/* Plan de Reskilling Stratégique */}
+          <div className="mt-6 pt-6 border-t border-slate-700/50">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-emerald-400" />
+              {l === 'fr' ? 'Stratégie de Reskilling Recommandée' : 'Recommended Reskilling Strategy'}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Phase 1 : Évaluation */}
+              <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">1</div>
+                  <span className="font-medium text-blue-400">{l === 'fr' ? 'Évaluation' : 'Assessment'}</span>
+                </div>
+                <p className="text-sm text-slate-400">
+                  {l === 'fr' 
+                    ? 'Valider les portraits de mutation avec entretiens individuels'
+                    : 'Validate mutation portraits with individual interviews'
+                  }
+                </p>
+                <div className="mt-2 text-xs text-slate-500">
+                  {l === 'fr' ? 'Durée: 2-4 semaines' : 'Duration: 2-4 weeks'}
+                </div>
+              </div>
+              
+              {/* Phase 2 : Formation */}
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold">2</div>
+                  <span className="font-medium text-amber-400">{l === 'fr' ? 'Formation' : 'Training'}</span>
+                </div>
+                <p className="text-sm text-slate-400">
+                  {l === 'fr' 
+                    ? 'Parcours de reskilling personnalisés par collaborateur'
+                    : 'Personalized reskilling paths per employee'
+                  }
+                </p>
+                <div className="mt-2 text-xs text-slate-500">
+                  {l === 'fr' 
+                    ? `Budget estimé: ${matchesWithGaps.reduce((acc, m) => acc + m.competenceGaps.reduce((a, g) => a + g.trainingHours, 0), 0)}h`
+                    : `Estimated budget: ${matchesWithGaps.reduce((acc, m) => acc + m.competenceGaps.reduce((a, g) => a + g.trainingHours, 0), 0)}h`
+                  }
+                </div>
+              </div>
+              
+              {/* Phase 3 : Transition */}
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">3</div>
+                  <span className="font-medium text-emerald-400">{l === 'fr' ? 'Transition' : 'Transition'}</span>
+                </div>
+                <p className="text-sm text-slate-400">
+                  {l === 'fr' 
+                    ? 'Affectation aux postes cibles avec période d\'accompagnement'
+                    : 'Assignment to target positions with support period'
+                  }
+                </p>
+                <div className="mt-2 text-xs text-slate-500">
+                  {l === 'fr' ? 'Durée: 1-3 mois' : 'Duration: 1-3 months'}
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
       )}
 
@@ -1005,7 +1069,7 @@ export function Step8Roadmap() {
           const pillarDesc = typeof config.desc === 'object' && 'augmentation' in config.desc
             ? config.desc[isAugmentation ? 'augmentation' : 'pivot'][l]
             : (config.desc as { fr: string; en: string })[l];
-
+          
           return (
             <motion.div
               key={pillarKey}
@@ -1026,7 +1090,7 @@ export function Step8Roadmap() {
                         <h2 className="font-serif text-lg text-slate-200">
                           {l === 'fr' ? `Pilier ${pillarIndex + 1}` : `Pillar ${pillarIndex + 1}`}
                           <span className={`ml-2 ${config.textClass}`}>— {config.label[l]}</span>
-                        </h2>
+                    </h2>
                         <span className="px-2 py-0.5 text-xs rounded-full bg-slate-700/50 text-slate-400 font-medium">
                           {config.subtitle[l]}
                         </span>
@@ -1050,19 +1114,19 @@ export function Step8Roadmap() {
                   </div>
                 </div>
               </div>
-
+              
               {/* Actions List - Checkboxes Style */}
               <div className="p-4">
                 <AnimatePresence>
                   {actions.map((action, actionIndex) => {
                     const priorityConfig = PRIORITY_CONFIG[action.priority];
                     const PriorityIcon = priorityConfig.icon;
-
+                    
                     return (
                       <motion.div
                         key={action.id}
                         className={`group flex items-start gap-4 p-4 rounded-xl border transition-all cursor-pointer mb-3 last:mb-0 ${
-                          action.completed
+                          action.completed 
                             ? 'bg-slate-800/20 border-slate-800/50 opacity-60'
                             : 'bg-slate-800/40 border-slate-700/50 hover:border-slate-600 hover:bg-slate-800/60'
                         }`}
@@ -1073,7 +1137,7 @@ export function Step8Roadmap() {
                         whileHover={{ scale: 1.005 }}
                         whileTap={{ scale: 0.995 }}
                       >
-                        {/* Checkbox */}
+                          {/* Checkbox */}
                         <div className="pt-0.5 flex-shrink-0">
                           <motion.div
                             className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
@@ -1087,10 +1151,10 @@ export function Step8Roadmap() {
                               <CheckCircle2 className={`w-4 h-4 ${config.textClass}`} />
                             )}
                           </motion.div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-3 mb-1.5">
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className={`font-medium ${action.completed ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
@@ -1108,12 +1172,12 @@ export function Step8Roadmap() {
                                    action.eracCategory === 'raise' ? 'A' : 'C'}
                                 </span>
                               )}
-                            </div>
-                            
-                            {/* Priority Badge */}
+                          </div>
+                          
+                          {/* Priority Badge */}
                             <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium flex-shrink-0 ${priorityConfig.bgClass} ${priorityConfig.textClass} border ${priorityConfig.borderClass}`}>
-                              <PriorityIcon className="w-3 h-3" />
-                              {priorityConfig.label[l]}
+                            <PriorityIcon className="w-3 h-3" />
+                            {priorityConfig.label[l]}
                             </div>
                           </div>
                           
@@ -1167,7 +1231,7 @@ export function Step8Roadmap() {
                     );
                   })}
                 </AnimatePresence>
-
+                
                 {actions.length === 0 && (
                   <div className="text-center py-6">
                     <AlertTriangle className="w-8 h-8 text-slate-600 mx-auto mb-2" />
@@ -1196,7 +1260,7 @@ export function Step8Roadmap() {
           {l === 'fr' ? 'Exportez Votre Synthèse Stratégique' : 'Export Your Strategic Summary'}
         </h2>
         <p className="text-slate-400 max-w-xl mx-auto mb-6">
-          {l === 'fr'
+          {l === 'fr' 
             ? 'Compilez l\'Audit + la Matrice Ikigai + ce Plan d\'Action dans un document de synthèse complet.'
             : 'Compile the Audit + Ikigai Matrix + this Action Plan into a complete summary document.'}
         </p>
@@ -1220,7 +1284,7 @@ export function Step8Roadmap() {
             <div className="text-xs text-slate-500">{l === 'fr' ? 'Positionnement' : 'Positioning'}</div>
           </div>
         </div>
-
+        
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <motion.button
             onClick={handleExportPDF}

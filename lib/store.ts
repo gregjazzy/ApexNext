@@ -2111,46 +2111,127 @@ export const useAuditStore = create<AuditStore>()(
         const { futureJobs } = state.enterpriseTargets;
         const { members } = state.cohortData;
         const selectedTalents = state.talents.filter(t => t.selected);
+        const { tasks, userIntention } = state;
+        
+        // ===============================================
+        // MOTEUR DE MATCHING GPEC ENRICHI
+        // Compare l'Offre (Portrait du salarié) avec la Demande (Postes Cibles)
+        // ===============================================
+        
+        // Calculer le profil de résilience moyen des tâches
+        const avgResilience = tasks.length > 0 ? {
+          donnees: tasks.reduce((acc, t) => acc + t.resilience.donnees, 0) / tasks.length,
+          decision: tasks.reduce((acc, t) => acc + t.resilience.decision, 0) / tasks.length,
+          relationnel: tasks.reduce((acc, t) => acc + t.resilience.relationnel, 0) / tasks.length,
+          creativite: tasks.reduce((acc, t) => acc + t.resilience.creativite, 0) / tasks.length,
+          execution: tasks.reduce((acc, t) => acc + t.resilience.execution, 0) / tasks.length,
+        } : { donnees: 50, decision: 50, relationnel: 50, creativite: 50, execution: 50 };
+        
+        // Extraire les compétences innées du Carré d'As (Portrait de Mutation)
+        const innateSkills = [
+          userIntention.carreDAs.talent1,
+          userIntention.carreDAs.talent2,
+          userIntention.carreDAs.talent3,
+          userIntention.carreDAs.talent4,
+        ].filter(t => t && t.trim().length > 0);
+        
+        // Extraire la zone de rejet pour pénaliser les mauvais matchs
+        const rejectZone = userIntention.zoneDeRejet || [];
         
         // Calculer les matches pour chaque combinaison employé/poste
         const matches: EmployeeMatch[] = [];
         
         for (const member of members) {
           for (const job of futureJobs) {
-            // Calcul du score de compatibilité basé sur les compétences
-            let totalScore = 0;
-            let maxScore = 0;
+            // ===============================================
+            // CALCUL DU SCORE D'AFFINITÉ MULTI-CRITÈRES
+            // ===============================================
+            
+            let competenceScore = 0;
+            let maxCompetenceScore = 0;
             const gaps: EmployeeMatch['competenceGaps'] = [];
             
             for (const comp of job.requiredCompetences) {
               const weight = comp.criticalityScore / 100;
-              maxScore += 5 * weight;
+              maxCompetenceScore += 5 * weight;
               
-              // Estimation du niveau actuel basé sur les talents sélectionnés
-              let currentLevel = 2; // Niveau par défaut
+              // === NIVEAU DE BASE (2/5) ===
+              let currentLevel = 2;
               
-              // Bonus si un talent correspond à la catégorie
-              if (comp.category === 'relationnelle') {
-                const hasRelationalTalent = selectedTalents.some(t => 
-                  ['intelligence-negociation', 'leadership-adaptatif', 'gestion-crise'].includes(t.id)
-                );
-                if (hasRelationalTalent) currentLevel = Math.min(5, currentLevel + 2);
-              } else if (comp.category === 'technique') {
-                const hasTechnicalTalent = selectedTalents.some(t =>
-                  ['synthese-strategique', 'pensee-systemique', 'audit-critique'].includes(t.id)
-                );
-                if (hasTechnicalTalent) currentLevel = Math.min(5, currentLevel + 2);
-              } else if (comp.category === 'haptique') {
-                const hasHaptiqueTalent = selectedTalents.some(t =>
-                  ['intuition-operationnelle', 'sens-craft', 'precision-execution'].includes(t.id)
-                );
-                if (hasHaptiqueTalent) currentLevel = Math.min(5, currentLevel + 2);
+              // === BONUS TALENTS STRATÉGIQUES (12 actifs) ===
+              // Mapping des talents vers catégories de compétences
+              const talentCategoryMap: Record<string, CompetenceCategory[]> = {
+                'arbitrage-incertitude': ['relationnelle', 'technique'],
+                'synthese-strategique': ['technique'],
+                'intelligence-negociation': ['relationnelle'],
+                'pensee-systemique': ['technique'],
+                'diagnostic-crise': ['technique', 'haptique'],
+                'tactique-relationnelle': ['relationnelle'],
+                'innovation-rupture': ['technique'],
+                'pilotage-systemes': ['technique', 'haptique'],
+                'ethique-gouvernance': ['relationnelle', 'technique'],
+                'leadership-adaptatif': ['relationnelle'],
+                'audit-critique': ['technique'],
+                'communication-influence': ['relationnelle'],
+              };
+              
+              // Vérifier si un talent sélectionné correspond à la catégorie
+              for (const talent of selectedTalents) {
+                const categories = talentCategoryMap[talent.id] || [];
+                if (categories.includes(comp.category)) {
+                  // Bonus proportionnel au niveau de maîtrise du talent
+                  currentLevel = Math.min(5, currentLevel + Math.floor(talent.level / 2));
+                  break;
+                }
               }
               
-              totalScore += Math.min(currentLevel, comp.requiredLevel) * weight;
+              // === BONUS SCORES DE RÉSILIENCE (AUDIT TÂCHES) ===
+              // Si les tâches actuelles ont des scores élevés dans la catégorie
+              if (comp.category === 'relationnelle' && avgResilience.relationnel > 70) {
+                currentLevel = Math.min(5, currentLevel + 1);
+              } else if (comp.category === 'technique' && avgResilience.decision > 70) {
+                currentLevel = Math.min(5, currentLevel + 1);
+              } else if (comp.category === 'haptique' && avgResilience.execution > 70) {
+                currentLevel = Math.min(5, currentLevel + 1);
+              }
+              
+              // === BONUS CARRÉ D'AS (TALENTS INNÉS) ===
+              // Matching sémantique simple entre talents innés et compétences requises
+              const compNameLower = comp.name.toLowerCase();
+              for (const innateSkill of innateSkills) {
+                const skillLower = innateSkill.toLowerCase();
+                // Recherche de correspondance partielle
+                if (compNameLower.includes(skillLower) || skillLower.includes(compNameLower) ||
+                    // Correspondances par mots-clés
+                    (skillLower.includes('négoci') && compNameLower.includes('négoci')) ||
+                    (skillLower.includes('communi') && compNameLower.includes('communi')) ||
+                    (skillLower.includes('manag') && compNameLower.includes('manag')) ||
+                    (skillLower.includes('organis') && compNameLower.includes('organis')) ||
+                    (skillLower.includes('coord') && compNameLower.includes('coord')) ||
+                    (skillLower.includes('techni') && compNameLower.includes('techni'))) {
+                  currentLevel = Math.min(5, currentLevel + 1);
+                  break;
+                }
+              }
+              
+              // === MALUS ZONE DE REJET ===
+              // Si le poste implique des tâches dans la zone de rejet
+              for (const reject of rejectZone) {
+                const rejectLower = reject.toLowerCase();
+                if (compNameLower.includes(rejectLower) || 
+                    job.description.toLowerCase().includes(rejectLower)) {
+                  currentLevel = Math.max(1, currentLevel - 1);
+                  break;
+                }
+              }
+              
+              competenceScore += Math.min(currentLevel, comp.requiredLevel) * weight;
               
               const gap = currentLevel - comp.requiredLevel;
               if (gap < 0) {
+                // Calcul des heures de formation basé sur la criticité
+                const trainingHours = Math.abs(gap) * (20 + Math.floor(comp.criticalityScore / 20));
+                
                 gaps.push({
                   competenceId: comp.id,
                   competenceName: comp.name,
@@ -2158,12 +2239,21 @@ export const useAuditStore = create<AuditStore>()(
                   currentLevel,
                   requiredLevel: comp.requiredLevel,
                   gap,
-                  trainingHours: Math.abs(gap) * 20, // Estimation: 20h par niveau
+                  trainingHours,
                 });
               }
             }
             
-            const compatibilityScore = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+            // === BONUS RÉSISTANCE À L'AUTOMATISATION ===
+            // Les postes à haute résistance sont favorisés pour les profils résilients
+            const resilienceBonus = (job.automationResistance / 100) * 10;
+            
+            // === CALCUL DU SCORE FINAL ===
+            const baseScore = maxCompetenceScore > 0 
+              ? (competenceScore / maxCompetenceScore) * 100 
+              : 50;
+            
+            const compatibilityScore = Math.min(100, Math.round(baseScore + resilienceBonus));
             
             // Déterminer la recommandation
             let recommendation: EmployeeMatch['recommendation'] = 'difficult';
@@ -2171,12 +2261,29 @@ export const useAuditStore = create<AuditStore>()(
             else if (compatibilityScore >= 70) recommendation = 'good';
             else if (compatibilityScore >= 50) recommendation = 'possible';
             
-            // Identifier les points forts
+            // === IDENTIFIER LES POINTS FORTS ===
             const strengths: string[] = [];
+            
+            // Points forts des talents stratégiques
             for (const talent of selectedTalents) {
               if (talent.level >= 4) {
                 strengths.push(talent.name);
               }
+            }
+            
+            // Points forts du Carré d'As
+            for (const innateSkill of innateSkills.slice(0, 2)) {
+              if (innateSkill && !strengths.includes(innateSkill)) {
+                strengths.push(`Talent inné: ${innateSkill}`);
+              }
+            }
+            
+            // Point fort résilience
+            if (avgResilience.relationnel > 70) {
+              strengths.push('Excellence relationnelle');
+            }
+            if (avgResilience.decision > 70) {
+              strengths.push('Force décisionnelle');
             }
             
             matches.push({
@@ -2186,13 +2293,13 @@ export const useAuditStore = create<AuditStore>()(
               futureJobTitle: job.title,
               compatibilityScore,
               competenceGaps: gaps,
-              strengths: strengths.slice(0, 3),
+              strengths: strengths.slice(0, 5),
               recommendation,
             });
           }
         }
         
-        // Trier par score de compatibilité
+        // Trier par score de compatibilité décroissant
         matches.sort((a, b) => b.compatibilityScore - a.compatibilityScore);
         
         return {
