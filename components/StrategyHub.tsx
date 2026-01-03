@@ -19,7 +19,8 @@ import {
   Sparkles,
   LayoutGrid,
   ArrowRight,
-  Info
+  Info,
+  Star
 } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -29,7 +30,7 @@ import { UserMenu } from '@/components/ui/UserMenu';
 // CONFIGURATION DU HUB STRATÉGIQUE
 // ===============================================
 
-type NodeStatus = 'completed' | 'todo' | 'locked' | 'optional' | 'current';
+type NodeStatus = 'completed' | 'todo' | 'locked' | 'optional' | 'required' | 'current';
 
 interface HubNode {
   id: string;
@@ -118,7 +119,15 @@ export function StrategyHub() {
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    
+    // ===============================================
+    // SÉQUENÇAGE : Hub accessible uniquement après Step 1
+    // ===============================================
+    // Si le persona n'est pas défini, rediriger vers l'audit
+    if (!context.persona || !context.goal) {
+      router.push('/audit');
+    }
+  }, [context.persona, context.goal, router]);
 
   // ===============================================
   // CALCUL DES ÉTATS DES NŒUDS
@@ -138,7 +147,8 @@ export function StrategyHub() {
       case 'portrait':
         if (!hasDiagnostic) return 'locked';
         if (!isPivot) return 'optional';
-        return hasPortrait ? 'completed' : 'todo';
+        // Si Pivot : afficher "Requis" tant que non complété
+        return hasPortrait ? 'completed' : 'required';
       
       case 'strategy':
         if (!hasDiagnostic) return 'locked';
@@ -176,6 +186,11 @@ export function StrategyHub() {
         icon: Info,
         className: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
       },
+      required: {
+        label: { fr: 'Requis', en: 'Required' },
+        icon: Star,
+        className: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+      },
       current: {
         label: { fr: 'En cours', en: 'In progress' },
         icon: Sparkles,
@@ -187,6 +202,8 @@ export function StrategyHub() {
 
   const handleNodeClick = (node: HubNode) => {
     const status = getNodeStatus(node.id);
+    // Seul le statut 'locked' empêche de cliquer
+    // 'required', 'todo', 'optional', 'completed' sont tous cliquables
     if (status === 'locked') return;
     router.push(node.route);
   };
@@ -196,23 +213,36 @@ export function StrategyHub() {
   // ===============================================
 
   const completedCount = HUB_NODES.filter(n => getNodeStatus(n.id) === 'completed').length;
-  const totalRequired = context.goal === 'pivot' ? 4 : 3;
-  const progressPercent = Math.round((completedCount / totalRequired) * 100);
+  // Toujours afficher 4 étapes (reflète les 4 cartes visibles)
+  const totalSteps = 4;
+  const progressPercent = Math.round((completedCount / totalSteps) * 100);
 
   const isAugmentation = context.goal === 'augmentation';
+
+  // Labels personnalisés par persona
+  const personaLabels: Record<string, { fr: string; en: string }> = {
+    salarie: { fr: 'Salarié', en: 'Employee' },
+    freelance: { fr: 'Freelance', en: 'Freelancer' },
+    leader: { fr: 'Leader / RH', en: 'Leader / HR' },
+  };
+  
+  const personaLabel = context.persona ? personaLabels[context.persona]?.[l] || context.persona : '';
 
   // ===============================================
   // RENDER
   // ===============================================
 
-  if (!isClient) {
+  // Affichage du loading ou redirection si pas de persona
+  if (!isClient || !context.persona || !context.goal) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto animate-pulse">
             <LayoutGrid className="w-10 h-10 text-white" />
           </div>
-          <p className="text-slate-400">Chargement du Centre de Commandement...</p>
+          <p className="text-slate-400">
+            {l === 'fr' ? 'Chargement du Centre de Commandement...' : 'Loading Command Center...'}
+          </p>
         </div>
       </div>
     );
@@ -245,10 +275,10 @@ export function StrategyHub() {
               </motion.div>
               <div>
                 <h1 className="font-serif text-2xl font-bold text-slate-100">
-                  {l === 'fr' ? 'Centre de Commandement' : 'Command Center'}
+                  {l === 'fr' ? `Trajectoire de Mutation : ${personaLabel}` : `Mutation Trajectory: ${personaLabel}`}
                 </h1>
                 <p className="text-sm text-slate-500">
-                  {l === 'fr' ? 'Cartographie de votre mutation stratégique' : 'Map of your strategic mutation'}
+                  {l === 'fr' ? 'Centre de Commandement Stratégique' : 'Strategic Command Center'}
                 </p>
               </div>
             </div>
@@ -288,7 +318,7 @@ export function StrategyHub() {
                 {l === 'fr' ? 'Progression globale' : 'Overall progress'}
               </span>
               <span className="text-xs text-slate-400 font-medium">
-                {completedCount} / {totalRequired} {l === 'fr' ? 'étapes' : 'steps'}
+                {completedCount} / {totalSteps} {l === 'fr' ? 'étapes' : 'steps'}
               </span>
             </div>
             <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
