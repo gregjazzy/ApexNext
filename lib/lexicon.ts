@@ -26,14 +26,14 @@ export const matrixLexicon = {
   goals: {
     augmentation: {
       title: {
-        salarie: { fr: "Ingénierie de l'Employabilité", en: "Employability Engineering" },
+        salarie: { fr: "Réduisez votre risque IA", en: "Reduce your AI risk" },
         freelance: { fr: "Scalabilité de la Valeur", en: "Value Scalability" },
         leader: { fr: "Audit d'Efficience Opérationnelle", en: "Operational Efficiency Audit" }
       },
       description: {
         salarie: {
-          fr: "Devenir l'expert augmenté capable de superviser l'automatisation sur votre périmètre.",
-          en: "Become the augmented expert capable of supervising automation within your scope."
+          fr: "Transformez votre poste pour rester indispensable.",
+          en: "Transform your role to stay indispensable."
         },
         freelance: {
           fr: "Passer de l'exécution concurrencée à une offre de conseil expert à haute marge.",
