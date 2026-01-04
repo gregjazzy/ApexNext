@@ -211,11 +211,14 @@ export function Step2Context() {
   // Initialiser la recherche avec la valeur existante (uniquement au montage)
   const hasInitialized = useRef(false);
   useEffect(() => {
-    if (!hasInitialized.current && context.industry) {
-      setSectorSearch(getSelectedSectorLabel());
+    if (!hasInitialized.current) {
+      if (context.industry) {
+        setSectorSearch(getSelectedSectorLabel());
+      }
       hasInitialized.current = true;
     }
-  }, [context.industry, getSelectedSectorLabel]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Volontairement vide - ne s'exécute qu'au montage
 
   // Effet pour fermer le dropdown au clic extérieur
   useEffect(() => {
