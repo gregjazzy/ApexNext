@@ -306,17 +306,124 @@ export interface PivotSuggestionsInput {
 }
 
 // ============================================================================
+// INSTRUCTION DE LANGUE
+// ============================================================================
+
+export const getLanguageInstruction = (locale: string): string => {
+  if (locale === 'en') {
+    return `
+
+---
+
+# 🌍 LANGUAGE INSTRUCTION
+
+**CRITICAL: You MUST respond ENTIRELY in ENGLISH.**
+- All job titles and descriptions in English
+- All transition paths in English
+- All advice and warnings in English
+- Adapt job titles to the English-speaking market (US/UK)
+`;
+  }
+  return `
+
+---
+
+# 🌍 INSTRUCTION DE LANGUE
+
+**CRITIQUE : Tu DOIS répondre ENTIÈREMENT en FRANÇAIS.**
+- Tous les titres de métiers et descriptions en français
+- Tous les chemins de transition en français
+- Tous les conseils et avertissements en français
+- Adapte les titres de métiers au marché francophone
+`;
+};
+
+// ============================================================================
 // CONSTRUCTION DU PROMPT UTILISATEUR
 // ============================================================================
 
-export const buildPivotPrompt = (input: PivotSuggestionsInput): string => {
+export const buildPivotPrompt = (input: PivotSuggestionsInput, locale: string = 'fr'): string => {
+  const langInstruction = getLanguageInstruction(locale);
+  const isEnglish = locale === 'en';
+  
   const tasksList = input.tasks
-    .map(t => `- **${t.name}** : ${t.resilienceScore}% résilience`)
+    .map(t => `- **${t.name}** : ${t.resilienceScore}% ${isEnglish ? 'resilience' : 'résilience'}`)
     .join('\n');
   
   const talentsList = input.talents
-    .map(t => `- **${t.name}** : Niveau ${t.level}/5`)
+    .map(t => `- **${t.name}** : ${isEnglish ? 'Level' : 'Niveau'} ${t.level}/5`)
     .join('\n');
+
+  if (isEnglish) {
+    return `
+# PIVOT SUGGESTIONS REQUEST
+
+## CURRENT PROFILE
+| Criteria | Value |
+|----------|-------|
+| **Current Position** | ${input.jobTitle} |
+| **Sector** | ${input.sector} |
+| **Experience** | ${input.yearsExperience || 'Not specified'} |
+| **Location** | ${input.location || 'Not specified'} |
+
+---
+
+## DIAGNOSTIC SCORES
+| Metric | Score |
+|--------|-------|
+| **Global Resilience** | ${input.scores.globalResilience}% |
+| **Talent Signature** | ${input.scores.talentSignature}% |
+
+---
+
+## CURRENT TASKS (with resilience)
+${tasksList}
+
+---
+
+## IDENTIFIED TALENTS
+${talentsList}
+
+${input.ikigai ? `
+---
+
+## IKIGAI DATA
+| Dimension | Score |
+|-----------|-------|
+| Strategic Engagement | ${input.ikigai.engagementStrategique}/100 |
+| Distinctive Expertise | ${input.ikigai.expertiseDistinctive}/100 |
+| Critical Market Demand | ${input.ikigai.demandeCritique}/100 |
+| Economic Leverage | ${input.ikigai.levierEconomique}/100 |
+| **Alignment Score** | ${input.ikigai.alignmentScore}/100 |
+` : ''}
+
+${input.preferences ? `
+---
+
+## TRANSITION PREFERENCES
+| Criteria | Value |
+|----------|-------|
+| Salary Expectation | ${input.preferences.salaryExpectation || 'Not specified'} |
+| Geographic Mobility | ${input.preferences.geographicMobility || 'Not specified'} |
+| Risk Tolerance | ${input.preferences.riskTolerance || 'Not specified'} |
+| Desired Timeline | ${input.preferences.timeToTransition || 'Not specified'} |
+` : ''}
+
+---
+
+# YOUR MISSION
+
+1. **Analyze TRANSFERABLE skills** - Not what's written, what's actually marketable
+2. **Identify HIDDEN BRIDGES** - The connections others don't see
+3. **Propose 5-7 destination jobs** realistic with a concrete transition path
+4. **Be HONEST** about difficulties and timelines
+
+**This profile comes from the ${input.sector} sector with ${input.yearsExperience || 'several years'} of experience.**
+**Take this reality into account in your proposals.**
+
+**Now generate the complete JSON.**
+${langInstruction}`;
+  }
 
   return `
 # DEMANDE DE SUGGESTIONS DE PIVOT
@@ -385,5 +492,5 @@ ${input.preferences ? `
 **Tiens compte de cette réalité dans tes propositions.**
 
 **Génère maintenant le JSON complet.**
-`;
+${langInstruction}`;
 };

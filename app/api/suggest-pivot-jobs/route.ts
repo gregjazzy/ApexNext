@@ -5,9 +5,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { 
-  SYSTEM_PROMPT_SUGGEST_PIVOT, 
-  buildPivotSuggestionPrompt,
-  PivotSuggestionInput 
+  SYSTEM_PROMPT_SUGGEST_PIVOT_JOBS, 
+  buildPivotPrompt,
+  PivotSuggestionsInput 
 } from '@/lib/prompts/suggest-pivot-jobs';
 
 // ============================================================================
@@ -25,7 +25,7 @@ async function callGemini(apiKey: string, userPrompt: string): Promise<unknown> 
         contents: [
           {
             parts: [
-              { text: SYSTEM_PROMPT_SUGGEST_PIVOT + '\n\n' + userPrompt }
+              { text: SYSTEM_PROMPT_SUGGEST_PIVOT_JOBS + '\n\n' + userPrompt }
             ]
           }
         ],
@@ -59,10 +59,24 @@ async function callGemini(apiKey: string, userPrompt: string): Promise<unknown> 
 
 export async function POST(req: NextRequest) {
   try {
-    const input: PivotSuggestionInput = await req.json();
+    const body = await req.json();
+    const { locale = 'fr', ...rawInput } = body;
+    
+    // Adapter les noms de champs si nécessaire
+    const input: PivotSuggestionsInput = {
+      jobTitle: rawInput.currentJob || rawInput.jobTitle,
+      sector: rawInput.currentSector || rawInput.sector,
+      yearsExperience: rawInput.yearsExperience,
+      location: rawInput.location,
+      tasks: rawInput.resilientTasks || rawInput.tasks || [],
+      talents: rawInput.talents || [],
+      ikigai: rawInput.ikigai,
+      scores: rawInput.scores || { globalResilience: 50, talentSignature: 50 },
+      preferences: rawInput.preferences,
+    };
 
     // Validation minimale
-    if (!input.currentJob || !input.currentSector) {
+    if (!input.jobTitle || !input.sector) {
       return NextResponse.json(
         { error: 'Données insuffisantes pour les suggestions' },
         { status: 400 }
@@ -78,8 +92,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Construire le prompt
-    const userPrompt = buildPivotSuggestionPrompt(input);
+    // Construire le prompt avec la locale
+    const userPrompt = buildPivotPrompt(input, locale);
 
     // Appeler le LLM
     const suggestions = await callGemini(geminiApiKey, userPrompt);

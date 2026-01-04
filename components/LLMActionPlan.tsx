@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import { 
   Rocket, Sparkles, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, 
   Target, Clock, CheckCircle2, ArrowRight, Zap, BookOpen, 
@@ -115,6 +116,7 @@ interface ActionPlan {
 // ============================================================================
 
 export function LLMActionPlan() {
+  const locale = useLocale();
   const { context, tasks, talents, getResilienceScore, getTalentScore, phantomCharge } = useAuditStore();
   const [actionPlan, setActionPlan] = useState<ActionPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -179,6 +181,7 @@ export function LLMActionPlan() {
           availableTime: phantomCharge.isEnabled ? {
             weeklyHoursGained: phantomCharge.potentialGainHours || 0,
           } : undefined,
+          locale,
         }),
       });
 

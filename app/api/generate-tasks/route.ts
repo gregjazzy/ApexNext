@@ -19,6 +19,7 @@ interface GenerateTasksRequest {
   sector: string;
   experience?: number;
   teamSize?: number;
+  locale?: string;
 }
 
 interface TaskGenerated {
@@ -39,7 +40,7 @@ interface GenerateTasksResponse {
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateTasksRequest = await request.json();
-    const { jobTitle, sector, experience, teamSize } = body;
+    const { jobTitle, sector, experience, teamSize, locale = 'fr' } = body;
 
     // Validation
     if (!jobTitle || !sector) {
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userPrompt = buildUserPrompt(jobTitle, sector, experience, teamSize);
+    const userPrompt = buildUserPrompt(jobTitle, sector, experience, teamSize, locale);
 
     let llmResponse: GenerateTasksResponse;
     let modelUsed: string;

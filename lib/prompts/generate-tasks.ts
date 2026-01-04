@@ -241,13 +241,62 @@ export const UI_MESSAGES = {
 // CONSTRUCTION DU PROMPT UTILISATEUR
 // ============================================================================
 
+// ============================================================================
+// INSTRUCTION DE LANGUE
+// ============================================================================
+
+export const getLanguageInstruction = (locale: string): string => {
+  if (locale === 'en') {
+    return `
+
+---
+
+# 🌍 LANGUAGE INSTRUCTION
+
+**CRITICAL: You MUST respond ENTIRELY in ENGLISH.**
+- All task names in English
+- All descriptions in English  
+- All vocabulary terms in English
+- All narratives in English
+- Keep technical terms that are universally used (e.g., "EBITDA", "SAP")
+`;
+  }
+  return `
+
+---
+
+# 🌍 INSTRUCTION DE LANGUE
+
+**CRITIQUE : Tu DOIS répondre ENTIÈREMENT en FRANÇAIS.**
+- Tous les noms de tâches en français
+- Toutes les descriptions en français
+- Tout le vocabulaire métier en français
+- Tous les narratifs en français
+`;
+};
+
+// ============================================================================
+// CONSTRUCTION DU PROMPT UTILISATEUR
+// ============================================================================
+
 export const buildUserPrompt = (
   jobTitle: string,
   sector: string,
   experience?: number,
-  teamSize?: number
+  teamSize?: number,
+  locale: string = 'fr'
 ): string => {
-  let prompt = `
+  const langInstruction = getLanguageInstruction(locale);
+  const isEnglish = locale === 'en';
+  
+  let prompt = isEnglish ? `
+# JOB ANALYSIS REQUEST
+
+## USER-PROVIDED INFORMATION
+
+**Job Title:** ${jobTitle}
+**Industry/Sector:** ${sector}
+` : `
 # DEMANDE D'ANALYSE DE POSTE
 
 ## INFORMATIONS FOURNIES PAR L'UTILISATEUR
@@ -257,16 +306,43 @@ export const buildUserPrompt = (
 `;
 
   if (experience !== undefined) {
-    prompt += `**Années d'expérience :** ${experience} ans\n`;
+    prompt += isEnglish 
+      ? `**Years of Experience:** ${experience} years\n`
+      : `**Années d'expérience :** ${experience} ans\n`;
   } else {
-    prompt += `**Années d'expérience :** Non précisé (assume 3-5 ans, profil confirmé)\n`;
+    prompt += isEnglish
+      ? `**Years of Experience:** Not specified (assume 3-5 years, mid-level professional)\n`
+      : `**Années d'expérience :** Non précisé (assume 3-5 ans, profil confirmé)\n`;
   }
 
   if (teamSize !== undefined) {
-    prompt += `**Taille de l'équipe :** ${teamSize} personnes\n`;
+    prompt += isEnglish
+      ? `**Team Size:** ${teamSize} people\n`
+      : `**Taille de l'équipe :** ${teamSize} personnes\n`;
   }
 
-  prompt += `
+  prompt += isEnglish ? `
+---
+
+## YOUR MISSION FOR THIS REQUEST
+
+1. **Normalize** the job title and sector to make them precise
+2. **Generate 14-16 tasks** that reflect the DAILY REALITY of this job
+3. **Use the exact vocabulary** of this profession in this sector
+4. **Cover all dimensions**: expertise, admin, relational, cross-functional
+5. **Be CONCRETE**: each task must be recognizable by someone in this role
+
+---
+
+## QUALITY REMINDER
+
+- Authentic professional vocabulary (no generic corporate jargon)
+- Granular, actionable tasks
+- Rich descriptions showing your understanding of the field
+- Coverage of both "noble" AND "unglamorous" aspects of the job
+
+**Now generate the complete JSON.**
+` : `
 ---
 
 ## TA MISSION POUR CETTE DEMANDE
@@ -289,5 +365,5 @@ export const buildUserPrompt = (
 **Génère maintenant le JSON complet.**
 `;
 
-  return prompt;
+  return prompt + langInstruction;
 };

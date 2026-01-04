@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import { Brain, Sparkles, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, Target, Shield, Zap, Clock, Wrench } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,7 @@ interface VulnerabilityAnalysis {
 // ============================================================================
 
 export function LLMVulnerabilityAnalysis() {
+  const locale = useLocale();
   const { context, tasks, talents, getResilienceScore, getTalentScore, phantomCharge, getPhantomChargeGain } = useAuditStore();
   const [analysis, setAnalysis] = useState<VulnerabilityAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,6 +102,7 @@ export function LLMVulnerabilityAnalysis() {
             weeklyEmailHours: phantomGain.weeklyHours,
             potentialGainHours: phantomGain.weeklyHours * (phantomGain.weeklyHours > 0 ? 0.7 : 0),
           } : undefined,
+          locale,
         }),
       });
 

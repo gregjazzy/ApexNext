@@ -313,21 +313,111 @@ export interface ActionPlanInput {
 }
 
 // ============================================================================
+// INSTRUCTION DE LANGUE
+// ============================================================================
+
+export const getLanguageInstruction = (locale: string): string => {
+  if (locale === 'en') {
+    return `
+
+---
+
+# 🌍 LANGUAGE INSTRUCTION
+
+**CRITICAL: You MUST respond ENTIRELY in ENGLISH.**
+- All action titles and descriptions in English
+- All micro-tasks in English
+- All tool recommendations in English
+- All tips and advice in English
+`;
+  }
+  return `
+
+---
+
+# 🌍 INSTRUCTION DE LANGUE
+
+**CRITIQUE : Tu DOIS répondre ENTIÈREMENT en FRANÇAIS.**
+- Tous les titres et descriptions d'actions en français
+- Toutes les micro-tâches en français
+- Toutes les recommandations d'outils en français
+- Tous les conseils en français
+`;
+};
+
+// ============================================================================
 // CONSTRUCTION DU PROMPT UTILISATEUR
 // ============================================================================
 
-export const buildActionPlanPrompt = (input: ActionPlanInput): string => {
+export const buildActionPlanPrompt = (input: ActionPlanInput, locale: string = 'fr'): string => {
+  const langInstruction = getLanguageInstruction(locale);
+  const isEnglish = locale === 'en';
+  
   const vulnerableList = input.vulnerableTasks
-    .map(t => `- **${t.name}** (${t.resilienceScore}% résilience) → À automatiser/déléguer`)
+    .map(t => `- **${t.name}** (${t.resilienceScore}% ${isEnglish ? 'resilience' : 'résilience'}) → ${isEnglish ? 'To automate/delegate' : 'À automatiser/déléguer'}`)
     .join('\n');
   
   const resilientList = input.resilientTasks
-    .map(t => `- **${t.name}** (${t.resilienceScore}% résilience) → À protéger/renforcer`)
+    .map(t => `- **${t.name}** (${t.resilienceScore}% ${isEnglish ? 'resilience' : 'résilience'}) → ${isEnglish ? 'To protect/strengthen' : 'À protéger/renforcer'}`)
     .join('\n');
   
   const talentsList = input.topTalents
-    .map(t => `- **${t.name}** : Niveau ${t.level}/5`)
+    .map(t => `- **${t.name}** : ${isEnglish ? 'Level' : 'Niveau'} ${t.level}/5`)
     .join('\n');
+
+  if (isEnglish) {
+    return `
+# ACTION PLAN BRIEF
+
+## PROFILE
+| Criteria | Value |
+|----------|-------|
+| **Current Position** | ${input.jobTitle} |
+| **Sector** | ${input.sector} |
+| **Experience** | ${input.yearsExperience || 'Not specified'} |
+| **Goal** | ${input.goal === 'augmentation' ? '🎯 AUGMENTATION - Become an augmented expert' : `🔄 PIVOT - Transition to ${input.targetRole || 'new career'}`} |
+
+---
+
+## DIAGNOSTIC SCORES
+| Metric | Score |
+|--------|-------|
+| **Global Resilience** | ${input.scores.globalResilience}% |
+| **Talent Signature** | ${input.scores.talentSignature}% |
+${input.availableTime ? `| **Recoverable Time (AI)** | ${input.availableTime.weeklyHoursGained}h/week |` : ''}
+
+---
+
+## TASKS TO AUTOMATE (vulnerable)
+${vulnerableList || 'None identified'}
+
+---
+
+## TASKS TO PROTECT (resilient)
+${resilientList || 'None identified'}
+
+---
+
+## TOP TALENTS
+${talentsList}
+
+---
+
+# YOUR MISSION
+
+Generate a **12-WEEK OPERATIONAL ACTION PLAN** that:
+
+1. **Starts TOMORROW** with quick wins
+2. **Considers available time** (person working full-time)
+3. **Produces TANGIBLE results** (not just "learned stuff")
+4. **Is SPECIFIC** to the role of ${input.jobTitle} in the ${input.sector} sector
+
+**Each action must have micro-tasks of 30 min max.**
+**Each recommendation must cite SPECIFIC tools/resources.**
+
+**Now generate the complete JSON.**
+${langInstruction}`;
+  }
 
   return `
 # BRIEF POUR PLAN D'ACTION
@@ -379,5 +469,5 @@ Génère un **PLAN D'ACTION OPÉRATIONNEL SUR 12 SEMAINES** qui :
 **Chaque recommandation doit citer des outils/ressources PRÉCIS.**
 
 **Génère maintenant le JSON complet.**
-`;
+${langInstruction}`;
 };

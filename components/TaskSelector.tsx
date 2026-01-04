@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import { useAuditStore } from '@/lib/store';
 import { UI_MESSAGES } from '@/lib/prompts/generate-tasks';
 import { 
@@ -20,6 +21,7 @@ interface TaskSelectorProps {
 }
 
 export function TaskSelector({ onComplete }: TaskSelectorProps) {
+  const locale = useLocale();
   const { context, clearTasks, addTasksFromAI, tasks } = useAuditStore();
   
   const [loading, setLoading] = useState(false);
@@ -54,7 +56,8 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
           jobTitle,
           sector,
           experience: context.yearsExperience,
-          teamSize: context.teamSize
+          teamSize: context.teamSize,
+          locale
         })
       });
 

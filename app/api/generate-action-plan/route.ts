@@ -60,7 +60,8 @@ async function callGemini(apiKey: string, userPrompt: string): Promise<unknown> 
 
 export async function POST(req: NextRequest) {
   try {
-    const input: ActionPlanInput = await req.json();
+    const body = await req.json();
+    const { locale = 'fr', ...input } = body as ActionPlanInput & { locale?: string };
 
     // Validation minimale
     if (!input.jobTitle || !input.sector || !input.goal) {
@@ -79,8 +80,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Construire le prompt
-    const userPrompt = buildActionPlanPrompt(input);
+    // Construire le prompt avec la locale
+    const userPrompt = buildActionPlanPrompt(input, locale);
 
     // Appeler le LLM
     const actionPlan = await callGemini(geminiApiKey, userPrompt);

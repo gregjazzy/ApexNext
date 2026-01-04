@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocale } from 'next-intl';
 import { Compass, Sparkles, AlertTriangle, RefreshCw, ChevronDown, ChevronUp, Target, TrendingUp, Clock, DollarSign, ArrowRight, Briefcase, GraduationCap, XCircle, Lightbulb } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -59,6 +60,7 @@ interface PivotSuggestions {
 // ============================================================================
 
 export function LLMPivotSuggestions() {
+  const locale = useLocale();
   const { context, tasks, talents, getResilienceScore, getTalentScore, strategy } = useAuditStore();
   const [suggestions, setSuggestions] = useState<PivotSuggestions | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,6 +124,7 @@ export function LLMPivotSuggestions() {
             globalResilience: resilienceScore,
             talentSignature: talentScore,
           },
+          locale,
         }),
       });
 
