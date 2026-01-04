@@ -883,7 +883,7 @@ export function Step7Ikigai() {
           // Retourner au Hub après avoir complété l'Ikigai
           router.push('/hub');
         }}
-        canProceed={canProceed}
+        nextDisabled={!canProceed}
         nextLabel={l === 'fr' ? 'Valider et retourner au Hub →' : 'Validate and return to Hub →'}
         prevLabel={l === 'fr' ? '← Retour au Diagnostic' : '← Back to Diagnostic'}
       />

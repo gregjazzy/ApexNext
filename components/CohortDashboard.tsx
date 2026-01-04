@@ -81,7 +81,7 @@ export function CohortDashboard() {
 
   // Calcul des statistiques
   const totalMembers = cohortData.members.length;
-  const receivedCount = cohortData.members.filter(m => m.status === 'completed' || m.status === 'received').length;
+  const receivedCount = cohortData.members.filter(m => m.status === 'completed').length;
   const inProgressCount = cohortData.members.filter(m => m.status === 'in_progress' || m.status === 'invited').length;
   const pendingCount = cohortData.members.filter(m => m.status === 'pending').length;
   

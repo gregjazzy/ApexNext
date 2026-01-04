@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Shield, AlertTriangle, TrendingUp, Brain, Heart, Sparkles, Database, Star, Monitor, RefreshCw, Cpu, Cog, Users, Lightbulb, ChevronLeft, Radar, Rocket, Zap, Compass, LayoutGrid } from 'lucide-react';
 import { ResilienceRadar } from '@/components/ui/ResilienceRadar';
+import { LLMVulnerabilityAnalysis } from '@/components/LLMAnalysis';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Task } from '@/lib/store';
 import { ScoreRing } from '@/components/ui/ScoreRing';
@@ -260,6 +261,9 @@ export function Step6Verdict() {
           </div>
         </div>
       </motion.div>
+
+      {/* Analyse Stratégique IA (LLM #2) */}
+      <LLMVulnerabilityAnalysis />
 
       {/* Message Global d'Analyse (si score < 40%) */}
       {globalAnalysis && (

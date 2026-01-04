@@ -65,6 +65,27 @@ export const matrixLexicon = {
           en: "Manage your employees' transition. Prepare documentation with their Pivot diagnostic."
         }
       }
+    },
+    reclassement: {
+      title: {
+        salarie: { fr: "Reclassement Professionnel", en: "Professional Reclassification" },
+        freelance: { fr: "Repositionnement Marché", en: "Market Repositioning" },
+        leader: { fr: "Job Designer — PSE & Restructuration", en: "Job Designer — Restructuring & Outplacement" }
+      },
+      description: {
+        salarie: {
+          fr: "Accompagnement vers une nouvelle fonction suite à une réorganisation.",
+          en: "Support toward a new role following a reorganization."
+        },
+        freelance: {
+          fr: "Repositionnez votre offre sur un segment plus résilient.",
+          en: "Reposition your offering on a more resilient segment."
+        },
+        leader: {
+          fr: "Architecturez les postes de demain et pilotez le matching avec vos équipes.",
+          en: "Design tomorrow's positions and manage matching with your teams."
+        }
+      }
     }
   },
   launchButton: {

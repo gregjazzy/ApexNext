@@ -1,9 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Initialisation conditionnelle pour éviter les erreurs de build
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Le client sera null si les variables d'environnement ne sont pas définies
+let supabase: SupabaseClient | null = null;
+
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+}
+
+export { supabase };
 
 // ============================================================================
 // TYPES
@@ -44,6 +52,11 @@ export interface JobPack {
  * Récupère tous les packs disponibles
  */
 export async function getAllPacks(): Promise<JobPack[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('*')
@@ -63,6 +76,11 @@ export async function getAllPacks(): Promise<JobPack[]> {
  * Récupère un pack par couple job/sector
  */
 export async function getPack(jobTitle: string, sector: string): Promise<JobPack | null> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('*')
@@ -83,6 +101,11 @@ export async function getPack(jobTitle: string, sector: string): Promise<JobPack
  * Recherche un pack par métier (fuzzy match)
  */
 export async function findPack(jobTitle: string, sector: string): Promise<JobPack | null> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('*')
@@ -108,6 +131,11 @@ export async function findPack(jobTitle: string, sector: string): Promise<JobPac
  * Récupère tous les secteurs disponibles
  */
 export async function getSectors(): Promise<string[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('sector')
@@ -118,7 +146,8 @@ export async function getSectors(): Promise<string[]> {
     return [];
   }
 
-  const sectors = [...new Set(data.map((d: { sector: string }) => d.sector))];
+  const sectorSet = new Set<string>(data.map((d: { sector: string }) => d.sector));
+  const sectors = Array.from(sectorSet);
   return sectors.sort();
 }
 
@@ -126,6 +155,11 @@ export async function getSectors(): Promise<string[]> {
  * Récupère tous les métiers d'un secteur
  */
 export async function getJobsInSector(sector: string): Promise<string[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('job_title')
@@ -145,6 +179,11 @@ export async function getJobsInSector(sector: string): Promise<string[]> {
  * Vérifie si un pack existe
  */
 export async function packExists(jobTitle: string, sector: string): Promise<boolean> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return false;
+  }
+
   const { data, error } = await supabase
     .from('job_packs')
     .select('id')
@@ -159,6 +198,11 @@ export async function packExists(jobTitle: string, sector: string): Promise<bool
  * Insère un nouveau pack (pour import batch)
  */
 export async function insertPack(pack: Omit<JobPack, 'id' | 'created_at' | 'updated_at' | 'is_active'>): Promise<boolean> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return false;
+  }
+
   const { error } = await supabase
     .from('job_packs')
     .insert(pack);
@@ -175,6 +219,11 @@ export async function insertPack(pack: Omit<JobPack, 'id' | 'created_at' | 'upda
  * Insère plusieurs packs (batch)
  */
 export async function insertPacks(packs: Omit<JobPack, 'id' | 'created_at' | 'updated_at' | 'is_active'>[]): Promise<boolean> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return false;
+  }
+
   const { error } = await supabase
     .from('job_packs')
     .insert(packs);

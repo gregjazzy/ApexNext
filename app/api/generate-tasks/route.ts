@@ -50,25 +50,27 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Vérifier si on a déjà ce couple en cache (Supabase)
-    const { data: cached } = await supabase
-      .from('job_packs')
-      .select('*')
-      .ilike('job_title', `%${jobTitle}%`)
-      .ilike('sector', `%${sector}%`)
-      .eq('is_active', true)
-      .limit(1)
-      .single();
+    if (supabase) {
+      const { data: cached } = await supabase
+        .from('job_packs')
+        .select('*')
+        .ilike('job_title', `%${jobTitle}%`)
+        .ilike('sector', `%${sector}%`)
+        .eq('is_active', true)
+        .limit(1)
+        .single();
 
-    if (cached) {
-      // Retourner le cache
-      return NextResponse.json({
-        job_title_normalized: cached.job_title,
-        sector_normalized: cached.sector,
-        tasks: cached.current_standard_tasks || [],
-        vocabulaire_metier: cached.vocabulaire_metier || [],
-        cached: true,
-        model: 'cache'
-      } as GenerateTasksResponse);
+      if (cached) {
+        // Retourner le cache
+        return NextResponse.json({
+          job_title_normalized: cached.job_title,
+          sector_normalized: cached.sector,
+          tasks: cached.current_standard_tasks || [],
+          vocabulaire_metier: cached.vocabulaire_metier || [],
+          cached: true,
+          model: 'cache'
+        } as GenerateTasksResponse);
+      }
     }
 
     // 2. Pas de cache → Appeler le LLM
@@ -102,21 +104,23 @@ export async function POST(request: NextRequest) {
       throw new Error('Aucune clé API disponible');
     }
 
-    // 3. Stocker en cache dans Supabase
-    const { error: insertError } = await supabase
-      .from('job_packs')
-      .insert({
-        job_title: llmResponse.job_title_normalized,
-        sector: llmResponse.sector_normalized,
-        current_standard_tasks: llmResponse.tasks,
-        vocabulaire_metier: llmResponse.vocabulaire_metier,
-        strategic_mutation_axes: [], // Sera rempli par LLM #2
-        future_augmented_title: null
-      });
+    // 3. Stocker en cache dans Supabase (si configuré)
+    if (supabase) {
+      const { error: insertError } = await supabase
+        .from('job_packs')
+        .insert({
+          job_title: llmResponse.job_title_normalized,
+          sector: llmResponse.sector_normalized,
+          current_standard_tasks: llmResponse.tasks,
+          vocabulaire_metier: llmResponse.vocabulaire_metier,
+          strategic_mutation_axes: [], // Sera rempli par LLM #2
+          future_augmented_title: null
+        });
 
-    if (insertError) {
-      console.error('Erreur insertion Supabase:', insertError);
-      // On continue quand même, le cache n'est pas critique
+      if (insertError) {
+        console.error('Erreur insertion Supabase:', insertError);
+        // On continue quand même, le cache n'est pas critique
+      }
     }
 
     return NextResponse.json({

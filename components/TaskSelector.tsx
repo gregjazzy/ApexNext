@@ -20,7 +20,7 @@ interface TaskSelectorProps {
 }
 
 export function TaskSelector({ onComplete }: TaskSelectorProps) {
-  const { context, setTasks, tasks } = useAuditStore();
+  const { context, clearTasks, addTasksFromAI, tasks } = useAuditStore();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +67,8 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
       setHasGenerated(true);
       
       // Pré-sélectionner toutes les tâches par défaut
-      const allIds = new Set((data.tasks || []).map((t: GeneratedTask) => t.id));
-      setSelectedTaskIds(allIds);
+      const taskIds = (data.tasks || []).map((t: GeneratedTask) => t.id) as string[];
+      setSelectedTaskIds(new Set<string>(taskIds));
 
     } catch (err) {
       console.error('Erreur:', err);
@@ -111,7 +111,7 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
     };
 
     setCustomTasks([...customTasks, newTask]);
-    setSelectedTaskIds(new Set([...selectedTaskIds, newTask.id]));
+    setSelectedTaskIds(new Set<string>([...Array.from(selectedTaskIds), newTask.id]));
     setNewTaskName('');
     setNewTaskDescription('');
     setShowAddForm(false);
@@ -131,13 +131,10 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
     const selectedTasks = allTasks.filter(t => selectedTaskIds.has(t.id));
 
     // Convertir au format du store
-    const storeTasks = selectedTasks.map((t, index) => ({
-      id: t.id,
+    const storeTasks = selectedTasks.map((t) => ({
       name: t.name,
-      description: t.description,
-      category: 'cognitive' as const,
-      frequency: 'daily' as const,
       hoursPerWeek: 0,
+      temporalite: 'quotidien' as const,
       resilience: {
         donnees: 50,
         decision: 50,
@@ -147,7 +144,9 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
       }
     }));
 
-    setTasks(storeTasks);
+    // Vider les anciennes tâches et ajouter les nouvelles
+    clearTasks();
+    addTasksFromAI(storeTasks);
     onComplete?.();
   };
 

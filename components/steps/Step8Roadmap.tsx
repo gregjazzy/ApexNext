@@ -7,6 +7,7 @@ import { useLocale } from 'next-intl';
 import { useAuditStore, CompetenceCategory } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { generatePDFReport } from '@/lib/reportGenerator';
+import { LLMPivotSuggestions } from '@/components/LLMPivotSuggestions';
 
 // Configuration couleurs catégories de compétences
 const COMPETENCE_COLORS: Record<CompetenceCategory, { bg: string; text: string; border: string }> = {
@@ -393,7 +394,6 @@ export function Step8Roadmap() {
         ikigai: strategy.ikigai,
         roadmap: strategy.roadmap,
         eracActions: strategy.eracActions,
-        nicheOpportunities: strategy.nicheOpportunities,
         gapAnalysis: strategy.gapAnalysis,
       },
       kpis: computedKPIs,
@@ -795,6 +795,11 @@ export function Step8Roadmap() {
           </div>
         </motion.div>
       )}
+
+      {/* =============================================== */}
+      {/* SUGGESTIONS MÉTIERS IA - PIVOT ONLY (LLM #4) */}
+      {/* =============================================== */}
+      {isPivot && <LLMPivotSuggestions />}
 
       {/* =============================================== */}
       {/* LE PONT DE COMPÉTENCES - PIVOT ONLY */}
