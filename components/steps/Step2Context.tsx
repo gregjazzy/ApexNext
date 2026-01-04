@@ -4,9 +4,10 @@ import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Building2, Briefcase, FileText, Upload, X, CheckCircle, Clock, Users, Zap, DollarSign, Handshake, AlertCircle, HelpCircle, Search, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useAuditStore } from '@/lib/store';
+import { useAuditStore, GEO_ZONES, GeoZone } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { contextLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
+import { Globe } from 'lucide-react';
 
 // ===============================================
 // LISTE COMPLÈTE DES SECTEURS D'ACTIVITÉ
@@ -132,6 +133,7 @@ export function Step2Context() {
     setAutomationExposure,
     setBudgetResponsibility,
     setClientFacing,
+    setCountry,
     nextStep, 
     prevStep 
   } = useAuditStore();
@@ -549,6 +551,51 @@ export function Step2Context() {
                 </div>
               )}
             </div>
+          </motion.div>
+
+          {/* Pays / Zone géographique */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.42 }}
+          >
+            <label className="apex-label flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              {l === 'fr' ? 'Pays / Zone économique' : 'Country / Economic Zone'}
+              <div className="relative">
+                <button
+                  type="button"
+                  className="text-amber-500 hover:text-amber-400 transition-colors"
+                  title={l === 'fr' 
+                    ? 'Le pays influence les recommandations (certifications, salaires, culture du marché)'
+                    : 'Country influences recommendations (certifications, salaries, market culture)'}
+                >
+                  <HelpCircle className="w-4 h-4" />
+                </button>
+              </div>
+            </label>
+            <select
+              value={context.country || ''}
+              onChange={(e) => e.target.value && setCountry(e.target.value as GeoZone)}
+              className="apex-select"
+            >
+              <option value="">{l === 'fr' ? 'Sélectionner votre pays...' : 'Select your country...'}</option>
+              {GEO_ZONES.map((zone) => (
+                <option key={zone.id} value={zone.id}>
+                  {zone.flag} {zone.label[l]}
+                </option>
+              ))}
+            </select>
+            {context.country && (
+              <div className="mt-1 flex items-center gap-2">
+                <CheckCircle className="w-3 h-3 text-emerald-500" />
+                <span className="text-xs text-slate-500">
+                  {l === 'fr' 
+                    ? 'Les recommandations seront adaptées à votre marché local'
+                    : 'Recommendations will be adapted to your local market'}
+                </span>
+              </div>
+            )}
           </motion.div>
           
           {/* Années d'expérience */}

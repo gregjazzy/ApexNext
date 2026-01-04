@@ -57,7 +57,8 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
           sector,
           experience: context.yearsExperience,
           teamSize: context.teamSize,
-          locale
+          locale,
+          country: context.country
         })
       });
 

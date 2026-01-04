@@ -241,6 +241,9 @@ export const UI_MESSAGES = {
 // CONSTRUCTION DU PROMPT UTILISATEUR
 // ============================================================================
 
+import { GeoZone } from '@/lib/store';
+import { getGeoContextForTasks } from './geo-context';
+
 // ============================================================================
 // INSTRUCTION DE LANGUE
 // ============================================================================
@@ -284,9 +287,11 @@ export const buildUserPrompt = (
   sector: string,
   experience?: number,
   teamSize?: number,
-  locale: string = 'fr'
+  locale: string = 'fr',
+  country?: GeoZone
 ): string => {
   const langInstruction = getLanguageInstruction(locale);
+  const geoContext = getGeoContextForTasks(country);
   const isEnglish = locale === 'en';
   
   let prompt = isEnglish ? `
@@ -365,5 +370,5 @@ export const buildUserPrompt = (
 **Génère maintenant le JSON complet.**
 `;
 
-  return prompt + langInstruction;
+  return prompt + langInstruction + geoContext;
 };

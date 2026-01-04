@@ -276,6 +276,7 @@ export interface ActionPlanInput {
   jobTitle: string;
   sector: string;
   yearsExperience?: string;
+  country?: GeoZone;
   
   goal: 'augmentation' | 'pivot';
   targetRole?: string;
@@ -311,6 +312,9 @@ export interface ActionPlanInput {
     weeklyHoursGained: number;
   };
 }
+
+import { GeoZone } from '@/lib/store';
+import { getGeoContextForActionPlan } from './geo-context';
 
 // ============================================================================
 // INSTRUCTION DE LANGUE
@@ -351,6 +355,7 @@ export const getLanguageInstruction = (locale: string): string => {
 
 export const buildActionPlanPrompt = (input: ActionPlanInput, locale: string = 'fr'): string => {
   const langInstruction = getLanguageInstruction(locale);
+  const geoContext = getGeoContextForActionPlan(input.country);
   const isEnglish = locale === 'en';
   
   const vulnerableList = input.vulnerableTasks
@@ -416,7 +421,7 @@ Generate a **12-WEEK OPERATIONAL ACTION PLAN** that:
 **Each recommendation must cite SPECIFIC tools/resources.**
 
 **Now generate the complete JSON.**
-${langInstruction}`;
+${langInstruction}${geoContext}`;
   }
 
   return `
@@ -469,5 +474,5 @@ Génère un **PLAN D'ACTION OPÉRATIONNEL SUR 12 SEMAINES** qui :
 **Chaque recommandation doit citer des outils/ressources PRÉCIS.**
 
 **Génère maintenant le JSON complet.**
-${langInstruction}`;
+${langInstruction}${geoContext}`;
 };

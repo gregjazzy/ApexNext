@@ -125,6 +125,7 @@ export function LLMPivotSuggestions() {
             talentSignature: talentScore,
           },
           locale,
+          country: context.country,
         }),
       });
 

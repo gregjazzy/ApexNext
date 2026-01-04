@@ -182,6 +182,7 @@ export function LLMActionPlan() {
             weeklyHoursGained: phantomCharge.potentialGainHours || 0,
           } : undefined,
           locale,
+          country: context.country,
         }),
       });
 

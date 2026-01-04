@@ -273,6 +273,7 @@ export interface PivotSuggestionsInput {
   sector: string;
   yearsExperience?: string;
   location?: string;
+  country?: GeoZone;
   
   tasks: Array<{
     name: string;
@@ -304,6 +305,9 @@ export interface PivotSuggestionsInput {
     timeToTransition?: string;
   };
 }
+
+import { GeoZone } from '@/lib/store';
+import { getGeoContextForPivot } from './geo-context';
 
 // ============================================================================
 // INSTRUCTION DE LANGUE
@@ -344,6 +348,7 @@ export const getLanguageInstruction = (locale: string): string => {
 
 export const buildPivotPrompt = (input: PivotSuggestionsInput, locale: string = 'fr'): string => {
   const langInstruction = getLanguageInstruction(locale);
+  const geoContext = getGeoContextForPivot(input.country);
   const isEnglish = locale === 'en';
   
   const tasksList = input.tasks
@@ -422,7 +427,7 @@ ${input.preferences ? `
 **Take this reality into account in your proposals.**
 
 **Now generate the complete JSON.**
-${langInstruction}`;
+${langInstruction}${geoContext}`;
   }
 
   return `
@@ -492,5 +497,5 @@ ${input.preferences ? `
 **Tiens compte de cette réalité dans tes propositions.**
 
 **Génère maintenant le JSON complet.**
-${langInstruction}`;
+${langInstruction}${geoContext}`;
 };

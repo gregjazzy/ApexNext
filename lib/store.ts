@@ -63,12 +63,45 @@ export const MUTATION_DRIVERS: { id: MutationDriver; label: { fr: string; en: st
   { id: 'meaning_purpose', label: { fr: 'Quête de sens', en: 'Search for meaning' }, description: { fr: 'Contribution à un impact sociétal positif', en: 'Contribution to positive societal impact' }, icon: '🌍' },
 ];
 
+// Zones géographiques pour contextualisation LLM
+export type GeoZone = 
+  | 'france'
+  | 'belgium'
+  | 'switzerland'
+  | 'canada_fr'
+  | 'morocco'
+  | 'usa'
+  | 'uk'
+  | 'germany'
+  | 'spain'
+  | 'italy'
+  | 'netherlands'
+  | 'other_eu'
+  | 'other_world';
+
+export const GEO_ZONES: { id: GeoZone; label: { fr: string; en: string }; flag: string }[] = [
+  { id: 'france', label: { fr: 'France', en: 'France' }, flag: '🇫🇷' },
+  { id: 'belgium', label: { fr: 'Belgique', en: 'Belgium' }, flag: '🇧🇪' },
+  { id: 'switzerland', label: { fr: 'Suisse', en: 'Switzerland' }, flag: '🇨🇭' },
+  { id: 'canada_fr', label: { fr: 'Canada (Québec)', en: 'Canada (Quebec)' }, flag: '🇨🇦' },
+  { id: 'morocco', label: { fr: 'Maroc', en: 'Morocco' }, flag: '🇲🇦' },
+  { id: 'usa', label: { fr: 'États-Unis', en: 'United States' }, flag: '🇺🇸' },
+  { id: 'uk', label: { fr: 'Royaume-Uni', en: 'United Kingdom' }, flag: '🇬🇧' },
+  { id: 'germany', label: { fr: 'Allemagne', en: 'Germany' }, flag: '🇩🇪' },
+  { id: 'spain', label: { fr: 'Espagne', en: 'Spain' }, flag: '🇪🇸' },
+  { id: 'italy', label: { fr: 'Italie', en: 'Italy' }, flag: '🇮🇹' },
+  { id: 'netherlands', label: { fr: 'Pays-Bas', en: 'Netherlands' }, flag: '🇳🇱' },
+  { id: 'other_eu', label: { fr: 'Autre pays UE', en: 'Other EU country' }, flag: '🇪🇺' },
+  { id: 'other_world', label: { fr: 'Autre pays', en: 'Other country' }, flag: '🌍' },
+];
+
 export interface AuditContext {
   persona: Persona;
   goal: Goal;
   jobTitle: string;
   industry: string;
   jobDescription: string;
+  country?: GeoZone;                // Pays/zone géographique pour contextualisation LLM
   // Champs enrichis pour un diagnostic plus précis
   yearsExperience?: number;        // Années d'expérience dans le poste
   teamSize?: number;               // Taille de l'équipe supervisée (0 si contributeur individuel)
@@ -463,6 +496,7 @@ interface AuditStore {
   setJobTitle: (title: string) => void;
   setIndustry: (industry: string) => void;
   setJobDescription: (description: string) => void;
+  setCountry: (country: GeoZone) => void;
   // Actions - Context (Champs enrichis)
   setYearsExperience: (years: number) => void;
   setTeamSize: (size: number) => void;
@@ -1960,6 +1994,9 @@ export const useAuditStore = create<AuditStore>()(
       })),
       setJobDescription: (jobDescription) => set((state) => ({
         context: { ...state.context, jobDescription }
+      })),
+      setCountry: (country) => set((state) => ({
+        context: { ...state.context, country }
       })),
       // Context - Champs enrichis
       setYearsExperience: (yearsExperience) => set((state) => ({

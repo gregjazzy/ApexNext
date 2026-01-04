@@ -103,6 +103,7 @@ export function LLMVulnerabilityAnalysis() {
             potentialGainHours: phantomGain.weeklyHours * (phantomGain.weeklyHours > 0 ? 0.7 : 0),
           } : undefined,
           locale,
+          country: context.country,
         }),
       });
 

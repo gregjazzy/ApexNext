@@ -13,6 +13,8 @@ const LLM_CONFIG = {
   FALLBACK: 'gemini-pro', // ou 'gpt-4o'
 } as const;
 
+import { GeoZone } from '@/lib/store';
+
 // Types
 interface GenerateTasksRequest {
   jobTitle: string;
@@ -20,6 +22,7 @@ interface GenerateTasksRequest {
   experience?: number;
   teamSize?: number;
   locale?: string;
+  country?: GeoZone;
 }
 
 interface TaskGenerated {
@@ -40,7 +43,7 @@ interface GenerateTasksResponse {
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateTasksRequest = await request.json();
-    const { jobTitle, sector, experience, teamSize, locale = 'fr' } = body;
+    const { jobTitle, sector, experience, teamSize, locale = 'fr', country } = body;
 
     // Validation
     if (!jobTitle || !sector) {
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const userPrompt = buildUserPrompt(jobTitle, sector, experience, teamSize, locale);
+    const userPrompt = buildUserPrompt(jobTitle, sector, experience, teamSize, locale, country);
 
     let llmResponse: GenerateTasksResponse;
     let modelUsed: string;
