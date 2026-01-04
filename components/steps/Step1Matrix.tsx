@@ -41,14 +41,15 @@ export function Step1Matrix() {
         : "Independent, you're looking to optimize your business or pivot to a resilient new market.",
       icon: <Briefcase className="w-6 h-6" />,
     },
-    {
-      id: 'leader' as Persona,
-      title: personaLabels.leader[l],
-      description: l === 'fr'
-        ? "Vous pilotez une équipe et anticipez les mutations sectorielles."
-        : "You lead a team and anticipate sector transformations.",
-      icon: <Users className="w-6 h-6" />,
-    },
+    // NOTE: Option Leader/RH masquée pour le B2C - peut être réactivée pour B2B
+    // {
+    //   id: 'leader' as Persona,
+    //   title: personaLabels.leader[l],
+    //   description: l === 'fr'
+    //     ? "Vous pilotez une équipe et anticipez les mutations sectorielles."
+    //     : "You lead a team and anticipate sector transformations.",
+    //   icon: <Users className="w-6 h-6" />,
+    // },
   ];
 
   // Type pour les options de goal
