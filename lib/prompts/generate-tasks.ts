@@ -118,12 +118,16 @@ Tu dois retourner un JSON valide avec cette structure EXACTE :
     {
       "id": "task_1",
       "name": "Nom de la tâche avec vocabulaire métier (max 80 caractères)",
-      "description": "Description complète en 2-4 phrases. Contexte + Méthode + Enjeux."
-    },
-    {
-      "id": "task_2",
-      "name": "...",
-      "description": "..."
+      "description": "Description complète en 2-4 phrases. Contexte + Méthode + Enjeux.",
+      "temporalite": "quotidien | hebdomadaire | mensuel | strategique",
+      "hoursPerWeek": 4,
+      "resilience": {
+        "donnees": 25,
+        "decision": 40,
+        "relationnel": 60,
+        "creativite": 30,
+        "execution": 10
+      }
     }
   ],
   
@@ -142,6 +146,44 @@ Tu dois retourner un JSON valide avec cette structure EXACTE :
   "typical_day_narrative": "Description d'une journée type de 8h à 18h, avec les moments clés et les interactions. (5-8 phrases)"
 }
 \`\`\`
+
+---
+
+# 🎯 ÉVALUATION DE LA RÉSILIENCE (OBLIGATOIRE)
+
+Pour chaque tâche, évalue sa RÉSILIENCE face à l'automatisation IA (0-100) :
+
+## Les 5 dimensions
+
+| Dimension | 0% (Automatisable) | 100% (Humain essentiel) |
+|-----------|-------------------|------------------------|
+| **donnees** | Données structurées (Excel, BDD, formulaires) | Données complexes, ambiguës ou absentes |
+| **decision** | Règles claires, critères fixes | Jugement complexe, contexte ambigu |
+| **relationnel** | Aucune interaction humaine | Relation humaine essentielle (négociation, médiation) |
+| **creativite** | Process répétitif, standard | Création originale, pensée divergente |
+| **execution** | 100% digital, aucune présence physique | Intervention physique, dextérité requise |
+
+## Exemples de calibration
+
+| Tâche | donnees | decision | relationnel | creativite | execution |
+|-------|---------|----------|-------------|------------|-----------|
+| Saisie de factures | 10 | 15 | 5 | 5 | 0 |
+| Reporting Excel | 20 | 25 | 10 | 15 | 0 |
+| Négociation fournisseur | 50 | 70 | 85 | 45 | 20 |
+| Audit qualité terrain | 40 | 65 | 55 | 35 | 75 |
+| Brainstorming stratégique | 60 | 75 | 70 | 90 | 15 |
+| Gestion de crise | 55 | 85 | 90 | 70 | 30 |
+
+## Temporalité
+
+- **quotidien** : Tâche effectuée tous les jours
+- **hebdomadaire** : Tâche effectuée 1-3 fois par semaine
+- **mensuel** : Tâche effectuée quelques fois par mois
+- **strategique** : Tâche ponctuelle mais à fort impact
+
+## Heures par semaine
+
+Estime le temps moyen passé sur cette tâche (0.5 à 20h/semaine)
 
 ---
 
@@ -227,14 +269,14 @@ Une réponse de qualité PREMIUM doit permettre à quelqu'un du métier de dire 
 // ============================================================================
 
 export const UI_MESSAGES = {
-  title: "Analyse de votre métier",
-  intro: "L'IA va identifier les tâches typiques d'un(e) {jobTitle} dans le secteur {sector}.",
-  instruction: "Validez les tâches qui correspondent à votre quotidien, puis ajoutez celles qui manquent.",
-  loading: "Analyse en cours...",
+  title: "Vos tâches analysées",
+  intro: "Voici les tâches typiques d'un(e) {jobTitle} dans {sector}, avec leur niveau de vulnérabilité à l'IA.",
+  instruction: "Cochez les tâches qui correspondent à votre quotidien. Ajoutez celles qui manquent.",
+  loading: "Analyse IA en cours...",
   error: "Erreur lors de l'analyse. Veuillez réessayer.",
   noTasks: "Aucune tâche générée. Vérifiez le métier et le secteur.",
-  addCustom: "Ajoutez vos tâches spécifiques :",
-  validate: "Valider mes tâches",
+  addButton: "Ajouter une tâche",
+  validateButton: "Continuer avec ces tâches",
 };
 
 // ============================================================================

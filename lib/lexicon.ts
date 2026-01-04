@@ -132,8 +132,8 @@ export const contextLexicon = {
   },
   industryLabel: {
     salarie: { fr: "Secteur d'activité", en: "Industry" },
-    freelance: { fr: "Marché cible", en: "Target Market" },
-    leader: { fr: "Secteur & Taille", en: "Sector & Size" }
+    freelance: { fr: "Secteur d'activité", en: "Industry" },
+    leader: { fr: "Secteur d'activité", en: "Industry" }
   }
 };
 

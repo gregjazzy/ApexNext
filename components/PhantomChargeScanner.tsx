@@ -335,7 +335,7 @@ export function PhantomChargeScanner({ isToggleMode = false }: PhantomChargeScan
               type="number"
               min="0"
               max="59"
-              step="5"
+              step="1"
               value={phantomCharge.dailyMinutes ?? ''}
               onChange={(e) => setPhantomCharge({ dailyMinutes: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)) })}
               placeholder="30"
@@ -416,26 +416,36 @@ export function PhantomChargeScanner({ isToggleMode = false }: PhantomChargeScan
                 const value = phantomCharge[storeKey];
                 
                 return (
-                  <div key={key} className="flex items-center gap-3">
-                    <Icon className={cn('w-4 h-4 flex-shrink-0', config.textClass)} />
-                    <div className="flex-1">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={value}
-                        onChange={(e) => handleFluxChange(storeKey, parseInt(e.target.value))}
-                        className={cn(
-                          'w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-700',
-                          config.color === 'emerald' && 'accent-emerald-500',
-                          config.color === 'amber' && 'accent-amber-500',
-                          config.color === 'rose' && 'accent-rose-500'
-                        )}
-                      />
+                  <div key={key} className="space-y-1">
+                    {/* Label + Description */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className={cn('w-3.5 h-3.5', config.textClass)} />
+                        <span className={cn('text-xs font-medium', config.textClass)}>
+                          {config.label[l]}
+                        </span>
+                        <span className="text-[10px] text-slate-600">
+                          ({config.description[l]})
+                        </span>
+                      </div>
+                      <span className={cn('text-sm font-bold tabular-nums', config.textClass)}>
+                        {value}%
+                      </span>
                     </div>
-                    <span className={cn('text-sm font-bold tabular-nums w-12 text-right', config.textClass)}>
-                      {value}%
-                    </span>
+                    {/* Slider */}
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={value}
+                      onChange={(e) => handleFluxChange(storeKey, parseInt(e.target.value))}
+                      className={cn(
+                        'w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-700',
+                        config.color === 'emerald' && 'accent-emerald-500',
+                        config.color === 'amber' && 'accent-amber-500',
+                        config.color === 'rose' && 'accent-rose-500'
+                      )}
+                    />
                   </div>
                 );
               })}

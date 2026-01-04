@@ -264,21 +264,324 @@ const GEO_PROFILES: Record<GeoZone, GeoProfile> = {
     ],
   },
   
-  other_world: {
-    name: 'Autre pays (hors EU)',
+  // Europe de l'Est / CEI
+  russia: {
+    name: 'Russie',
+    aiAdoptionLevel: 'fast_follower',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'medium',
+      pivotCulture: 'Marché en transformation. Opportunités dans les grandes villes.',
+    },
+    careerMindset: 'Diplômes techniques valorisés. Réseaux personnels importants. Adaptabilité face aux sanctions.',
+    certifications: ['Diplômes russes', 'ACCA', 'Certifications tech internationales'],
+    salaryContext: 'Écarts importants Moscou/Saint-Pétersbourg vs régions. Rouble volatil.',
+    keyIndustries: ['Énergie', 'Tech', 'Finance', 'Défense', 'Agriculture'],
+    culturalNotes: [
+      'Russe obligatoire sauf multinationales',
+      'Moscou et Saint-Pétersbourg = hubs économiques',
+      'Contexte géopolitique impacte les opportunités internationales',
+      'Tech russe autonome (Yandex, VK, etc.)',
+    ],
+  },
+  
+  eastern_europe: {
+    name: 'Europe de l\'Est',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'medium',
+      pivotCulture: 'Marchés dynamiques. Main d\'œuvre qualifiée et compétitive.',
+    },
+    careerMindset: 'Formation technique solide. Multilinguisme fréquent. Ouverture internationale.',
+    certifications: ['Certifications EU', 'ACCA', 'Certifications tech'],
+    salaryContext: 'Salaires plus bas qu\'Europe de l\'Ouest mais en croissance. Nearshoring attractif.',
+    keyIndustries: ['Tech/IT outsourcing', 'Manufacturing', 'Finance', 'Services partagés'],
+    culturalNotes: [
+      'Pologne, Tchéquie, Roumanie = hubs tech',
+      'Anglais répandu dans les affaires',
+      'Nearshoring vers EU de l\'Ouest en forte croissance',
+      'Main d\'œuvre tech très qualifiée',
+    ],
+  },
+  
+  // Amérique Latine
+  brazil: {
+    name: 'Brésil',
     aiAdoptionLevel: 'mainstream',
     laborMarket: {
       flexibility: 'medium',
       protections: 'medium',
-      pivotCulture: 'Variable selon le pays. Contexte local à préciser.',
+      pivotCulture: 'Marché dynamique mais inégal. Entrepreneuriat valorisé.',
     },
-    careerMindset: 'Contexte très variable. Adaptation culturelle essentielle.',
-    certifications: ['Certifications internationales (PMI, CFA, etc.)'],
-    salaryContext: 'Très variable selon le pays.',
-    keyIndustries: ['Variable selon le pays'],
+    careerMindset: 'Réseaux personnels cruciaux. Diplômes américains/européens très valorisés. Flexibilité appréciée.',
+    certifications: ['CRC (Comptabilité)', 'MBA international', 'Certifications tech US'],
+    salaryContext: 'Écarts importants selon région (São Paulo >> autres). Real volatil.',
+    keyIndustries: ['Agribusiness', 'Tech (São Paulo)', 'Finance', 'Énergie', 'Mining'],
     culturalNotes: [
-      'Contexte spécifique à préciser par le candidat',
-      'Visa/permis de travail = enjeu potentiel',
+      'São Paulo = hub économique majeur',
+      'Portugais obligatoire',
+      'Relations personnelles très importantes (jeitinho)',
+      'Startup ecosystem en croissance',
+    ],
+  },
+  
+  latam: {
+    name: 'Amérique Latine',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'low',
+      pivotCulture: 'Marchés émergents avec opportunités. Adaptabilité valorisée.',
+    },
+    careerMindset: 'Pragmatisme et débrouillardise. Relations personnelles essentielles.',
+    certifications: ['Certifications US reconnues', 'MBA international'],
+    salaryContext: 'Très variable selon les pays. Dollarisation fréquente.',
+    keyIndustries: ['Mining', 'Agriculture', 'Tech nearshoring', 'Tourisme'],
+    culturalNotes: [
+      'Espagnol obligatoire (sauf Brésil)',
+      'Contexte économique variable',
+      'Nearshoring vers US en croissance',
+    ],
+  },
+  
+  // Afrique
+  north_africa: {
+    name: 'Afrique du Nord',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'medium',
+      protections: 'medium',
+      pivotCulture: 'Marchés en développement. Nearshoring vers Europe en croissance.',
+    },
+    careerMindset: 'Diplômes français/européens valorisés. Bilinguisme arabe-français courant.',
+    certifications: ['Diplômes français reconnus', 'Certifications internationales'],
+    salaryContext: 'Salaires plus bas mais pouvoir d\'achat correct. Nearshoring = opportunités.',
+    keyIndustries: ['Offshoring/Nearshoring', 'Tourisme', 'Énergie', 'Textile', 'Agriculture'],
+    culturalNotes: [
+      'Français et arabe = langues des affaires',
+      'Proximité géographique et culturelle avec l\'Europe',
+      'Tunisie, Algérie = hubs nearshoring',
+      'Jeunesse de la population = dynamisme',
+    ],
+  },
+  
+  south_africa: {
+    name: 'Afrique du Sud',
+    aiAdoptionLevel: 'fast_follower',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'medium',
+      pivotCulture: 'Économie la plus développée d\'Afrique. Hub continental.',
+    },
+    careerMindset: 'Anglais natif. Diplômes internationaux valorisés. Diversité = atout.',
+    certifications: ['SAICA (comptabilité)', 'Certifications UK reconnues', 'MBA international'],
+    salaryContext: 'Salaires corrects en contexte africain. Rand volatil.',
+    keyIndustries: ['Finance', 'Mining', 'Tech', 'Tourisme', 'Agriculture'],
+    culturalNotes: [
+      'Anglais = langue des affaires',
+      'Johannesburg, Cape Town = hubs économiques',
+      'Hub pour l\'Afrique subsaharienne',
+      'Économie la plus diversifiée du continent',
+    ],
+  },
+  
+  africa_other: {
+    name: 'Afrique',
+    aiAdoptionLevel: 'laggard',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'low',
+      pivotCulture: 'Marchés émergents. Opportunités dans les secteurs en croissance.',
+    },
+    careerMindset: 'Adaptabilité et résilience. Diplômes internationaux valorisés.',
+    certifications: ['Certifications internationales', 'ACCA (anglophone)'],
+    salaryContext: 'Variable selon les pays. Afrique du Sud, Nigeria, Kenya = hubs économiques.',
+    keyIndustries: ['Tech (Nigeria, Kenya)', 'Finance', 'Mining', 'Agriculture'],
+    culturalNotes: [
+      'Anglais dominant en Afrique anglophone',
+      'Lagos, Nairobi, Johannesburg = hubs',
+      'Fintech africaine en forte croissance',
+    ],
+  },
+  
+  // Moyen-Orient
+  uae: {
+    name: 'Émirats Arabes Unis',
+    aiAdoptionLevel: 'early_adopter',
+    laborMarket: {
+      flexibility: 'very_high',
+      protections: 'low',
+      pivotCulture: 'Marché très ouvert aux talents internationaux. Pivot facile.',
+    },
+    careerMindset: 'Expérience internationale = norme. Salaires élevés mais pas de sécurité long terme.',
+    certifications: ['Certifications US/UK reconnues', 'CFA', 'PMP', 'Big 4 experience'],
+    salaryContext: 'Salaires nets élevés (pas d\'impôt sur le revenu). Packages expatriés complets.',
+    keyIndustries: ['Finance', 'Immobilier', 'Tourisme', 'Tech', 'Logistique'],
+    culturalNotes: [
+      'Dubaï = hub business, Abu Dhabi = institutionnel',
+      'Anglais = langue des affaires',
+      'Visa lié à l\'emploi',
+      'Culture internationale très forte',
+    ],
+  },
+  
+  middle_east: {
+    name: 'Moyen-Orient',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'low',
+      pivotCulture: 'Variable selon les pays. Expatriés nombreux dans les pays du Golfe.',
+    },
+    careerMindset: 'Expérience internationale valorisée. Contexte culturel spécifique.',
+    certifications: ['Certifications internationales'],
+    salaryContext: 'Pays du Golfe = salaires élevés. Autres = variable.',
+    keyIndustries: ['Pétrole/Gaz', 'Finance', 'Construction', 'Tourisme'],
+    culturalNotes: [
+      'Contexte culturel et religieux à respecter',
+      'Business culture variable selon les pays',
+      'Anglais souvent suffisant dans les affaires',
+    ],
+  },
+  
+  // Asie
+  japan: {
+    name: 'Japon',
+    aiAdoptionLevel: 'fast_follower',
+    laborMarket: {
+      flexibility: 'low',
+      protections: 'high',
+      pivotCulture: 'Emploi à vie traditionnel en déclin mais encore présent. Reconversion = mal vu.',
+    },
+    careerMindset: 'Loyauté à l\'entreprise. Ancienneté = progression. Changement = risque.',
+    certifications: ['JLPT (japonais)', 'Certifications japonaises', 'MBA international'],
+    salaryContext: 'Salaires corrects mais progression lente. Bonus semestriels importants.',
+    keyIndustries: ['Automobile', 'Électronique', 'Finance', 'Manufacturing', 'Tech'],
+    culturalNotes: [
+      'Japonais quasi-obligatoire sauf startups/GAFA',
+      'Culture hiérarchique forte',
+      'Heures de travail longues',
+      'Marché qui s\'ouvre aux étrangers',
+    ],
+  },
+  
+  china: {
+    name: 'Chine',
+    aiAdoptionLevel: 'early_adopter',
+    laborMarket: {
+      flexibility: 'very_high',
+      protections: 'low',
+      pivotCulture: 'Marché ultra-dynamique. Changement = opportunité. 996 culture.',
+    },
+    careerMindset: 'Ambition et vitesse. Résultats immédiats. Réseau (guanxi) = crucial.',
+    certifications: ['Certifications locales', 'CPA China', 'Tech certifications'],
+    salaryContext: 'Écarts énormes. Tech/Finance Shanghai/Beijing = salaires élevés.',
+    keyIndustries: ['Tech (BAT)', 'E-commerce', 'Manufacturing', 'Finance', 'IA'],
+    culturalNotes: [
+      'Mandarin quasi-obligatoire',
+      'Guanxi (relations) = capital social',
+      'Marché tech autonome (pas de Google/Facebook)',
+      'Visa de travail restrictif',
+    ],
+  },
+  
+  india: {
+    name: 'Inde',
+    aiAdoptionLevel: 'fast_follower',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'low',
+      pivotCulture: 'Marché très dynamique. Mobilité fréquente. IT = voie royale.',
+    },
+    careerMindset: 'Éducation = priorité absolue. IIT/IIM = prestige. Diaspora = réseau puissant.',
+    certifications: ['CA India', 'CS', 'ICWA', 'Certifications tech US'],
+    salaryContext: 'Salaires bas en absolu mais pouvoir d\'achat correct. IT/MNC = packages élevés.',
+    keyIndustries: ['IT/Tech', 'Pharma', 'BPO', 'Finance', 'Startups'],
+    culturalNotes: [
+      'Anglais = langue des affaires',
+      'Bangalore, Mumbai, Delhi = hubs',
+      'Startup ecosystem très actif',
+      'Outsourcing/offshoring majeur',
+    ],
+  },
+  
+  singapore: {
+    name: 'Singapour',
+    aiAdoptionLevel: 'early_adopter',
+    laborMarket: {
+      flexibility: 'very_high',
+      protections: 'low',
+      pivotCulture: 'Hub international. Pivot = normal. Méritocratie.',
+    },
+    careerMindset: 'Excellence et performance. International par défaut. Anglais natif.',
+    certifications: ['ACCA', 'CFA', 'Certifications tech', 'MAS certifications (finance)'],
+    salaryContext: 'Salaires élevés. Packages compétitifs avec Hong Kong.',
+    keyIndustries: ['Finance', 'Tech', 'Logistique', 'Pharma', 'Trading'],
+    culturalNotes: [
+      'Anglais = langue officielle',
+      'Hub pour l\'Asie du Sud-Est',
+      'Méritocratie très forte',
+      'Coût de la vie élevé',
+    ],
+  },
+  
+  asia_other: {
+    name: 'Asie',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'low',
+      pivotCulture: 'Variable selon les pays. Marchés dynamiques en général.',
+    },
+    careerMindset: 'Pragmatisme. Adaptation culturelle essentielle.',
+    certifications: ['Certifications internationales'],
+    salaryContext: 'Très variable selon les pays.',
+    keyIndustries: ['Manufacturing', 'Tech', 'Tourisme', 'Agriculture'],
+    culturalNotes: [
+      'Contexte culturel très variable',
+      'Anglais souvent suffisant dans les affaires internationales',
+      'Marchés émergents dynamiques',
+    ],
+  },
+  
+  // Océanie
+  australia: {
+    name: 'Australie',
+    aiAdoptionLevel: 'fast_follower',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'medium',
+      pivotCulture: 'Culture anglo-saxonne du changement. Reconversion acceptée.',
+    },
+    careerMindset: 'Work-life balance important. Pragmatisme australien. Outdoor culture.',
+    certifications: ['CPA Australia', 'CA ANZ', 'Certifications tech'],
+    salaryContext: 'Salaires élevés. Mining = packages très attractifs.',
+    keyIndustries: ['Mining', 'Finance', 'Tech', 'Agriculture', 'Tourisme'],
+    culturalNotes: [
+      'Visa = enjeu majeur pour non-Australiens',
+      'Sydney/Melbourne = hubs économiques',
+      'Culture décontractée mais professionnelle',
+      'Isolement géographique = marché particulier',
+    ],
+  },
+  
+  oceania: {
+    name: 'Océanie',
+    aiAdoptionLevel: 'mainstream',
+    laborMarket: {
+      flexibility: 'high',
+      protections: 'medium',
+      pivotCulture: 'Culture anglo-saxonne. Nouvelle-Zélande = qualité de vie prioritaire.',
+    },
+    careerMindset: 'Équilibre vie pro/perso. Pragmatisme.',
+    certifications: ['Certifications ANZ', 'Certifications internationales'],
+    salaryContext: 'Variable. Nouvelle-Zélande < Australie.',
+    keyIndustries: ['Agriculture', 'Tourisme', 'Tech', 'Film (NZ)'],
+    culturalNotes: [
+      'Anglais = langue native',
+      'Marchés plus petits mais qualité de vie élevée',
+      'Immigration points-based system',
     ],
   },
 };

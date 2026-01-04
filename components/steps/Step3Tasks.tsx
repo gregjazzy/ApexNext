@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Clock, Trash2, ChevronDown, ChevronUp, Cpu, Users, Lightbulb, Brain, Cog, Timer, Sparkles, Loader2 } from 'lucide-react';
+import { TimeBudgetIndicator } from '@/components/ui/TimeBudgetIndicator';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
@@ -176,6 +177,20 @@ export function Step3Tasks() {
           {getLexiconValue(tasksLexicon.subtitle, persona, locale)}
         </motion.p>
       </div>
+
+      {/* =============================================== */}
+      {/* INDICATEUR BUDGET TEMPS (Sticky Overview) */}
+      {/* Vue temps réel du total heures et répartition */}
+      {/* =============================================== */}
+      {tasks.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+        >
+          <TimeBudgetIndicator tasks={tasks} targetHours={40} />
+        </motion.div>
+      )}
 
       {/* =============================================== */}
       {/* SCANNER DE CHARGE FANTÔME (Emails & Flux) */}
@@ -416,23 +431,24 @@ export function Step3Tasks() {
                               </p>
                               <input
                                 type="range"
-                                min="0.5"
-                                max="20"
-                                step="0.5"
+                                min="0.1"
+                                max="60"
+                                step="0.1"
                                 value={task.hoursPerWeek || 4}
                                 onChange={(e) => updateTask(task.id, { hoursPerWeek: parseFloat(e.target.value) })}
                                 onClick={(e) => e.stopPropagation()}
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                               />
                               <div className="flex justify-between text-xs text-slate-600">
-                                <span>0.5h</span>
-                                <span>20h</span>
+                                <span>0.1h</span>
+                                <span>60h</span>
                               </div>
                             </div>
                             {/* 1. Données (Automatisation) */}
                             <ResilienceSlider
                               label={t('resilience.data')}
                               description={t('resilience.dataDesc')}
+                              tooltip={t('resilience.dataTooltip')}
                               value={task.resilience.donnees}
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, donnees: value }
@@ -444,6 +460,7 @@ export function Step3Tasks() {
                             <ResilienceSlider
                               label={t('resilience.decision')}
                               description={t('resilience.decisionDesc')}
+                              tooltip={t('resilience.decisionTooltip')}
                               value={task.resilience.decision}
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, decision: value }
@@ -455,6 +472,7 @@ export function Step3Tasks() {
                             <ResilienceSlider
                               label={t('resilience.relational')}
                               description={t('resilience.relationalDesc')}
+                              tooltip={t('resilience.relationalTooltip')}
                               value={task.resilience.relationnel}
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, relationnel: value }
@@ -466,6 +484,7 @@ export function Step3Tasks() {
                             <ResilienceSlider
                               label={t('resilience.creativity')}
                               description={t('resilience.creativityDesc')}
+                              tooltip={t('resilience.creativityTooltip')}
                               value={task.resilience.creativite}
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, creativite: value }
@@ -477,6 +496,7 @@ export function Step3Tasks() {
                             <ResilienceSlider
                               label={t('resilience.execution')}
                               description={t('resilience.executionDesc')}
+                              tooltip={t('resilience.executionTooltip')}
                               value={task.resilience.execution}
                               onChange={(value) => updateTask(task.id, {
                                 resilience: { ...task.resilience, execution: value }

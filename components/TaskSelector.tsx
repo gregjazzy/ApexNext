@@ -7,17 +7,50 @@ import { useAuditStore } from '@/lib/store';
 import { UI_MESSAGES } from '@/lib/prompts/generate-tasks';
 import { 
   Loader2, CheckSquare, Square, Plus, X, 
-  Sparkles, AlertCircle, ChevronDown, ChevronUp 
+  Sparkles, AlertCircle, ChevronDown, ChevronUp,
+  Clock, Shield, ShieldAlert
 } from 'lucide-react';
 
 interface GeneratedTask {
   id: string;
   name: string;
   description: string;
+  temporalite?: 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
+  hoursPerWeek?: number;
+  resilience?: {
+    donnees: number;
+    decision: number;
+    relationnel: number;
+    creativite: number;
+    execution: number;
+  };
 }
 
 interface TaskSelectorProps {
   onComplete?: () => void;
+}
+
+// Labels pour temporalité
+const TEMPORALITY_LABELS: Record<string, string> = {
+  quotidien: 'Quotidien',
+  hebdomadaire: 'Hebdo',
+  mensuel: 'Mensuel',
+  strategique: 'Strat.'
+};
+
+// Calcule le score de vulnérabilité moyen (inverse de résilience)
+function getVulnerabilityScore(resilience?: GeneratedTask['resilience']): number {
+  if (!resilience) return 50;
+  const avg = (resilience.donnees + resilience.decision + resilience.relationnel + 
+               resilience.creativite + resilience.execution) / 5;
+  return Math.round(100 - avg); // Inverser : haut = vulnérable
+}
+
+// Couleur selon le niveau de vulnérabilité
+function getVulnerabilityColor(score: number): string {
+  if (score >= 70) return 'text-red-400 bg-red-500/20';
+  if (score >= 50) return 'text-amber-400 bg-amber-500/20';
+  return 'text-emerald-400 bg-emerald-500/20';
 }
 
 export function TaskSelector({ onComplete }: TaskSelectorProps) {
@@ -137,9 +170,9 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
     // Convertir au format du store
     const storeTasks = selectedTasks.map((t) => ({
       name: t.name,
-      hoursPerWeek: 0,
-      temporalite: 'quotidien' as const,
-      resilience: {
+      hoursPerWeek: t.hoursPerWeek || 4,
+      temporalite: t.temporalite || 'quotidien' as const,
+      resilience: t.resilience || {
         donnees: 50,
         decision: 50,
         relationnel: 50,
@@ -213,6 +246,45 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
+          {/* Résumé global */}
+          {generatedTasks.length > 0 && (
+            <div className="p-4 bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-zinc-300">Analyse de votre profil</h3>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    {generatedTasks.length} tâches identifiées • 
+                    {' '}{Math.round(generatedTasks.reduce((sum, t) => sum + (t.hoursPerWeek || 0), 0))}h/semaine estimées
+                  </p>
+                </div>
+                {(() => {
+                  const avgVuln = Math.round(
+                    generatedTasks.reduce((sum, t) => sum + getVulnerabilityScore(t.resilience), 0) / generatedTasks.length
+                  );
+                  const highRiskCount = generatedTasks.filter(t => getVulnerabilityScore(t.resilience) >= 60).length;
+                  return (
+                    <div className="text-right">
+                      <div className={`text-2xl font-bold ${
+                        avgVuln >= 60 ? 'text-red-400' : 
+                        avgVuln >= 40 ? 'text-amber-400' : 'text-emerald-400'
+                      }`}>
+                        {avgVuln}%
+                      </div>
+                      <div className="text-xs text-zinc-500">
+                        vulnérabilité moyenne
+                      </div>
+                      {highRiskCount > 0 && (
+                        <div className="text-xs text-red-400 mt-1">
+                          {highRiskCount} tâche{highRiskCount > 1 ? 's' : ''} à risque
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
           {/* Instruction */}
           <p className="text-sm text-zinc-400 text-center">
             {UI_MESSAGES.instruction}
@@ -263,8 +335,44 @@ export function TaskSelector({ onComplete }: TaskSelectorProps) {
                         )}
                       </div>
                       
+                      {/* Badges : temporalité, heures, vulnérabilité */}
+                      {!isCustom && task.resilience && (
+                        <div className="flex flex-wrap items-center gap-2 mt-2">
+                          {/* Temporalité */}
+                          {task.temporalite && (
+                            <span className="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded">
+                              {TEMPORALITY_LABELS[task.temporalite] || task.temporalite}
+                            </span>
+                          )}
+                          
+                          {/* Heures par semaine */}
+                          {task.hoursPerWeek && task.hoursPerWeek > 0 && (
+                            <span className="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {task.hoursPerWeek}h/sem
+                            </span>
+                          )}
+                          
+                          {/* Score de vulnérabilité */}
+                          {(() => {
+                            const vulnScore = getVulnerabilityScore(task.resilience);
+                            const colorClass = getVulnerabilityColor(vulnScore);
+                            return (
+                              <span className={`text-xs px-2 py-0.5 rounded flex items-center gap-1 ${colorClass}`}>
+                                {vulnScore >= 50 ? (
+                                  <ShieldAlert className="w-3 h-3" />
+                                ) : (
+                                  <Shield className="w-3 h-3" />
+                                )}
+                                {vulnScore}% vulnérable
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      )}
+
                       {/* Description (toujours visible, ou expandable si longue) */}
-                      <p className={`text-sm text-zinc-500 mt-1 ${!isExpanded && 'line-clamp-2'}`}>
+                      <p className={`text-sm text-zinc-500 mt-2 ${!isExpanded && 'line-clamp-2'}`}>
                         {task.description}
                       </p>
                       

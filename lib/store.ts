@@ -65,34 +65,81 @@ export const MUTATION_DRIVERS: { id: MutationDriver; label: { fr: string; en: st
 
 // Zones géographiques pour contextualisation LLM
 export type GeoZone = 
+  // Europe
   | 'france'
   | 'belgium'
   | 'switzerland'
-  | 'canada_fr'
-  | 'morocco'
-  | 'usa'
-  | 'uk'
   | 'germany'
+  | 'uk'
   | 'spain'
   | 'italy'
   | 'netherlands'
   | 'other_eu'
-  | 'other_world';
+  // Europe de l'Est / CEI
+  | 'russia'
+  | 'eastern_europe'
+  // Amérique du Nord
+  | 'usa'
+  | 'canada_fr'
+  // Amérique Latine
+  | 'brazil'
+  | 'latam'
+  // Afrique
+  | 'morocco'
+  | 'north_africa'
+  | 'south_africa'
+  | 'africa_other'
+  // Moyen-Orient
+  | 'uae'
+  | 'middle_east'
+  // Asie
+  | 'japan'
+  | 'china'
+  | 'india'
+  | 'singapore'
+  | 'asia_other'
+  // Océanie
+  | 'australia'
+  | 'oceania';
 
 export const GEO_ZONES: { id: GeoZone; label: { fr: string; en: string }; flag: string }[] = [
+  // Europe francophone
   { id: 'france', label: { fr: 'France', en: 'France' }, flag: '🇫🇷' },
   { id: 'belgium', label: { fr: 'Belgique', en: 'Belgium' }, flag: '🇧🇪' },
   { id: 'switzerland', label: { fr: 'Suisse', en: 'Switzerland' }, flag: '🇨🇭' },
-  { id: 'canada_fr', label: { fr: 'Canada (Québec)', en: 'Canada (Quebec)' }, flag: '🇨🇦' },
-  { id: 'morocco', label: { fr: 'Maroc', en: 'Morocco' }, flag: '🇲🇦' },
-  { id: 'usa', label: { fr: 'États-Unis', en: 'United States' }, flag: '🇺🇸' },
-  { id: 'uk', label: { fr: 'Royaume-Uni', en: 'United Kingdom' }, flag: '🇬🇧' },
+  // Europe autres
   { id: 'germany', label: { fr: 'Allemagne', en: 'Germany' }, flag: '🇩🇪' },
+  { id: 'uk', label: { fr: 'Royaume-Uni', en: 'United Kingdom' }, flag: '🇬🇧' },
   { id: 'spain', label: { fr: 'Espagne', en: 'Spain' }, flag: '🇪🇸' },
   { id: 'italy', label: { fr: 'Italie', en: 'Italy' }, flag: '🇮🇹' },
   { id: 'netherlands', label: { fr: 'Pays-Bas', en: 'Netherlands' }, flag: '🇳🇱' },
   { id: 'other_eu', label: { fr: 'Autre pays UE', en: 'Other EU country' }, flag: '🇪🇺' },
-  { id: 'other_world', label: { fr: 'Autre pays', en: 'Other country' }, flag: '🌍' },
+  // Europe de l'Est / CEI
+  { id: 'russia', label: { fr: 'Russie', en: 'Russia' }, flag: '🇷🇺' },
+  { id: 'eastern_europe', label: { fr: 'Europe de l\'Est (autre)', en: 'Eastern Europe (other)' }, flag: '🌍' },
+  // Amérique du Nord
+  { id: 'usa', label: { fr: 'États-Unis', en: 'United States' }, flag: '🇺🇸' },
+  { id: 'canada_fr', label: { fr: 'Canada', en: 'Canada' }, flag: '🇨🇦' },
+  // Amérique Latine
+  { id: 'brazil', label: { fr: 'Brésil', en: 'Brazil' }, flag: '🇧🇷' },
+  { id: 'latam', label: { fr: 'Amérique Latine (autre)', en: 'Latin America (other)' }, flag: '🌎' },
+  // Afrique
+  { id: 'morocco', label: { fr: 'Maroc', en: 'Morocco' }, flag: '🇲🇦' },
+  { id: 'north_africa', label: { fr: 'Afrique du Nord (Algérie, Tunisie, Égypte...)', en: 'North Africa' }, flag: '🌍' },
+  { id: 'south_africa', label: { fr: 'Afrique du Sud', en: 'South Africa' }, flag: '🇿🇦' },
+  { id: 'africa_other', label: { fr: 'Afrique (autre)', en: 'Africa (other)' }, flag: '🌍' },
+  // Moyen-Orient
+  { id: 'uae', label: { fr: 'Émirats Arabes Unis', en: 'United Arab Emirates' }, flag: '🇦🇪' },
+  { id: 'middle_east', label: { fr: 'Moyen-Orient (autre)', en: 'Middle East (other)' }, flag: '🏜️' },
+  // Asie
+  { id: 'japan', label: { fr: 'Japon', en: 'Japan' }, flag: '🇯🇵' },
+  { id: 'china', label: { fr: 'Chine', en: 'China' }, flag: '🇨🇳' },
+  { id: 'india', label: { fr: 'Inde', en: 'India' }, flag: '🇮🇳' },
+  { id: 'singapore', label: { fr: 'Singapour', en: 'Singapore' }, flag: '🇸🇬' },
+  { id: 'asia_other', label: { fr: 'Asie (autre)', en: 'Asia (other)' }, flag: '🌏' },
+  // Océanie
+  { id: 'australia', label: { fr: 'Australie', en: 'Australia' }, flag: '🇦🇺' },
+  { id: 'oceania', label: { fr: 'Océanie (autre)', en: 'Oceania (other)' }, flag: '🌊' },
 ];
 
 export interface AuditContext {
@@ -105,9 +152,6 @@ export interface AuditContext {
   // Champs enrichis pour un diagnostic plus précis
   yearsExperience?: number;        // Années d'expérience dans le poste
   teamSize?: number;               // Taille de l'équipe supervisée (0 si contributeur individuel)
-  automationExposure?: 'low' | 'medium' | 'high'; // Exposition perçue à l'automatisation
-  budgetResponsibility?: number;   // Responsabilité budgétaire en K€
-  clientFacing?: boolean;          // Contact client direct
   // Moteurs de Mutation (pour parcours Pivot uniquement)
   mutationDrivers?: MutationDriver[];  // 2 moteurs sélectionnés max
 }
@@ -500,9 +544,6 @@ interface AuditStore {
   // Actions - Context (Champs enrichis)
   setYearsExperience: (years: number) => void;
   setTeamSize: (size: number) => void;
-  setAutomationExposure: (exposure: 'low' | 'medium' | 'high') => void;
-  setBudgetResponsibility: (budget: number) => void;
-  setClientFacing: (facing: boolean) => void;
   // Actions - Mutation Drivers (Pivot uniquement)
   setMutationDrivers: (drivers: MutationDriver[]) => void;
   
@@ -1854,9 +1895,6 @@ const initialContext: AuditContext = {
   jobDescription: '',
   yearsExperience: undefined,
   teamSize: undefined,
-  automationExposure: undefined,
-  budgetResponsibility: undefined,
-  clientFacing: undefined,
 };
 
 const initialUserIntention: UserIntention = {
@@ -2004,15 +2042,6 @@ export const useAuditStore = create<AuditStore>()(
       })),
       setTeamSize: (teamSize) => set((state) => ({
         context: { ...state.context, teamSize }
-      })),
-      setAutomationExposure: (automationExposure) => set((state) => ({
-        context: { ...state.context, automationExposure }
-      })),
-      setBudgetResponsibility: (budgetResponsibility) => set((state) => ({
-        context: { ...state.context, budgetResponsibility }
-      })),
-      setClientFacing: (clientFacing) => set((state) => ({
-        context: { ...state.context, clientFacing }
       })),
       setMutationDrivers: (mutationDrivers) => set((state) => ({
         context: { ...state.context, mutationDrivers: mutationDrivers.slice(0, 2) } // Max 2 drivers

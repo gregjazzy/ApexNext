@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Building2, Briefcase, FileText, Upload, X, CheckCircle, Clock, Users, Zap, DollarSign, Handshake, AlertCircle, HelpCircle, Search, ChevronDown } from 'lucide-react';
+import { Building2, Briefcase, FileText, Upload, X, CheckCircle, Clock, Users, AlertCircle, HelpCircle, Search, ChevronDown } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, GEO_ZONES, GeoZone } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
@@ -130,9 +130,6 @@ export function Step2Context() {
     setJobDescription, 
     setYearsExperience,
     setTeamSize,
-    setAutomationExposure,
-    setBudgetResponsibility,
-    setClientFacing,
     setCountry,
     nextStep, 
     prevStep 
@@ -193,8 +190,8 @@ export function Step2Context() {
     );
     if (found) {
       setIndustry(found.key);
-    } else if (value.trim()) {
-      // Saisie libre - on stocke le texte directement
+    } else {
+      // Saisie libre ou vide - on stocke le texte directement (même si vide)
       setIndustry(value);
     }
   }, [l, setIndustry]);
@@ -211,12 +208,14 @@ export function Step2Context() {
     }
   }, []);
 
-  // Initialiser la recherche avec la valeur existante
+  // Initialiser la recherche avec la valeur existante (uniquement au montage)
+  const hasInitialized = useRef(false);
   useEffect(() => {
-    if (context.industry && !sectorSearch) {
+    if (!hasInitialized.current && context.industry) {
       setSectorSearch(getSelectedSectorLabel());
+      hasInitialized.current = true;
     }
-  }, [context.industry, getSelectedSectorLabel, sectorSearch]);
+  }, [context.industry, getSelectedSectorLabel]);
 
   // Effet pour fermer le dropdown au clic extérieur
   useEffect(() => {
@@ -561,7 +560,7 @@ export function Step2Context() {
           >
             <label className="apex-label flex items-center gap-2">
               <Globe className="w-4 h-4" />
-              {l === 'fr' ? 'Pays / Zone économique' : 'Country / Economic Zone'}
+              {l === 'fr' ? 'Pays' : 'Country'}
               <div className="relative">
                 <button
                   type="button"
@@ -598,29 +597,52 @@ export function Step2Context() {
             )}
           </motion.div>
           
-          {/* Années d'expérience */}
+          {/* Expérience & Équipe - Ligne combinée */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.45 }}
+            className="grid grid-cols-2 gap-3"
           >
-            <label className="apex-label flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              {l === 'fr' ? 'Années d\'expérience dans ce poste' : 'Years of experience in this role'}
-              <span className="text-slate-600 font-normal">(optionnel)</span>
-            </label>
-            <select
-              value={context.yearsExperience || ''}
-              onChange={(e) => setYearsExperience(e.target.value ? parseInt(e.target.value) : 0)}
-              className="apex-select"
-            >
-              <option value="">{l === 'fr' ? 'Sélectionner...' : 'Select...'}</option>
-              <option value="1">&lt; 2 {l === 'fr' ? 'ans' : 'years'}</option>
-              <option value="3">2-5 {l === 'fr' ? 'ans' : 'years'}</option>
-              <option value="7">5-10 {l === 'fr' ? 'ans' : 'years'}</option>
-              <option value="15">10-20 {l === 'fr' ? 'ans' : 'years'}</option>
-              <option value="25">&gt; 20 {l === 'fr' ? 'ans' : 'years'}</option>
-            </select>
+            {/* Années d'expérience */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                {l === 'fr' ? 'Expérience' : 'Experience'}
+              </label>
+              <select
+                value={context.yearsExperience || ''}
+                onChange={(e) => setYearsExperience(e.target.value ? parseInt(e.target.value) : 0)}
+                className="apex-select text-sm py-2"
+              >
+                <option value="">-</option>
+                <option value="1">&lt; 2 {l === 'fr' ? 'ans' : 'yrs'}</option>
+                <option value="3">2-5 {l === 'fr' ? 'ans' : 'yrs'}</option>
+                <option value="7">5-10 {l === 'fr' ? 'ans' : 'yrs'}</option>
+                <option value="15">10-20 {l === 'fr' ? 'ans' : 'yrs'}</option>
+                <option value="25">&gt; 20 {l === 'fr' ? 'ans' : 'yrs'}</option>
+              </select>
+            </div>
+            
+            {/* Taille équipe */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
+                <Users className="w-3.5 h-3.5" />
+                {l === 'fr' ? 'Équipe gérée' : 'Team managed'}
+              </label>
+              <select
+                value={context.teamSize ?? ''}
+                onChange={(e) => setTeamSize(e.target.value ? parseInt(e.target.value) : 0)}
+                className="apex-select text-sm py-2"
+              >
+                <option value="">-</option>
+                <option value="0">{l === 'fr' ? 'Solo' : 'Solo'}</option>
+                <option value="3">1-5</option>
+                <option value="10">6-15</option>
+                <option value="30">16-50</option>
+                <option value="100">50+</option>
+              </select>
+            </div>
           </motion.div>
         </div>
 
@@ -714,115 +736,6 @@ export function Step2Context() {
           )}
         </motion.div>
       </div>
-
-      {/* Section Données Enrichies pour Diagnostic Précis */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-        className="space-y-4"
-      >
-        <div className="flex items-center gap-2 mb-2">
-          <Zap className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-medium text-slate-300">
-            {l === 'fr' ? 'Données de diagnostic avancé' : 'Advanced Diagnostic Data'}
-          </span>
-          <span className="text-xs text-slate-600">{l === 'fr' ? '(Optionnel - améliore la précision)' : '(Optional - improves accuracy)'}</span>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-slate-900/50 rounded-lg border border-slate-800">
-          {/* Taille équipe */}
-          <div>
-            <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
-              <Users className="w-3.5 h-3.5" />
-              {l === 'fr' ? 'Taille équipe supervisée' : 'Team size supervised'}
-            </label>
-            <select
-              value={context.teamSize ?? ''}
-              onChange={(e) => setTeamSize(e.target.value ? parseInt(e.target.value) : 0)}
-              className="apex-select text-sm py-2"
-            >
-              <option value="">-</option>
-              <option value="0">{l === 'fr' ? 'Contributeur individuel' : 'Individual contributor'}</option>
-              <option value="3">1-5 {l === 'fr' ? 'personnes' : 'people'}</option>
-              <option value="10">6-15 {l === 'fr' ? 'personnes' : 'people'}</option>
-              <option value="30">16-50 {l === 'fr' ? 'personnes' : 'people'}</option>
-              <option value="100">50+ {l === 'fr' ? 'personnes' : 'people'}</option>
-            </select>
-          </div>
-          
-          {/* Exposition automatisation */}
-          <div>
-            <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
-              <Zap className="w-3.5 h-3.5" />
-              {l === 'fr' ? 'Exposition automatisation' : 'Automation exposure'}
-            </label>
-            <select
-              value={context.automationExposure || ''}
-              onChange={(e) => setAutomationExposure(e.target.value as 'low' | 'medium' | 'high')}
-              className="apex-select text-sm py-2"
-            >
-              <option value="">-</option>
-              <option value="low">{l === 'fr' ? 'Faible' : 'Low'}</option>
-              <option value="medium">{l === 'fr' ? 'Modérée' : 'Medium'}</option>
-              <option value="high">{l === 'fr' ? 'Élevée' : 'High'}</option>
-            </select>
-          </div>
-          
-          {/* Budget */}
-          <div>
-            <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
-              <DollarSign className="w-3.5 h-3.5" />
-              {l === 'fr' ? 'Responsabilité budget (K€)' : 'Budget responsibility (K€)'}
-            </label>
-            <select
-              value={context.budgetResponsibility ?? ''}
-              onChange={(e) => setBudgetResponsibility(e.target.value ? parseInt(e.target.value) : 0)}
-              className="apex-select text-sm py-2"
-            >
-              <option value="">-</option>
-              <option value="0">{l === 'fr' ? 'Aucun' : 'None'}</option>
-              <option value="50">&lt; 100K€</option>
-              <option value="250">100K€ - 500K€</option>
-              <option value="750">500K€ - 1M€</option>
-              <option value="2000">1M€ - 5M€</option>
-              <option value="10000">&gt; 5M€</option>
-            </select>
-          </div>
-          
-          {/* Contact client */}
-          <div>
-            <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1.5">
-              <Handshake className="w-3.5 h-3.5" />
-              {l === 'fr' ? 'Contact client direct' : 'Direct client contact'}
-            </label>
-            <div className="flex gap-2 mt-1">
-              <button
-                type="button"
-                onClick={() => setClientFacing(true)}
-                className={`flex-1 py-2 px-3 rounded text-sm transition-all ${
-                  context.clientFacing === true 
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                    : 'bg-slate-800 text-slate-500 border border-slate-700 hover:border-slate-600'
-                }`}
-              >
-                {l === 'fr' ? 'Oui' : 'Yes'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setClientFacing(false)}
-                className={`flex-1 py-2 px-3 rounded text-sm transition-all ${
-                  context.clientFacing === false 
-                    ? 'bg-slate-700/50 text-slate-300 border border-slate-600' 
-                    : 'bg-slate-800 text-slate-500 border border-slate-700 hover:border-slate-600'
-                }`}
-              >
-                {l === 'fr' ? 'Non' : 'No'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </motion.div>
 
       {/* TEXTAREA - Description manuelle des missions */}
       <motion.div

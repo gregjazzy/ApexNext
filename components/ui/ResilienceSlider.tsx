@@ -1,12 +1,15 @@
 'use client';
 
 import * as Slider from '@radix-ui/react-slider';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { motion } from 'framer-motion';
+import { HelpCircle } from 'lucide-react';
 import { cn, getResilienceColor } from '@/lib/utils';
 
 interface ResilienceSliderProps {
   label: string;
   description?: string;
+  tooltip?: string;
   value: number;
   onChange: (value: number) => void;
   icon?: React.ReactNode;
@@ -17,6 +20,7 @@ type ColorKey = 'emerald' | 'amber' | 'rose';
 export function ResilienceSlider({
   label,
   description,
+  tooltip,
   value,
   onChange,
   icon,
@@ -51,10 +55,36 @@ export function ResilienceSlider({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {icon && <span className="text-slate-400">{icon}</span>}
-          <div>
-            <span className="text-sm font-medium text-slate-200">{label}</span>
-            {description && (
-              <p className="text-xs text-slate-500">{description}</p>
+          <div className="flex items-center gap-1.5">
+            <div>
+              <span className="text-sm font-medium text-slate-200">{label}</span>
+              {description && (
+                <p className="text-xs text-slate-500">{description}</p>
+              )}
+            </div>
+            {tooltip && (
+              <Tooltip.Provider delayDuration={200}>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <button 
+                      type="button" 
+                      className="text-slate-500 hover:text-slate-300 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Content
+                      className="z-50 max-w-xs px-3 py-2 text-xs text-slate-200 bg-slate-800 border border-slate-700 rounded-lg shadow-xl"
+                      sideOffset={5}
+                    >
+                      <div className="whitespace-pre-line">{tooltip}</div>
+                      <Tooltip.Arrow className="fill-slate-800" />
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
+              </Tooltip.Provider>
             )}
           </div>
         </div>

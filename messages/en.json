@@ -125,15 +125,20 @@
     },
     "resilience": {
       "data": "Data",
-      "dataDesc": "Vulnerability to automation (structured data)",
+      "dataDesc": "Type of data handled",
+      "dataTooltip": "0% = Structured data (Excel, forms, databases) → highly automatable\n100% = Complex or no data → resilient\n\n📌 Examples:\n• Invoice entry → 10%\n• Report analysis → 50%\n• Customer feedback interpretation → 80%",
       "decision": "Decision",
-      "decisionDesc": "Complexity of judgment and decision-making",
+      "decisionDesc": "Complexity of judgment required",
+      "decisionTooltip": "0% = Simple decisions with clear rules → automatable\n100% = Complex judgment, ambiguous context → resilient\n\n📌 Examples:\n• Validation against fixed criteria → 15%\n• Project prioritization → 60%\n• Crisis management → 90%",
       "relational": "Relational",
-      "relationalDesc": "Need for authentic human interactions",
+      "relationalDesc": "Need for human interaction",
+      "relationalTooltip": "0% = No human interaction needed\n100% = Human relationship essential → very resilient\n\n📌 Examples:\n• Solo data processing → 5%\n• Team meeting → 50%\n• Client negotiation → 85%\n• Conflict mediation → 95%",
       "creativity": "Creativity",
-      "creativityDesc": "Need for innovation and original thinking",
-      "execution": "Physical Execution",
-      "executionDesc": "Vulnerability to robotics and autonomous systems"
+      "creativityDesc": "Need for innovation and originality",
+      "creativityTooltip": "0% = Repetitive task, standard process\n100% = Original creation, divergent thinking → resilient\n\n📌 Examples:\n• Following a procedure → 5%\n• Writing a standard report → 30%\n• Designing a strategy → 70%\n• Artistic creation → 95%",
+      "execution": "Physical",
+      "executionDesc": "Physical presence or dexterity required",
+      "executionTooltip": "0% = 100% digital, no physical presence\n100% = Physical intervention essential → resilient (for now)\n\n📌 Examples:\n• Computer work → 0%\n• Field/client visit → 60%\n• Equipment handling → 80%\n• Manual craftsmanship → 95%"
     }
   },
   "step4": {

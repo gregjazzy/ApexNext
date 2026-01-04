@@ -29,6 +29,15 @@ interface TaskGenerated {
   id: string;
   name: string;
   description: string;
+  temporalite: 'quotidien' | 'hebdomadaire' | 'mensuel' | 'strategique';
+  hoursPerWeek: number;
+  resilience: {
+    donnees: number;
+    decision: number;
+    relationnel: number;
+    creativite: number;
+    execution: number;
+  };
 }
 
 interface GenerateTasksResponse {

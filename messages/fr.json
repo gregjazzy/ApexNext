@@ -125,15 +125,20 @@
     },
     "resilience": {
       "data": "Données",
-      "dataDesc": "Vulnérabilité à l'automatisation (données structurées)",
+      "dataDesc": "Type de données manipulées",
+      "dataTooltip": "0% = Données structurées (Excel, formulaires, bases de données) → très automatisable\n100% = Données complexes ou absentes → résilient\n\n📌 Exemples :\n• Saisie de factures → 10%\n• Analyse de rapports → 50%\n• Interprétation de retours clients → 80%",
       "decision": "Décision",
-      "decisionDesc": "Complexité du jugement et de la prise de décision",
+      "decisionDesc": "Complexité du jugement requis",
+      "decisionTooltip": "0% = Décisions simples avec règles claires → automatisable\n100% = Jugement complexe, contexte ambigu → résilient\n\n📌 Exemples :\n• Validation selon critères fixes → 15%\n• Priorisation de projets → 60%\n• Gestion de crise → 90%",
       "relational": "Relationnel",
-      "relationalDesc": "Nécessité d'interactions humaines authentiques",
+      "relationalDesc": "Besoin d'interaction humaine",
+      "relationalTooltip": "0% = Aucune interaction humaine nécessaire\n100% = Relation humaine essentielle → très résilient\n\n📌 Exemples :\n• Traitement de données seul → 5%\n• Réunion d'équipe → 50%\n• Négociation client → 85%\n• Médiation de conflit → 95%",
       "creativity": "Créativité",
-      "creativityDesc": "Besoin d'innovation et de pensée originale",
-      "execution": "Exécution Physique",
-      "executionDesc": "Vulnérabilité à la robotique et systèmes autonomes"
+      "creativityDesc": "Besoin d'innovation et d'originalité",
+      "creativityTooltip": "0% = Tâche répétitive, processus standard\n100% = Création originale, pensée divergente → résilient\n\n📌 Exemples :\n• Suivre une procédure → 5%\n• Rédiger un rapport standard → 30%\n• Concevoir une stratégie → 70%\n• Création artistique → 95%",
+      "execution": "Physique",
+      "executionDesc": "Présence physique ou dextérité requise",
+      "executionTooltip": "0% = 100% digital, aucune présence physique\n100% = Intervention physique essentielle → résilient (pour l'instant)\n\n📌 Exemples :\n• Travail sur ordinateur → 0%\n• Visite terrain/client → 60%\n• Manipulation d'équipements → 80%\n• Artisanat manuel → 95%"
     }
   },
   "step4": {
