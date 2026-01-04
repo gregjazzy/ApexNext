@@ -14,6 +14,7 @@
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@supabase/supabase-js": "^2.89.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.6",
     "jspdf": "^3.0.4",

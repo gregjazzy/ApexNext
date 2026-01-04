@@ -551,7 +551,7 @@ export function Step7Ikigai() {
       </motion.div>
 
       {/* =============================================== */}
-      {/* MODULE GPEC - Matrice de Matching (Vue Décideur RH) */}
+      {/* MODULE JOB DESIGNER - Matrice de Matching (Vue Décideur RH) */}
       {/* Affiché uniquement en mode Reclassement */}
       {/* =============================================== */}
       {isReclassement && (
@@ -879,9 +879,12 @@ export function Step7Ikigai() {
           setStep(6);
           router.push('/audit');
         }}
-        onNext={() => setStep(8)}
+        onNext={() => {
+          // Retourner au Hub après avoir complété l'Ikigai
+          router.push('/hub');
+        }}
         canProceed={canProceed}
-        nextLabel={l === 'fr' ? 'Voir le Plan d\'Action →' : 'View Action Plan →'}
+        nextLabel={l === 'fr' ? 'Valider et retourner au Hub →' : 'Validate and return to Hub →'}
         prevLabel={l === 'fr' ? '← Retour au Diagnostic' : '← Back to Diagnostic'}
       />
     </motion.div>

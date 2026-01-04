@@ -26,7 +26,7 @@ import {
 import { useAuditStore, EmployeeMatch, CompetenceCategory } from '@/lib/store';
 
 // ===============================================
-// MATRICE DE MATCHING GPEC
+// MATRICE DE MATCHING JOB DESIGNER
 // Vue décideur RH : quel salarié pour quel poste ?
 // ===============================================
 
@@ -162,7 +162,7 @@ export function GPECMatchingMatrix({ onSelectMatch }: MatchingMatrixProps) {
           </div>
           <div>
             <h2 className="text-xl font-serif text-white">
-              {l === 'fr' ? 'Matrice de Matching GPEC' : 'GPEC Matching Matrix'}
+              {l === 'fr' ? 'Matrice de Matching' : 'Matching Matrix'}
             </h2>
             <p className="text-sm text-slate-400">
               {l === 'fr' 

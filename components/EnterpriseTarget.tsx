@@ -21,34 +21,71 @@ import {
   Heart,
   Check,
   X,
-  ArrowRight
+  ArrowRight,
+  Info,
+  Zap
 } from 'lucide-react';
 import { useAuditStore, FutureJob, TargetCompetence, CompetenceCategory } from '@/lib/store';
 import { BackToHub } from '@/components/ui/BackToHub';
 
 // ===============================================
-// MODULE D'EXIGENCES STRATÉGIQUES (GPEC)
-// Interface RH pour définir les "Métiers de Demain"
+// MODULE JOB DESIGNER
+// Interface RH pour concevoir les "Postes de Demain"
 // ===============================================
 
-const COMPETENCE_CATEGORIES: { id: CompetenceCategory; label: { fr: string; en: string }; icon: React.ReactNode; color: string }[] = [
+const COMPETENCE_CATEGORIES: { 
+  id: CompetenceCategory; 
+  label: { fr: string; en: string }; 
+  icon: React.ReactNode; 
+  color: string;
+  description: { fr: string; en: string };
+  examples: { fr: string; en: string };
+  resilience: string;
+}[] = [
   { 
     id: 'haptique', 
     label: { fr: 'Haptique / Gestuelle', en: 'Haptic / Gestural' },
     icon: <Wrench className="w-4 h-4" />,
-    color: 'amber'
+    color: 'amber',
+    description: {
+      fr: 'Compétences liées au toucher, à la dextérité manuelle et à la coordination physique.',
+      en: 'Skills related to touch, manual dexterity and physical coordination.'
+    },
+    examples: {
+      fr: 'Chirurgie, artisanat, kinésithérapie, soudure de précision',
+      en: 'Surgery, craftsmanship, physiotherapy, precision welding'
+    },
+    resilience: '95%'
   },
   { 
     id: 'relationnelle', 
     label: { fr: 'Relationnelle / Humaine', en: 'Relational / Human' },
     icon: <Heart className="w-4 h-4" />,
-    color: 'rose'
+    color: 'rose',
+    description: {
+      fr: 'Compétences d\'interaction humaine : empathie, négociation, leadership.',
+      en: 'Human interaction skills: empathy, negotiation, leadership.'
+    },
+    examples: {
+      fr: 'Management, vente complexe, médiation, coaching',
+      en: 'Management, complex sales, mediation, coaching'
+    },
+    resilience: '90%'
   },
   { 
     id: 'technique', 
     label: { fr: 'Technique / Analytique', en: 'Technical / Analytical' },
     icon: <GraduationCap className="w-4 h-4" />,
-    color: 'blue'
+    color: 'blue',
+    description: {
+      fr: 'Compétences analytiques et techniques : programmation, data, ingénierie.',
+      en: 'Analytical and technical skills: programming, data, engineering.'
+    },
+    examples: {
+      fr: 'Python, analyse de données, architecture système',
+      en: 'Python, data analysis, system architecture'
+    },
+    resilience: '60%'
   },
 ];
 
@@ -63,6 +100,42 @@ const HORIZON_OPTIONS = [
   { id: '1_year' as const, label: { fr: '1 an', en: '1 year' } },
   { id: '3_years' as const, label: { fr: '3 ans', en: '3 years' } },
 ];
+
+// ===============================================
+// CALCUL AUTOMATIQUE DE LA RÉSISTANCE À L'IA
+// Basé sur les types de compétences du poste
+// ===============================================
+const calculateAutomationResistance = (competences: { category: CompetenceCategory }[]) => {
+  if (competences.length === 0) return { score: 0, breakdown: null };
+  
+  const BASE_SCORE = 40;
+  const CATEGORY_BONUS = {
+    haptique: 30,      // +30% par compétence haptique
+    relationnelle: 25, // +25% par compétence relationnelle
+    technique: 10,     // +10% par compétence technique
+  };
+  
+  let bonus = 0;
+  const counts = { haptique: 0, relationnelle: 0, technique: 0 };
+  
+  competences.forEach(comp => {
+    counts[comp.category]++;
+    bonus += CATEGORY_BONUS[comp.category];
+  });
+  
+  // Plafonner à 95% max
+  const score = Math.min(95, BASE_SCORE + bonus);
+  
+  return { 
+    score, 
+    breakdown: counts,
+    bonusDetails: {
+      haptique: counts.haptique * CATEGORY_BONUS.haptique,
+      relationnelle: counts.relationnelle * CATEGORY_BONUS.relationnelle,
+      technique: counts.technique * CATEGORY_BONUS.technique,
+    }
+  };
+};
 
 export function EnterpriseTarget() {
   const locale = useLocale();
@@ -156,9 +229,9 @@ export function EnterpriseTarget() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center space-y-4"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-medium">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/20 text-violet-400 border border-violet-500/30 text-sm font-medium">
           <Building2 className="w-4 h-4" />
-          {l === 'fr' ? 'Module GPEC — Exigences Stratégiques' : 'GPEC Module — Strategic Requirements'}
+          {l === 'fr' ? 'Job Designer — Architecture de Poste' : 'Job Designer — Position Architecture'}
         </div>
         <h1 className="text-3xl md:text-4xl font-serif text-white">
           {l === 'fr' ? 'Métiers de Demain' : 'Jobs of Tomorrow'}
@@ -312,10 +385,24 @@ export function EnterpriseTarget() {
                       <div className="text-sm text-slate-400">
                         {job.requiredCompetences.length} {l === 'fr' ? 'compétences' : 'competencies'}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-emerald-400">
-                        <Shield className="w-3 h-3" />
-                        {job.automationResistance}% {l === 'fr' ? 'résilience' : 'resilience'}
-                      </div>
+                      {(() => {
+                        const resistance = calculateAutomationResistance(job.requiredCompetences);
+                        if (resistance.score === 0) {
+                          return (
+                            <div className="flex items-center gap-1 text-xs text-slate-500">
+                              <Shield className="w-3 h-3" />
+                              {l === 'fr' ? 'Ajoutez des compétences' : 'Add competencies'}
+                            </div>
+                          );
+                        }
+                        const colorClass = resistance.score >= 70 ? 'text-emerald-400' : resistance.score >= 50 ? 'text-amber-400' : 'text-rose-400';
+                        return (
+                          <div className={`flex items-center gap-1 text-xs ${colorClass}`}>
+                            <Shield className="w-3 h-3" />
+                            {resistance.score}% {l === 'fr' ? 'résilience' : 'resilience'}
+                          </div>
+                        );
+                      })()}
                     </div>
                     {expandedJob === job.id ? (
                       <ChevronUp className="w-5 h-5 text-slate-400" />
@@ -395,6 +482,52 @@ export function EnterpriseTarget() {
                             </div>
                           )}
                         </div>
+
+                        {/* Résistance calculée */}
+                        {(() => {
+                          const resistance = calculateAutomationResistance(job.requiredCompetences);
+                          if (resistance.score === 0) return null;
+                          
+                          const colorClass = resistance.score >= 70 ? 'emerald' : resistance.score >= 50 ? 'amber' : 'rose';
+                          
+                          return (
+                            <div className={`p-3 rounded-lg bg-${colorClass}-500/10 border border-${colorClass}-500/30`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <Shield className={`w-5 h-5 text-${colorClass}-400`} />
+                                  <span className={`font-medium text-${colorClass}-400`}>
+                                    {resistance.score}% {l === 'fr' ? 'Résilience IA' : 'AI Resilience'}
+                                  </span>
+                                </div>
+                                <span className={`text-xs text-${colorClass}-400/70`}>
+                                  {l === 'fr' ? 'Calculé automatiquement' : 'Auto-calculated'}
+                                </span>
+                              </div>
+                              {resistance.breakdown && (
+                                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                                  {resistance.breakdown.haptique > 0 && (
+                                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                                      🔧 {resistance.breakdown.haptique} haptique{resistance.breakdown.haptique > 1 ? 's' : ''} (+{resistance.bonusDetails?.haptique}%)
+                                    </span>
+                                  )}
+                                  {resistance.breakdown.relationnelle > 0 && (
+                                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400">
+                                      💗 {resistance.breakdown.relationnelle} relationnelle{resistance.breakdown.relationnelle > 1 ? 's' : ''} (+{resistance.bonusDetails?.relationnelle}%)
+                                    </span>
+                                  )}
+                                  {resistance.breakdown.technique > 0 && (
+                                    <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
+                                      📊 {resistance.breakdown.technique} technique{resistance.breakdown.technique > 1 ? 's' : ''} (+{resistance.bonusDetails?.technique}%)
+                                    </span>
+                                  )}
+                                  <span className="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400">
+                                    Base: 40%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
 
                         {/* Actions */}
                         <div className="flex justify-end pt-2 border-t border-slate-800/50">
@@ -529,22 +662,19 @@ export function EnterpriseTarget() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1.5">
-                      {l === 'fr' ? 'Résistance à l\'automatisation' : 'Automation Resistance'}: {newJob.automationResistance}%
-                    </label>
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={newJob.automationResistance}
-                      onChange={(e) => setNewJob({ ...newJob, automationResistance: parseInt(e.target.value) })}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                      <span>{l === 'fr' ? 'Faible' : 'Low'}</span>
-                      <span>{l === 'fr' ? 'Élevée' : 'High'}</span>
+                  {/* Info : La résistance sera calculée automatiquement */}
+                  <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                    <div className="flex items-center gap-2 text-sm text-emerald-400">
+                      <Shield className="w-4 h-4" />
+                      <span className="font-medium">
+                        {l === 'fr' ? 'Résistance calculée automatiquement' : 'Resistance calculated automatically'}
+                      </span>
                     </div>
+                    <p className="text-xs text-slate-400 mt-1 pl-6">
+                      {l === 'fr' 
+                        ? 'La résilience face à l\'IA sera calculée selon les compétences que vous ajouterez (Haptiques = +30%, Relationnelles = +25%, Techniques = +10%).'
+                        : 'AI resilience will be calculated based on the competencies you add (Haptic = +30%, Relational = +25%, Technical = +10%).'}
+                    </p>
                   </div>
                 </div>
 
@@ -619,7 +749,7 @@ export function EnterpriseTarget() {
                         <button
                           key={cat.id}
                           onClick={() => setNewCompetence({ ...newCompetence, category: cat.id })}
-                          className={`flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
+                          className={`relative group flex flex-col items-center gap-2 p-3 rounded-lg border transition-colors ${
                             newCompetence.category === cat.id
                               ? `bg-${cat.color}-500/20 border-${cat.color}-500/50 text-${cat.color}-400`
                               : 'bg-slate-800/50 border-slate-700 text-slate-400 hover:border-slate-600'
@@ -627,9 +757,52 @@ export function EnterpriseTarget() {
                         >
                           {cat.icon}
                           <span className="text-xs">{cat.label[l]}</span>
+                          
+                          {/* Tooltip informatif */}
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none">
+                            <div className="text-xs text-slate-300 mb-2">{cat.description[l]}</div>
+                            <div className="text-xs text-slate-500 mb-2">
+                              <span className="font-medium">{l === 'fr' ? 'Ex:' : 'Ex:'}</span> {cat.examples[l]}
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <Zap className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400">{cat.resilience} {l === 'fr' ? 'résilience IA' : 'AI resilience'}</span>
+                            </div>
+                            {/* Flèche du tooltip */}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-8 border-transparent border-t-slate-700" />
+                          </div>
                         </button>
                       ))}
                     </div>
+                    
+                    {/* Info-bulle de la catégorie sélectionnée */}
+                    {newCompetence.category && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50"
+                      >
+                        {(() => {
+                          const selectedCat = COMPETENCE_CATEGORIES.find(c => c.id === newCompetence.category);
+                          if (!selectedCat) return null;
+                          return (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <Info className="w-4 h-4 text-slate-500" />
+                                <span className="text-sm text-slate-300">{selectedCat.description[l]}</span>
+                              </div>
+                              <div className="text-xs text-slate-500 pl-6">
+                                <span className="font-medium">{l === 'fr' ? 'Exemples :' : 'Examples:'}</span> {selectedCat.examples[l]}
+                              </div>
+                              <div className="flex items-center gap-1 text-xs pl-6">
+                                <Zap className="w-3 h-3 text-emerald-400" />
+                                <span className="text-emerald-400">{selectedCat.resilience} {l === 'fr' ? 'résilience face à l\'IA' : 'resilience against AI'}</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </motion.div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

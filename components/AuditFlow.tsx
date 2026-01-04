@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -33,9 +33,12 @@ const stepComponents: Record<number, React.ComponentType> = {
 export function AuditFlow() {
   const { data: session } = useSession();
   const router = useRouter();
-  const { currentStep, initializeTalents, talents, setStep } = useAuditStore();
+  const { currentStep, initializeTalents, talents, setStep, context } = useAuditStore();
   const t = useTranslations('common');
   const tStepper = useTranslations('stepper');
+  
+  // Ref pour éviter les redirections multiples
+  const hasRedirected = useRef(false);
 
   // Initialize talents on mount
   useEffect(() => {
@@ -43,6 +46,24 @@ export function AuditFlow() {
       initializeTalents();
     }
   }, [talents.length, initializeTalents]);
+  
+  // ===============================================
+  // SMART NAVIGATION : Skip Step 1 si persona + goal déjà définis
+  // ===============================================
+  // Si persona + goal sont définis, l'utilisateur a déjà fait Step 1
+  // On passe directement au Step 2 (ou à l'étape actuelle si > 1)
+  useEffect(() => {
+    if (hasRedirected.current) return;
+    
+    const hasPersonaAndGoal = context.persona && context.goal;
+    const isAtStep1 = currentStep === 1;
+    
+    // Si persona + goal définis et on est à Step 1, aller au Step 2
+    if (hasPersonaAndGoal && isAtStep1) {
+      hasRedirected.current = true;
+      setStep(2);
+    }
+  }, [context.persona, context.goal, currentStep, setStep]);
 
   // Rediriger vers /strategy si step >= 7 (Phase 2)
   useEffect(() => {
@@ -50,6 +71,13 @@ export function AuditFlow() {
       router.push('/strategy');
     }
   }, [currentStep, router]);
+  
+  // ===============================================
+  // SCROLL TO TOP : Remonter en haut à chaque changement d'étape
+  // ===============================================
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   // Limiter à l'étape 6 max pour Phase 1
   const displayStep = Math.min(currentStep, 6);

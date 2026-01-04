@@ -43,6 +43,41 @@ export function Step6Verdict() {
   const resilientTasks = sortedTasks.slice(-Math.min(3, sortedTasks.length)).reverse();
 
   const scoreColor = getResilienceColor(overallScore);
+  
+  // ===============================================
+  // COMMENTAIRES STRATÉGIQUES
+  // ===============================================
+  
+  // Analyse globale selon le score
+  const getGlobalAnalysis = (): { title: string; description: string } | null => {
+    if (resilienceScore < 40) {
+      return {
+        title: l === 'fr' ? '⚠️ Exposition Critique Détectée' : '⚠️ Critical Exposure Detected',
+        description: l === 'fr' 
+          ? 'Votre diagnostic révèle une forte exposition à l\'automatisation. Plus de 60% de vos tâches quotidiennes sont désormais réalisables par des outils IA. Ce n\'est pas une fatalité : c\'est une opportunité de repositionnement. Les professionnels qui anticipent cette transition ne la subissent pas — ils la pilotent.'
+          : 'Your diagnostic reveals high exposure to automation. Over 60% of your daily tasks can now be performed by AI tools. This is not a fatality: it\'s a repositioning opportunity. Professionals who anticipate this transition don\'t suffer it — they drive it.'
+      };
+    }
+    return null;
+  };
+  
+  // Analyse par tâche selon sa zone
+  const getTaskAnalysis = (task: Task): string => {
+    const score = getTaskScore(task);
+    const isVulnerable = score < 50;
+    
+    if (isVulnerable) {
+      return l === 'fr'
+        ? 'Cette activité est devenue une commodité numérique. L\'IA peut désormais l\'exécuter avec une précision comparable — voire supérieure — à l\'humain. Votre valeur ajoutée ne réside plus dans l\'exécution, mais dans la supervision et l\'arbitrage stratégique.'
+        : 'This activity has become a digital commodity. AI can now execute it with comparable — or even superior — precision to humans. Your added value no longer lies in execution, but in supervision and strategic arbitration.';
+    } else {
+      return l === 'fr'
+        ? 'C\'est votre sanctuaire. L\'empathie, la négociation et le jugement contextuel que cette tâche requiert sont des forteresses que l\'IA ne peut pas encore conquérir. Cultivez cette expertise : c\'est votre avantage compétitif durable.'
+        : 'This is your sanctuary. The empathy, negotiation, and contextual judgment this task requires are fortresses that AI cannot yet conquer. Cultivate this expertise: it\'s your lasting competitive advantage.';
+    }
+  };
+  
+  const globalAnalysis = getGlobalAnalysis();
 
   const getStatusLabel = (score: number): string => {
     if (score >= 70) return t('status.resilient');
@@ -141,10 +176,36 @@ export function Step6Verdict() {
               </p>
             </div>
             
-            {/* Vulnérabilité vs Force Signature */}
-            <div className="flex gap-6">
-              <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">{t('tasks')}</p>
+            {/* Exposition vs Protection vs Force Signature */}
+            <div className="grid grid-cols-3 gap-4">
+              {/* Exposition à l'IA (inverse de résilience) */}
+              <div className="text-center p-3 rounded-lg bg-slate-800/50">
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">
+                  {l === 'fr' ? 'Exposition IA' : 'AI Exposure'}
+                </p>
+                <p className={cn(
+                  'text-2xl font-bold',
+                  getResilienceColor(resilienceScore) === 'rose' && 'text-rose-400',
+                  getResilienceColor(resilienceScore) === 'amber' && 'text-amber-400',
+                  getResilienceColor(resilienceScore) === 'emerald' && 'text-emerald-400'
+                )}>
+                  {taskVulnerability}%
+                </p>
+                <p className="text-[10px] text-slate-600">
+                  {taskVulnerability >= 60 
+                    ? (l === 'fr' ? '⚠️ Critique' : '⚠️ Critical')
+                    : taskVulnerability >= 40 
+                      ? (l === 'fr' ? '⚡ Modéré' : '⚡ Moderate')
+                      : (l === 'fr' ? '✓ Faible' : '✓ Low')
+                  }
+                </p>
+              </div>
+              
+              {/* Protection (résilience) */}
+              <div className="text-center p-3 rounded-lg bg-slate-800/50">
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">
+                  {l === 'fr' ? 'Protection' : 'Protection'}
+                </p>
                 <p className={cn(
                   'text-2xl font-bold',
                   getResilienceColor(resilienceScore) === 'emerald' && 'text-emerald-400',
@@ -153,22 +214,72 @@ export function Step6Verdict() {
                 )}>
                   {resilienceScore}%
                 </p>
+                <p className="text-[10px] text-slate-600">
+                  {resilienceScore >= 70 
+                    ? (l === 'fr' ? '🛡️ Solide' : '🛡️ Solid')
+                    : resilienceScore >= 40 
+                      ? (l === 'fr' ? '⚡ À renforcer' : '⚡ Needs work')
+                      : (l === 'fr' ? '⚠️ Fragile' : '⚠️ Fragile')
+                  }
+                </p>
               </div>
-              <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider">{t('talents')}</p>
+              
+              {/* Force Signature (talents) */}
+              <div className="text-center p-3 rounded-lg bg-slate-800/50">
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">
+                  {l === 'fr' ? 'Signature' : 'Signature'}
+                </p>
                 <p className={cn(
                   'text-2xl font-bold',
                   getResilienceColor(talentScore) === 'emerald' && 'text-emerald-400',
                   getResilienceColor(talentScore) === 'amber' && 'text-amber-400',
                   getResilienceColor(talentScore) === 'rose' && 'text-rose-400'
                 )}>
-                  {talentScore}%
+                  {signatureStrength}%
+                </p>
+                <p className="text-[10px] text-slate-600">
+                  {talentScore >= 70 
+                    ? (l === 'fr' ? '✨ Distinctif' : '✨ Distinctive')
+                    : talentScore >= 40 
+                      ? (l === 'fr' ? '⚡ À développer' : '⚡ To develop')
+                      : (l === 'fr' ? '⚠️ Générique' : '⚠️ Generic')
+                  }
                 </p>
               </div>
+            </div>
+            
+            {/* Explication de l'articulation des scores */}
+            <div className="mt-4 p-3 rounded-lg bg-slate-800/30 border border-slate-700/50">
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {l === 'fr' 
+                  ? `📊 Lecture : ${taskVulnerability}% de vos tâches sont automatisables par l'IA. Votre protection actuelle est de ${resilienceScore}% (tâches à forte valeur humaine). Votre signature distinctive (talents uniques) est évaluée à ${signatureStrength}%. Le score global de ${overallScore}% combine protection (60%) et signature (40%).`
+                  : `📊 Reading: ${taskVulnerability}% of your tasks are automatable by AI. Your current protection is ${resilienceScore}% (high human value tasks). Your distinctive signature (unique talents) is rated at ${signatureStrength}%. The overall score of ${overallScore}% combines protection (60%) and signature (40%).`
+                }
+              </p>
             </div>
           </div>
         </div>
       </motion.div>
+
+      {/* Message Global d'Analyse (si score < 40%) */}
+      {globalAnalysis && (
+        <motion.div
+          className="apex-card p-6 bg-gradient-to-r from-rose-500/10 to-amber-500/10 border-rose-500/30"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-rose-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-medium text-rose-400 mb-2">{globalAnalysis.title}</h3>
+              <p className="text-slate-300 leading-relaxed">{globalAnalysis.description}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Two Column Layout - Vulnerable vs Resilient */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -179,10 +290,17 @@ export function Step6Verdict() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-5 h-5 text-rose-400" />
             <h3 className="text-lg font-medium text-slate-200">{t('vulnerableZones')}</h3>
           </div>
+          
+          {/* Commentaire stratégique Zone Vulnérable */}
+          <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+            {l === 'fr' 
+              ? 'Ces activités sont devenues des commodités numériques. Votre valeur ajoutée réside désormais dans la supervision stratégique.'
+              : 'These activities have become digital commodities. Your added value now lies in strategic oversight.'}
+          </p>
           
           <div className="space-y-3">
             {vulnerableTasks.map((task, index) => {
@@ -194,19 +312,23 @@ export function Step6Verdict() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"
+                  className="p-3 bg-slate-800/50 rounded-lg space-y-2"
                 >
-                  <div>
+                  <div className="flex items-center justify-between">
                     <p className="font-medium text-slate-200">{task.name}</p>
+                    <span className={cn(
+                      'text-lg font-bold tabular-nums',
+                      color === 'rose' && 'text-rose-400',
+                      color === 'amber' && 'text-amber-400',
+                      color === 'emerald' && 'text-emerald-400'
+                    )}>
+                      {score}%
+                    </span>
                   </div>
-                  <span className={cn(
-                    'text-lg font-bold tabular-nums',
-                    color === 'rose' && 'text-rose-400',
-                    color === 'amber' && 'text-amber-400',
-                    color === 'emerald' && 'text-emerald-400'
-                  )}>
-                    {score}%
-                  </span>
+                  {/* Analyse détaillée au hover ou visible */}
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {getTaskAnalysis(task)}
+                  </p>
                 </motion.div>
               );
             })}
@@ -220,10 +342,17 @@ export function Step6Verdict() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-2">
             <Shield className="w-5 h-5 text-emerald-400" />
             <h3 className="text-lg font-medium text-slate-200">{t('resilientZones')}</h3>
           </div>
+          
+          {/* Commentaire stratégique Zone Résiliente */}
+          <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+            {l === 'fr' 
+              ? 'Ces activités sont vos sanctuaires. L\'empathie et le jugement contextuel qu\'elles requièrent sont vos avantages compétitifs durables.'
+              : 'These activities are your sanctuaries. The empathy and contextual judgment they require are your lasting competitive advantages.'}
+          </p>
           
           <div className="space-y-3">
             {resilientTasks.map((task, index) => {
@@ -235,19 +364,23 @@ export function Step6Verdict() {
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg"
+                  className="p-3 bg-slate-800/50 rounded-lg space-y-2"
                 >
-                  <div>
+                  <div className="flex items-center justify-between">
                     <p className="font-medium text-slate-200">{task.name}</p>
+                    <span className={cn(
+                      'text-lg font-bold tabular-nums',
+                      color === 'emerald' && 'text-emerald-400',
+                      color === 'amber' && 'text-amber-400',
+                      color === 'rose' && 'text-rose-400'
+                    )}>
+                      {score}%
+                    </span>
                   </div>
-                  <span className={cn(
-                    'text-lg font-bold tabular-nums',
-                    color === 'emerald' && 'text-emerald-400',
-                    color === 'amber' && 'text-amber-400',
-                    color === 'rose' && 'text-rose-400'
-                  )}>
-                    {score}%
-                  </span>
+                  {/* Analyse détaillée */}
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {getTaskAnalysis(task)}
+                  </p>
                 </motion.div>
               );
             })}
@@ -488,22 +621,9 @@ export function Step6Verdict() {
               {t('restartAudit')}
             </motion.button>
             
-            {/* Bouton Hub - Centre de Commandement */}
+            {/* Bouton Principal : Retour au Hub pour voir la progression */}
             <motion.button
               onClick={() => router.push('/hub')}
-              className="apex-button-outline flex items-center justify-center gap-2 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              {l === 'fr' ? 'Centre de Commandement' : 'Command Center'}
-            </motion.button>
-            
-            <motion.button
-              onClick={() => {
-                setStep(7);
-                router.push('/strategy');
-              }}
               className={cn(
                 "apex-button flex items-center justify-center gap-2 text-white font-medium",
                 context.goal === 'augmentation'
@@ -513,10 +633,17 @@ export function Step6Verdict() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Rocket className="w-4 h-4" />
-              {l === 'fr' ? 'Lancer la Phase 2' : 'Launch Phase 2'}
+              <LayoutGrid className="w-4 h-4" />
+              {l === 'fr' ? 'Voir ma Progression' : 'View my Progress'}
             </motion.button>
           </div>
+          
+          {/* Message explicatif */}
+          <p className="text-xs text-slate-500 mt-4">
+            {l === 'fr' 
+              ? '✓ Diagnostic complété — Accédez au Hub pour débloquer la prochaine étape'
+              : '✓ Diagnostic completed — Access the Hub to unlock the next step'}
+          </p>
         </div>
       </motion.div>
     </motion.div>

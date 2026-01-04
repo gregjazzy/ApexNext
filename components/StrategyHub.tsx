@@ -76,8 +76,8 @@ const HUB_NODES: HubNode[] = [
   {
     id: 'strategy',
     step: 3,
-    title: { fr: 'Arbitrage Stratégique', en: 'Strategic Arbitrage' },
-    subtitle: { fr: 'Matrice ERAC & Ikigai', en: 'ERAC Matrix & Ikigai' },
+    title: { fr: 'Matrice Ikigai', en: 'Ikigai Matrix' },
+    subtitle: { fr: 'Stratégie ERAC & Positionnement', en: 'ERAC Strategy & Positioning' },
     description: { fr: 'Éliminer, Réduire, Augmenter, Créer — Trouvez votre position unique', en: 'Eliminate, Reduce, Augment, Create — Find your unique position' },
     icon: Target,
     route: '/strategy',
@@ -114,19 +114,19 @@ const COHORT_NODE: HubNode = {
   gradientTo: 'to-purple-500',
 };
 
-// Node GPEC : Référentiel Cible (LA DEMANDE) - Step 1 pour Leader
+// Node Job Designer : Référentiel Cible (LA DEMANDE) - Step 1 pour Leader
 // Doit être configuré EN PREMIER avant la collecte des portraits
-const GPEC_NODE: HubNode = {
-  id: 'gpec',
+const JOB_DESIGNER_NODE: HubNode = {
+  id: 'job-designer',
   step: 1,
-  title: { fr: 'Référentiel Cible', en: 'Target Framework' },
-  subtitle: { fr: 'La Demande — Postes de Demain', en: 'The Demand — Jobs of Tomorrow' },
-  description: { fr: 'Définissez les postes cibles avec leurs 3 compétences clés (Haptique, Relationnel, Technique)', en: 'Define target positions with their 3 key competencies (Haptic, Relational, Technical)' },
+  title: { fr: 'Job Designer', en: 'Job Designer' },
+  subtitle: { fr: 'Architecture des Postes de Demain', en: 'Tomorrow\'s Position Architecture' },
+  description: { fr: 'Concevez les postes résilients : ce qui sera automatisé vs ce qui reste humain', en: 'Design resilient jobs: what will be automated vs what stays human' },
   icon: Target,
   route: '/gpec',
-  color: 'teal',
-  gradientFrom: 'from-teal-500',
-  gradientTo: 'to-cyan-500',
+  color: 'violet',
+  gradientFrom: 'from-violet-500',
+  gradientTo: 'to-purple-500',
 };
 
 // ===============================================
@@ -176,58 +176,46 @@ export function StrategyHub() {
     const isPivot = context.goal === 'pivot';
     const isReclassement = context.goal === 'reclassement';
     const isLeader = context.persona === 'leader';
-    const isGPECMode = isLeader && (isPivot || isReclassement);
     
-    // Vérifications spécifiques GPEC
-    const hasGPECConfigured = enterpriseTargets.isConfigured;
+    // Vérifications spécifiques
+    const hasJobDesignerConfigured = enterpriseTargets.isConfigured;
     const hasCohortMembers = cohortData.members.length > 0;
-    const hasCompletedMembers = cohortData.stats.completedCount > 0;
-    const allMembersCompleted = hasCohortMembers && 
-      cohortData.stats.completedCount === cohortData.members.length;
+    const receivedCount = cohortData.members.filter(m => m.status === 'completed').length;
+    const allReceived = hasCohortMembers && receivedCount === cohortData.members.length;
 
     switch (nodeId) {
       // ===============================================
-      // FLUX GPEC : GPEC → Portrait/Cohorte → Strategy → Roadmap
+      // FLUX LEADER
       // ===============================================
       
-      case 'gpec':
-        // Step 1 en mode GPEC : toujours accessible
-        if (hasGPECConfigured) return 'completed';
+      case 'job-designer':
+        // Job Designer : conception des postes
+        if (hasJobDesignerConfigured) return 'completed';
         if (enterpriseTargets.futureJobs.length > 0) return 'current';
         return 'todo';
       
       case 'cohort':
-        // Step 2 en mode PSE : requiert GPEC configuré
-        if (isGPECMode && !hasGPECConfigured) return 'locked';
-        if (allMembersCompleted) return 'completed';
-        if (hasCompletedMembers) return 'current';
+        // Cohorte : suivi des collaborateurs
+        if (allReceived && hasCohortMembers) return 'completed';
+        if (receivedCount > 0) return 'current';
         if (hasCohortMembers) return 'todo';
         return 'todo';
       
-      case 'portrait':
-        // GPEC Mode : requiert GPEC configuré
-        if (isGPECMode && !hasGPECConfigured) return 'locked';
-        // Standard Mode : requiert Diagnostic
-        if (!isGPECMode && !hasDiagnostic) return 'locked';
-        if (!isPivot && !isGPECMode) return 'optional';
-        return hasPortrait ? 'completed' : 'required';
+      // ===============================================
+      // FLUX EMPLOYÉ/FREELANCE
+      // ===============================================
       
-      // ===============================================
-      // FLUX STANDARD : Diagnostic → Portrait → Strategy → Roadmap
-      // ===============================================
+      case 'portrait':
+        // Portrait de Mutation
+        if (!hasDiagnostic) return 'locked';
+        if (!isPivot) return 'optional';
+        return hasPortrait ? 'completed' : 'required';
       
       case 'diagnostic':
         return hasDiagnostic ? 'completed' : 'todo';
       
       case 'strategy':
-        // GPEC Mode : requiert GPEC + Portrait/Cohorte
-        if (isGPECMode) {
-          if (!hasGPECConfigured) return 'locked';
-          if (isReclassement && !hasCohortMembers) return 'locked';
-          if (isPivot && !hasPortrait) return 'locked';
-          return hasStrategy ? 'completed' : 'todo';
-        }
-        // Standard Mode : requiert Diagnostic (+ Portrait si Pivot)
+        // Flux Employé/Freelance : requiert Diagnostic (+ Portrait si Pivot)
         if (!hasDiagnostic) return 'locked';
         if (isPivot && !hasPortrait) return 'locked';
         return hasStrategy ? 'completed' : 'todo';
@@ -294,42 +282,60 @@ export function StrategyHub() {
   const isReclassement = context.goal === 'reclassement';
   const isLeader = context.persona === 'leader';
   
-  // Mode GPEC = Leader + (Pivot ou Reclassement)
-  const isGPECMode = isLeader && (isPivot || isReclassement);
-  
   // ===============================================
   // CONSTRUCTION DES NODES VISIBLES
   // ===============================================
   // 
-  // FLUX STANDARD (Salarié/Freelance) :
-  //   1. Diagnostic → 2. Portrait → 3. Arbitrage → 4. Roadmap
+  // FLUX EMPLOYÉ/FREELANCE :
+  //   - Augmentation : Diagnostic → Arbitrage → Roadmap
+  //   - Pivot : Diagnostic → Portrait → Arbitrage → Roadmap
   //
-  // FLUX GPEC (Leader + Pivot/Reclassement) :
-  //   1. Référentiel Cible (DEMANDE) → 2. Portrait/Cohorte (OFFRE) → 3. Arbitrage (MATCHING) → 4. Roadmap
+  // FLUX LEADER (3 options) :
+  //   - Audit Efficience : Cohorte (Augmentation) → Roadmap
+  //   - PSE : Cohorte (Pivot) → Roadmap
+  //   - Job Designer : Job Designer → Roadmap
   //
   // ===============================================
   
   let visibleNodes: HubNode[] = [];
   
-  if (isGPECMode) {
-    // FLUX GPEC : Référentiel → Portrait/Cohorte → Arbitrage → Roadmap
-    visibleNodes = [
-      { ...GPEC_NODE, step: 1 },  // Step 1 : LA DEMANDE
-      isReclassement 
-        ? { ...COHORT_NODE, step: 2 }  // Step 2 : L'OFFRE (Dashboard Cohorte pour PSE)
-        : { ...HUB_NODES.find(n => n.id === 'portrait')!, step: 2 },  // Step 2 : L'OFFRE (Portrait pour GPEC)
-      { ...HUB_NODES.find(n => n.id === 'strategy')!, step: 3 },  // Step 3 : MATCHING
-      { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 4 },   // Step 4 : Plan de Reskilling
-    ];
+  if (isLeader) {
+    // FLUX LEADER : Dépend du goal
+    if (isReclassement) {
+      // Job Designer : Conception des postes de demain
+      visibleNodes = [
+        { ...JOB_DESIGNER_NODE, step: 1 },  // Step 1 : Conception des postes
+        { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 2 },   // Step 2 : Roadmap
+      ];
+    } else {
+      // Cohorte (Augmentation ou PSE/Pivot)
+      const cohortNode = {
+        ...COHORT_NODE,
+        step: 1,
+        title: isPivot 
+          ? { fr: 'Cohorte PSE', en: 'Restructuring Cohort' }
+          : { fr: 'Cohorte Efficience', en: 'Efficiency Cohort' },
+        subtitle: isPivot
+          ? { fr: 'Suivi des diagnostics Pivot', en: 'Pivot Diagnostic Tracking' }
+          : { fr: 'Suivi des diagnostics Augmentation', en: 'Augmentation Diagnostic Tracking' },
+        description: isPivot
+          ? { fr: 'Suivez la progression de vos collaborateurs dans leur diagnostic Pivot pour préparer les dossiers PSE.', en: 'Track your employees\' progress in their Pivot diagnostic to prepare restructuring documentation.' }
+          : { fr: 'Suivez la progression de vos collaborateurs dans leur diagnostic d\'efficience.', en: 'Track your employees\' progress in their efficiency diagnostic.' },
+      };
+      visibleNodes = [
+        cohortNode,  // Step 1 : Suivi de cohorte
+        { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 2 },   // Step 2 : Roadmap
+      ];
+    }
   } else if (isAugmentation) {
-    // FLUX AUGMENTATION : Diagnostic → Arbitrage → Roadmap (pas de Portrait)
+    // FLUX AUGMENTATION (Employé/Freelance) : Diagnostic → Arbitrage → Roadmap (pas de Portrait)
     visibleNodes = [
       { ...HUB_NODES.find(n => n.id === 'diagnostic')!, step: 1 },
       { ...HUB_NODES.find(n => n.id === 'strategy')!, step: 2 },
       { ...HUB_NODES.find(n => n.id === 'roadmap')!, step: 3 },
     ];
   } else {
-    // FLUX STANDARD (Pivot individuel) : Diagnostic → Portrait → Arbitrage → Roadmap
+    // FLUX PIVOT (Employé/Freelance) : Diagnostic → Portrait → Arbitrage → Roadmap
     visibleNodes = [
       { ...HUB_NODES.find(n => n.id === 'diagnostic')!, step: 1 },
       { ...HUB_NODES.find(n => n.id === 'portrait')!, step: 2 },
@@ -412,19 +418,23 @@ export function StrategyHub() {
                 <div className={`
                   flex items-center gap-2 px-3 py-1.5 rounded-full border
                   ${isAugmentation 
-                    ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400' 
+                    ? 'bg-blue-500/20 border-blue-500/30 text-blue-400' 
                     : isReclassement
                       ? 'bg-violet-500/20 border-violet-500/30 text-violet-400'
-                      : 'bg-indigo-500/20 border-indigo-500/30 text-indigo-400'
+                      : 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
                   }
                 `}>
                   {isAugmentation ? <Zap className="w-4 h-4" /> : isReclassement ? <Shield className="w-4 h-4" /> : <Compass className="w-4 h-4" />}
                   <span className="text-sm font-medium">
-                    {isAugmentation 
-                      ? (l === 'fr' ? 'Augmentation' : 'Augmentation')
-                      : isReclassement
-                        ? (l === 'fr' ? 'Reclassement' : 'Outplacement')
-                        : (l === 'fr' ? 'Pivot' : 'Pivot')
+                    {isLeader 
+                      ? (isAugmentation 
+                          ? (l === 'fr' ? 'Cohorte Efficience' : 'Efficiency Cohort')
+                          : isReclassement
+                            ? (l === 'fr' ? 'Job Designer' : 'Job Designer')
+                            : (l === 'fr' ? 'Cohorte PSE' : 'PSE Cohort'))
+                      : (isAugmentation 
+                          ? (l === 'fr' ? 'Augmentation' : 'Augmentation')
+                          : (l === 'fr' ? 'Pivot' : 'Pivot'))
                     }
                   </span>
                 </div>

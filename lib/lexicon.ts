@@ -49,7 +49,7 @@ export const matrixLexicon = {
       title: {
         salarie: { fr: "Pivot Stratégique Haute-Valeur", en: "High-Value Strategic Pivot" },
         freelance: { fr: "Mutation du Modèle d'Affaires", en: "Business Model Transformation" },
-        leader: { fr: "Ingénierie de la Transition (GPEC)", en: "Transition Engineering (GPEC)" }
+        leader: { fr: "PSE & Reclassement — Cohorte Pivot", en: "Restructuring & Outplacement — Pivot Cohort" }
       },
       description: {
         salarie: {
@@ -61,8 +61,8 @@ export const matrixLexicon = {
           en: "Realign your structure with the critical needs of a transformed market."
         },
         leader: {
-          fr: "Piloter le redéploiement stratégique des effectifs et la mutation des compétences.",
-          en: "Drive the strategic redeployment of workforce and skills transformation."
+          fr: "Pilotez la transition de vos collaborateurs. Préparez les dossiers avec leur diagnostic Pivot.",
+          en: "Manage your employees' transition. Prepare documentation with their Pivot diagnostic."
         }
       }
     }
@@ -76,7 +76,7 @@ export const matrixLexicon = {
 // Step 2 - Context Mapping Lexicon
 export const contextLexicon = {
   title: {
-    salarie: { fr: "Analyse du Poste", en: "Position Analysis" },
+    salarie: { fr: "Analyse du Poste Actuel", en: "Current Position Analysis" },
     freelance: { fr: "Audit d'Activité", en: "Activity Audit" },
     leader: { fr: "Mapping de Structure", en: "Structure Mapping" }
   },

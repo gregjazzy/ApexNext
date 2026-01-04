@@ -21,7 +21,7 @@ interface BackToHubProps {
   /**
    * Variante du bouton
    */
-  variant?: 'default' | 'compact' | 'footer';
+  variant?: 'default' | 'compact' | 'footer' | 'secondary';
   
   /**
    * Classe CSS additionnelle
@@ -91,6 +91,30 @@ export function BackToHub({
         <LayoutGrid className="w-4 h-4" />
         <span className="text-sm font-medium">
           {showSave ? labels.saveAndBack[l] : labels.back[l]}
+        </span>
+      </motion.button>
+    );
+  }
+
+  // Variante secondary (style plus discret)
+  if (variant === 'secondary') {
+    return (
+      <motion.button
+        onClick={handleClick}
+        className={`
+          flex items-center gap-2 px-4 py-2.5 rounded-xl
+          border border-slate-700/50 
+          text-slate-400 hover:text-slate-200 hover:border-slate-600
+          hover:bg-slate-800/50 transition-all duration-300
+          ${className}
+        `}
+        whileHover={{ x: -3 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <ChevronLeft className="w-4 h-4" />
+        <LayoutGrid className="w-4 h-4" />
+        <span className="text-sm font-medium">
+          {labels.back[l]}
         </span>
       </motion.button>
     );

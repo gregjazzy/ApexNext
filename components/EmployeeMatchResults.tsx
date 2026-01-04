@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useAuditStore, EmployeeMatch, CompetenceCategory } from '@/lib/store';
 
 // ===============================================
-// RÉSULTATS DE MATCHING GPEC
+// RÉSULTATS DE MATCHING JOB DESIGNER
 // Affiche le score de compatibilité et les gaps
 // ===============================================
 
@@ -91,8 +91,8 @@ export function EmployeeMatchResults() {
         </h3>
         <p className="text-sm text-slate-500 max-w-md mx-auto">
           {l === 'fr'
-            ? "Configurez d'abord les Métiers de Demain dans le module GPEC pour calculer les correspondances."
-            : "First configure the Jobs of Tomorrow in the GPEC module to calculate matches."
+            ? "Configurez d'abord les Postes de Demain dans le Job Designer pour calculer les correspondances."
+            : "First configure Tomorrow's Jobs in the Job Designer to calculate matches."
           }
         </p>
       </div>

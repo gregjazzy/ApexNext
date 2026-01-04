@@ -26,9 +26,9 @@ import {
   User, Users, Shield, ChevronRight,
   Briefcase, Gauge, Crosshair, Hammer, 
   FileOutput, AlertTriangle, Rocket, Settings,
-  FileText, BarChart3, Map, Lock, Unlock, 
+  FileText, BarChart3, Map, Lock, Unlock, LayoutGrid,
   ArrowRightLeft, CheckSquare, XSquare, AlertCircle, DollarSign, Brain,
-  ShieldCheck, Wrench, Database
+  ShieldCheck, Wrench, Database, Mail, Sparkles
 } from 'lucide-react';
 
 // ===============================================
@@ -196,7 +196,13 @@ export function Step8Roadmap() {
     reset,
     computeKPIs,
     enterpriseTargets,
+    phantomCharge,
+    getPhantomChargeGain,
   } = useAuditStore();
+  
+  // Calcul du gisement de temps (Phantom Charge)
+  const phantomGain = getPhantomChargeGain();
+  const showPhantomChargeSection = phantomGain.isSignificant && phantomCharge.isEnabled;
   
   // Recalculer les KPIs à chaque rendu
   useEffect(() => {
@@ -208,7 +214,7 @@ export function Step8Roadmap() {
   const isReclassement = context.goal === 'reclassement';
   const colors = isAugmentation ? SCENARIO_CONFIG.augmentation : SCENARIO_CONFIG.pivot;
   
-  // Données GPEC - Employee Matches avec gaps de compétences
+  // Données Job Designer - Employee Matches avec gaps de compétences
   const employeeMatches = enterpriseTargets.employeeMatches || [];
   const matchesWithGaps = employeeMatches.filter(m => m.competenceGaps.length > 0);
 
@@ -652,6 +658,145 @@ export function Step8Roadmap() {
       )}
 
       {/* =============================================== */}
+      {/* MODULE TRIAGE INTELLIGENT - PHANTOM CHARGE */}
+      {/* Affiché si gain > 2h/semaine (10h/mois) */}
+      {/* =============================================== */}
+      {showPhantomChargeSection && (
+        <motion.div
+          className="apex-card p-6 border-2 border-blue-500/30 bg-gradient-to-br from-blue-900/10 to-indigo-900/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.38 }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 flex items-center justify-center border border-blue-400/30">
+                <Mail className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="font-serif text-xl text-slate-200">
+                  {l === 'fr' ? 'Triage Intelligent & Morning Brief IA' : 'Smart Triage & AI Morning Brief'}
+                </h2>
+                <p className="text-sm text-blue-300/70">
+                  {l === 'fr' 
+                    ? 'Automatisation de vos flux administratifs'
+                    : 'Automation of your administrative flows'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30">
+              <Sparkles className="w-5 h-5 text-emerald-400" />
+              <div className="text-right">
+                <p className="text-lg font-bold text-emerald-400">
+                  +{phantomGain.monthlyHours.toFixed(0)}h
+                </p>
+                <p className="text-xs text-slate-400">
+                  /{l === 'fr' ? 'mois libérées' : 'month freed'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Message de validation stratégique */}
+          {phantomGain.monthlyHours >= 10 && (
+            <div className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-sm text-emerald-300 text-center font-medium">
+                {l === 'fr' 
+                  ? '✓ Votre transition est entièrement financée par le temps gagné sur vos flux administratifs.'
+                  : '✓ Your transition is entirely funded by time saved on your administrative flows.'}
+              </p>
+            </div>
+          )}
+
+          {/* Micro-Steps du Triage Intelligent */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              {l === 'fr' ? 'Plan de mise en place' : 'Implementation Plan'}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Step 1 : Filtres automatiques */}
+              <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-blue-500/30 transition-colors">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm">1</div>
+                  <span className="font-medium text-blue-400">
+                    {l === 'fr' ? 'Filtres Automatiques' : 'Automatic Filters'}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400 mb-3">
+                  {l === 'fr' 
+                    ? 'Configuration des règles de tri et d\'archivage automatique'
+                    : 'Configure sorting and automatic archiving rules'}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Clock className="w-3 h-3" />
+                  <span>{l === 'fr' ? '2-4 heures' : '2-4 hours'}</span>
+                </div>
+              </div>
+              
+              {/* Step 2 : Templates IA */}
+              <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-sm">2</div>
+                  <span className="font-medium text-amber-400">
+                    {l === 'fr' ? 'Templates de Réponse IA' : 'AI Response Templates'}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400 mb-3">
+                  {l === 'fr' 
+                    ? 'Création de modèles pour les réponses récurrentes (ChatGPT, Claude)'
+                    : 'Create templates for recurring responses (ChatGPT, Claude)'}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Clock className="w-3 h-3" />
+                  <span>{l === 'fr' ? '3-5 heures' : '3-5 hours'}</span>
+                </div>
+              </div>
+              
+              {/* Step 3 : Résumé quotidien */}
+              <div className="p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 hover:border-emerald-500/30 transition-colors">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">3</div>
+                  <span className="font-medium text-emerald-400">
+                    {l === 'fr' ? 'Morning Brief IA' : 'AI Morning Brief'}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-400 mb-3">
+                  {l === 'fr' 
+                    ? 'Installation d\'un outil de résumé quotidien (Superhuman, SaneBox)'
+                    : 'Install a daily summary tool (Superhuman, SaneBox)'}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <Clock className="w-3 h-3" />
+                  <span>{l === 'fr' ? '1-2 heures' : '1-2 hours'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ROI Summary */}
+          <div className="mt-6 pt-4 border-t border-slate-700/50">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2 text-slate-400">
+                <TrendingUp className="w-4 h-4" />
+                <span>{l === 'fr' ? 'ROI estimé' : 'Estimated ROI'}</span>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="text-slate-500">
+                  {l === 'fr' ? 'Investissement :' : 'Investment:'} 6-11h
+                </span>
+                <ArrowRight className="w-4 h-4 text-slate-600" />
+                <span className="text-emerald-400 font-bold">
+                  +{(phantomGain.monthlyHours * 12).toFixed(0)}h/{l === 'fr' ? 'an' : 'year'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* =============================================== */}
       {/* LE PONT DE COMPÉTENCES - PIVOT ONLY */}
       {/* Tableau comparatif enrichi */}
       {/* =============================================== */}
@@ -854,7 +999,7 @@ export function Step8Roadmap() {
       )}
 
       {/* =============================================== */}
-      {/* GAP DE COMPÉTENCES GPEC - RECLASSEMENT ONLY */}
+      {/* GAP DE COMPÉTENCES - RECLASSEMENT ONLY */}
       {/* Exigences entreprise vs Profils collaborateurs */}
       {/* =============================================== */}
       {isReclassement && matchesWithGaps.length > 0 && (
@@ -871,7 +1016,7 @@ export function Step8Roadmap() {
               </div>
               <div>
                 <h2 className="font-serif text-xl text-slate-200">
-                  {l === 'fr' ? 'Gap de Compétences — Exigences GPEC' : 'Competency Gap — GPEC Requirements'}
+                  {l === 'fr' ? 'Gap de Compétences — Exigences Stratégiques' : 'Competency Gap — Strategic Requirements'}
                 </h2>
                 <p className="text-sm text-rose-300/70">
                   {l === 'fr' 
@@ -1306,6 +1451,17 @@ export function Step8Roadmap() {
             {l === 'fr' ? 'Export JSON' : 'Export JSON'}
           </motion.button>
 
+          {/* Bouton Hub - Retour au Centre de Commandement */}
+          <motion.button
+            onClick={() => router.push('/hub')}
+            className="apex-button flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            {l === 'fr' ? 'Retour au Hub' : 'Back to Hub'}
+          </motion.button>
+          
           <motion.button
             onClick={() => {
               reset();

@@ -129,6 +129,37 @@ export interface ComputedKPIs {
 }
 
 // ===============================================
+// SCANNER DE CHARGE FANTÔME (Emails & Flux)
+// ===============================================
+// Module de quantification de la charge administrative invisible
+
+export interface PhantomChargeData {
+  // Inputs utilisateur simplifiés
+  dailyVolume: number;        // Nombre d'emails traités par jour (reçus + envoyés)
+  dailyHours: number;         // Heures passées sur les mails par jour
+  dailyMinutes: number;       // Minutes passées sur les mails par jour
+  
+  // Anciens champs (conservés pour compatibilité)
+  readingTimeAvg: number;     // Temps moyen de lecture par email (SECONDES) - DEPRECATED
+  responseTimeAvg: number;    // Temps moyen de rédaction par email (SECONDES) - DEPRECATED
+  
+  // Sliders qualitatifs (somme = 100%)
+  fluxAuto: number;           // % Flux Automatiques (95% réduction IA possible)
+  fluxBasNiveau: number;      // % Flux Bas Niveau (70% réduction IA possible)
+  fluxStrategique: number;    // % Flux Stratégiques (30% réduction IA possible)
+  
+  // État
+  isEnabled: boolean;         // Pour le toggle en mode Leader pivot/reclassement
+}
+
+// Coefficients de réduction IA (export pour utilisation externe)
+export const AI_REDUCTION_COEFFICIENTS = {
+  auto: 0.95,
+  basNiveau: 0.70,
+  strategique: 0.30,
+};
+
+// ===============================================
 // MODE RECLASSEMENT / PSE (Leader RH uniquement)
 // ===============================================
 // Cellule de reclassement stratégique - Audit de transition collective
@@ -143,6 +174,8 @@ export interface CohortMember {
   completedPortraitAt: number | null;
   employabilityIndex: number | null;  // Indice de réemployabilité (0-100)
   status: 'pending' | 'invited' | 'in_progress' | 'completed';
+  notes?: string;  // Notes libres du RH
+  mode?: 'augmentation' | 'pivot';  // Mode de la cohorte
 }
 
 export interface CohortData {
@@ -170,9 +203,9 @@ export interface CohortData {
 }
 
 // ===============================================
-// MODE GPEC - EXIGENCES STRATÉGIQUES ENTREPRISE
+// MODE JOB DESIGNER - ARCHITECTURE DES POSTES
 // ===============================================
-// Module pour définir les "Métiers de Demain" et calculer le matching
+// Module pour concevoir les "Postes de Demain" et calculer le matching
 
 export type CompetenceCategory = 'haptique' | 'relationnelle' | 'technique';
 
@@ -416,7 +449,8 @@ interface AuditStore {
   computedKPIs: ComputedKPIs;
   userIntention: UserIntention;  // Portrait de Mutation (Pivot uniquement)
   cohortData: CohortData;        // Données de cohorte (Reclassement/PSE uniquement)
-  enterpriseTargets: EnterpriseTargets;  // Exigences stratégiques (GPEC uniquement)
+  enterpriseTargets: EnterpriseTargets;  // Exigences stratégiques (Job Designer uniquement)
+  phantomCharge: PhantomChargeData;  // Scanner de Charge Fantôme (Emails & Flux)
   
   // Actions - Navigation
   setStep: (step: number) => void;
@@ -455,7 +489,7 @@ interface AuditStore {
   inviteCohortMembers: (memberIds: string[]) => void;
   updateCohortStats: () => void;
   
-  // Actions - Enterprise Targets (GPEC uniquement)
+  // Actions - Enterprise Targets (Job Designer uniquement)
   setOrganizationName: (name: string) => void;
   setStrategicHorizon: (horizon: EnterpriseTargets['strategicHorizon']) => void;
   addFutureJob: (job: Omit<FutureJob, 'id' | 'createdAt'>) => string;
@@ -497,6 +531,12 @@ interface AuditStore {
   generateStrategy: () => void;
   toggleRoadmapAction: (id: string) => void;
   computeKPIs: () => void;
+  
+  // Actions - Phantom Charge (Scanner de Charge Fantôme)
+  setPhantomCharge: (data: Partial<PhantomChargeData>) => void;
+  updatePhantomChargeFlux: (auto: number, basNiveau: number, strategique: number) => void;
+  togglePhantomChargeEnabled: () => void;
+  getPhantomChargeGain: () => { weeklyHours: number; monthlyHours: number; isSignificant: boolean };
   
   // Reset
   reset: () => void;
@@ -734,19 +774,19 @@ function generateValueCurve(tasks: Task[], talents: Talent[], goal: Goal): Value
     },
     {
       factor: 'Décision Complexe',
-      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.decision, 0) / tasks.length) : 50,
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.decision, 0) / tasks.length) : 0,
       target: 85,
       industry: 55,
     },
     {
       factor: 'Relations Clés',
-      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.relationnel, 0) / tasks.length) : 50,
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.relationnel, 0) / tasks.length) : 0,
       target: 90,
       industry: 60,
     },
     {
       factor: 'Création de Valeur',
-      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.creativite, 0) / tasks.length) : 50,
+      current: tasks.length > 0 ? Math.round(tasks.reduce((a, t) => a + t.resilience.creativite, 0) / tasks.length) : 0,
       target: goal === 'pivot' ? 95 : 75,
       industry: 45,
     },
@@ -1839,6 +1879,18 @@ const initialEnterpriseTargets: EnterpriseTargets = {
   isConfigured: false,
 };
 
+const initialPhantomCharge: PhantomChargeData = {
+  dailyVolume: 0,           // Nombre d'emails traités par jour (utilisateur saisit)
+  dailyHours: 0,            // Heures passées sur les mails par jour
+  dailyMinutes: 0,          // Minutes passées sur les mails par jour
+  readingTimeAvg: 0,        // DEPRECATED - conservé pour compatibilité
+  responseTimeAvg: 0,       // DEPRECATED - conservé pour compatibilité
+  fluxAuto: 30,             // 30% flux automatiques
+  fluxBasNiveau: 50,        // 50% flux bas niveau
+  fluxStrategique: 20,      // 20% flux stratégiques
+  isEnabled: true,          // Activé par défaut
+};
+
 const initialIkigai: IkigaiStrategique = {
   engagementStrategique: 0,
   expertiseDistinctive: 0,
@@ -1886,6 +1938,7 @@ export const useAuditStore = create<AuditStore>()(
       userIntention: initialUserIntention,
       cohortData: initialCohortData,
       enterpriseTargets: initialEnterpriseTargets,
+      phantomCharge: initialPhantomCharge,
 
       // Navigation (8 étapes)
       setStep: (step) => set({ currentStep: step }),
@@ -2044,7 +2097,7 @@ export const useAuditStore = create<AuditStore>()(
         };
       }),
 
-      // Enterprise Targets (GPEC)
+      // Enterprise Targets (Job Designer)
       setOrganizationName: (organizationName) => set((state) => ({
         enterpriseTargets: { ...state.enterpriseTargets, organizationName, lastUpdatedAt: Date.now() }
       })),
@@ -2114,7 +2167,7 @@ export const useAuditStore = create<AuditStore>()(
         const { tasks, userIntention } = state;
         
         // ===============================================
-        // MOTEUR DE MATCHING GPEC ENRICHI
+        // MOTEUR DE MATCHING JOB DESIGNER ENRICHI
         // Compare l'Offre (Portrait du salarié) avec la Demande (Postes Cibles)
         // ===============================================
         
@@ -2125,7 +2178,7 @@ export const useAuditStore = create<AuditStore>()(
           relationnel: tasks.reduce((acc, t) => acc + t.resilience.relationnel, 0) / tasks.length,
           creativite: tasks.reduce((acc, t) => acc + t.resilience.creativite, 0) / tasks.length,
           execution: tasks.reduce((acc, t) => acc + t.resilience.execution, 0) / tasks.length,
-        } : { donnees: 50, decision: 50, relationnel: 50, creativite: 50, execution: 50 };
+        } : { donnees: 0, decision: 0, relationnel: 0, creativite: 0, execution: 0 };
         
         // Extraire les compétences innées du Carré d'As (Portrait de Mutation)
         const innateSkills = [
@@ -2328,11 +2381,11 @@ export const useAuditStore = create<AuditStore>()(
             temporalite: 'quotidien' as Temporality,
             hoursPerWeek: 4,
             resilience: {
-              donnees: 50,
-              decision: 50,
-              relationnel: 50,
-              creativite: 50,
-              execution: 50,
+              donnees: 0,  // Pas de valeur par défaut - l'utilisateur doit évaluer
+              decision: 0,
+              relationnel: 0,
+              creativite: 0,
+              execution: 0,
             },
             createdAt: Date.now(),
           }]
@@ -2366,7 +2419,7 @@ export const useAuditStore = create<AuditStore>()(
       initializeTalents: () => set({
         talents: STRATEGIC_ASSETS.map((t) => ({
           ...t,
-          level: 3,
+          level: 1,  // Pas de valeur par défaut élevée - l'utilisateur doit évaluer
           selected: false,
         }))
       }),
@@ -2507,6 +2560,58 @@ export const useAuditStore = create<AuditStore>()(
         }
       })),
 
+      // ===============================================
+      // PHANTOM CHARGE (Scanner de Charge Fantôme)
+      // ===============================================
+      
+      setPhantomCharge: (data) => set((state) => ({
+        phantomCharge: { ...state.phantomCharge, ...data }
+      })),
+      
+      updatePhantomChargeFlux: (auto, basNiveau, strategique) => set((state) => ({
+        phantomCharge: {
+          ...state.phantomCharge,
+          fluxAuto: auto,
+          fluxBasNiveau: basNiveau,
+          fluxStrategique: strategique,
+        }
+      })),
+      
+      togglePhantomChargeEnabled: () => set((state) => ({
+        phantomCharge: {
+          ...state.phantomCharge,
+          isEnabled: !state.phantomCharge.isEnabled,
+        }
+      })),
+      
+      getPhantomChargeGain: () => {
+        const { phantomCharge } = get();
+        
+        // Temps quotidien total en minutes (heures * 60 + minutes)
+        const dailyTotalMinutes = (phantomCharge.dailyHours || 0) * 60 + (phantomCharge.dailyMinutes || 0);
+        
+        // Temps hebdomadaire (× 5 jours ouvrés)
+        const weeklyTotalMinutes = dailyTotalMinutes * 5;
+        const weeklyTotalHours = weeklyTotalMinutes / 60;
+        
+        // Gisement de temps (ROI IA) basé sur les coefficients
+        const pAuto = phantomCharge.fluxAuto / 100;
+        const pBas = phantomCharge.fluxBasNiveau / 100;
+        const pStrat = phantomCharge.fluxStrategique / 100;
+        
+        const potentialGainMinutes = weeklyTotalMinutes * (
+          pAuto * AI_REDUCTION_COEFFICIENTS.auto +
+          pBas * AI_REDUCTION_COEFFICIENTS.basNiveau +
+          pStrat * AI_REDUCTION_COEFFICIENTS.strategique
+        );
+        
+        const weeklyHours = potentialGainMinutes / 60;
+        const monthlyHours = weeklyHours * 4;
+        const isSignificant = weeklyHours >= 2; // > 2h/semaine
+        
+        return { weeklyHours, weeklyTotalHours, monthlyHours, isSignificant };
+      },
+
       // Calcul des KPIs automatiques
       computeKPIs: () => {
         const state = get();
@@ -2575,7 +2680,7 @@ export const useAuditStore = create<AuditStore>()(
         tasks: [],
         talents: STRATEGIC_ASSETS.map((t) => ({
           ...t,
-          level: 3,
+          level: 1,  // Pas de valeur par défaut élevée - l'utilisateur doit évaluer
           selected: false,
         })),
         software: [],
@@ -2584,10 +2689,11 @@ export const useAuditStore = create<AuditStore>()(
         userIntention: initialUserIntention,
         cohortData: initialCohortData,
         enterpriseTargets: initialEnterpriseTargets,
+        phantomCharge: initialPhantomCharge,
       }),
     }),
     {
-      name: 'apex-audit-storage-v8', // Version bump pour Module GPEC Enterprise Targets
+      name: 'apex-audit-storage-v9', // Version bump pour Scanner de Charge Fantôme
       partialize: (state) => ({
         currentStep: state.currentStep,
         context: state.context,
@@ -2597,6 +2703,7 @@ export const useAuditStore = create<AuditStore>()(
         strategy: state.strategy,
         userIntention: state.userIntention,
         cohortData: state.cohortData,
+        phantomCharge: state.phantomCharge,
         enterpriseTargets: state.enterpriseTargets,
       }),
     }

@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import { useAuditStore } from '@/lib/store';
+import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
+import { UserMenu } from '@/components/ui/UserMenu';
+import { ResetButton } from '@/components/ui/ResetButton';
 import { 
   Sparkles, 
   Heart, 
@@ -24,6 +28,7 @@ interface PortraitMutationProps {
 }
 
 export default function PortraitMutation({ onComplete, onBack }: PortraitMutationProps) {
+  const { data: session } = useSession();
   const { 
     userIntention, 
     setPassionsConcretes, 
@@ -102,8 +107,8 @@ export default function PortraitMutation({ onComplete, onBack }: PortraitMutatio
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col">
       {/* Header avec progression */}
-      <div className="border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
@@ -111,11 +116,19 @@ export default function PortraitMutation({ onComplete, onBack }: PortraitMutatio
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-white">Portrait de votre Mutation</h1>
-                <p className="text-sm text-slate-400">Prenez le temps. Votre audit technique va maintenant rencontrer votre projet de vie.</p>
+                <p className="text-xs text-slate-500">Prenez le temps. Votre audit technique va maintenant rencontrer votre projet de vie.</p>
               </div>
             </div>
-            <div className="text-sm text-slate-400">
-              {currentSection + 1} / {sections.length}
+            
+            {/* Actions Header */}
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-slate-400">
+                {currentSection + 1} / {sections.length}
+              </div>
+              
+              <ResetButton variant="text" />
+              <LanguageSwitcher />
+              {session?.user && <UserMenu user={session.user} />}
             </div>
           </div>
           
@@ -138,10 +151,10 @@ export default function PortraitMutation({ onComplete, onBack }: PortraitMutatio
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Contenu principal */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center p-6 pt-32">
         <div className="w-full max-w-2xl">
           <AnimatePresence mode="wait">
             <motion.div

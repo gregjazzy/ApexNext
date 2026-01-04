@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rocket, ChevronLeft, Zap, Compass, ArrowLeft, LayoutGrid } from 'lucide-react';
 import { useLocale } from 'next-intl';
@@ -41,8 +41,13 @@ const STRATEGY_STEPS = [
 export function StrategyFlow() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const l = locale === 'fr' ? 'fr' : 'en';
+  
+  // Lire le paramètre ?step=8 pour accès direct à la Roadmap
+  const stepParam = searchParams.get('step');
+  const targetStep = stepParam === '8' ? 8 : 7;
   
   const { 
     currentStep, 
@@ -69,15 +74,13 @@ export function StrategyFlow() {
       return;
     }
 
-    // Pour le parcours Pivot, afficher le Portrait si pas encore complété
-    if (context.goal === 'pivot' && !userIntention.isComplete) {
+    // Pour le parcours Pivot, afficher le Portrait si pas encore complété (seulement pour Ikigai)
+    if (targetStep === 7 && context.goal === 'pivot' && !userIntention.isComplete) {
       setShowPortrait(true);
     }
 
-    // S'assurer qu'on est sur l'étape 7 ou 8
-    if (currentStep < 7) {
-      setStep(7);
-    }
+    // Définir l'étape selon le paramètre URL
+    setStep(targetStep);
 
     // Générer la stratégie si pas encore fait
     if (!strategy.generatedAt) {
@@ -85,13 +88,22 @@ export function StrategyFlow() {
     }
 
     setIsInitialized(true);
-  }, [tasks, context, getSelectedTalents, router, currentStep, setStep, strategy.generatedAt, generateStrategy, userIntention.isComplete]);
+  }, [tasks, context, getSelectedTalents, router, targetStep, setStep, strategy.generatedAt, generateStrategy, userIntention.isComplete]);
+
+  // ===============================================
+  // SCROLL TO TOP : Remonter en haut à chaque changement d'étape
+  // ===============================================
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   // Callback quand le Portrait est complété
   const handlePortraitComplete = () => {
     setShowPortrait(false);
     // Régénérer la stratégie avec les nouvelles données
     generateStrategy();
+    // Retourner au Hub pour montrer la progression
+    router.push('/hub');
   };
 
   // Callback pour retourner au diagnostic
@@ -103,10 +115,11 @@ export function StrategyFlow() {
   const config = isAugmentation ? SCENARIO_CONFIG.augmentation : SCENARIO_CONFIG.pivot;
   const ScenarioIcon = config.icon;
 
-  // Déterminer le composant actuel (7 ou 8)
-  const strategyStep = currentStep >= 7 ? currentStep : 7;
-  const CurrentStepComponent = strategyStep === 7 ? Step7Ikigai : Step8Roadmap;
-  const currentStepInfo = STRATEGY_STEPS.find(s => s.number === strategyStep);
+  // Déterminer le composant actuel basé sur l'URL (7 = Ikigai, 8 = Roadmap)
+  const CurrentStepComponent = targetStep === 7 ? Step7Ikigai : Step8Roadmap;
+  const currentStepInfo = STRATEGY_STEPS.find(s => s.number === targetStep);
+  const isIkigai = targetStep === 7;
+  const isRoadmap = targetStep === 8;
 
   if (!isInitialized) {
     return (
@@ -196,7 +209,10 @@ export function StrategyFlow() {
               {/* Step Info */}
               <div className="hidden sm:block text-right">
                 <p className="text-xs text-slate-500">
-                  {l === 'fr' ? 'Étape' : 'Step'} {strategyStep - 6} / 2
+                  {isIkigai 
+                    ? (l === 'fr' ? 'Stratégie' : 'Strategy')
+                    : (l === 'fr' ? 'Plan d\'Action' : 'Action Plan')
+                  }
                 </p>
                 <p className="text-sm text-slate-300 font-medium">
                   {currentStepInfo?.title[l]}
@@ -212,46 +228,15 @@ export function StrategyFlow() {
               )}
             </div>
           </div>
-
-          {/* Mini Stepper Phase 2 */}
-          <div className="flex items-center justify-center gap-4 mt-4">
-            {STRATEGY_STEPS.map((step, index) => {
-              const isActive = strategyStep === step.number;
-              const isCompleted = strategyStep > step.number;
-
-              return (
-                <div key={step.number} className="flex items-center gap-2">
-                  {index > 0 && (
-                    <div className={`w-12 h-0.5 ${isCompleted ? `bg-gradient-to-r ${config.gradient}` : 'bg-slate-700'}`} />
-                  )}
-                  <motion.button
-                    onClick={() => setStep(step.number)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
-                      isActive
-                        ? `bg-gradient-to-r ${config.gradient} text-white shadow-lg`
-                        : isCompleted
-                        ? `${isAugmentation ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-400'} border ${config.border}`
-                        : 'bg-slate-800/50 text-slate-500 border border-slate-700'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="font-medium">{step.number - 6}</span>
-                    <span className="hidden sm:inline text-sm">{step.title[l]}</span>
-                  </motion.button>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="pt-40 pb-16 px-4">
+      <main className="pt-28 pb-16 px-4">
         <div className="max-w-5xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
-              key={strategyStep}
+              key={targetStep}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}

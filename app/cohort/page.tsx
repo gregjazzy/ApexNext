@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield } from 'lucide-react';
+import { ArrowLeft, Shield, Users, Zap } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { CohortDashboard } from '@/components/CohortDashboard';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -22,15 +22,20 @@ export default function CohortPage() {
   const { context } = useAuditStore();
   const [isClient, setIsClient] = useState(false);
 
+  // Cohorte accessible pour Leader en mode Augmentation ou Pivot (pas reclassement = Job Designer)
+  const isLeader = context.persona === 'leader';
+  const isCohortMode = isLeader && (context.goal === 'augmentation' || context.goal === 'pivot');
+  const isPSEMode = context.goal === 'pivot';
+
   useEffect(() => {
     setIsClient(true);
-    // Vérifier que l'utilisateur est en mode reclassement
-    if (context.goal !== 'reclassement') {
+    // Vérifier que l'utilisateur est en mode cohorte (Leader + Augmentation ou Pivot)
+    if (!isCohortMode) {
       router.push('/hub');
     }
-  }, [context.goal, router]);
+  }, [isCohortMode, router]);
 
-  if (!isClient || context.goal !== 'reclassement') {
+  if (!isClient || !isCohortMode) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
@@ -43,6 +48,27 @@ export default function CohortPage() {
     );
   }
 
+  // Configuration dynamique selon le mode
+  const pageConfig = isPSEMode 
+    ? {
+        title: { fr: 'Cohorte PSE', en: 'PSE Cohort' },
+        subtitle: { fr: 'Suivi des diagnostics Pivot', en: 'Pivot Diagnostic Tracking' },
+        icon: Shield,
+        color: 'emerald',
+        footer: { fr: 'Gestion du Plan de Sauvegarde', en: 'Restructuring Plan Management' },
+        badge: { fr: 'Mode PSE actif', en: 'PSE Mode active' },
+      }
+    : {
+        title: { fr: 'Cohorte Efficience', en: 'Efficiency Cohort' },
+        subtitle: { fr: 'Suivi des diagnostics Augmentation', en: 'Augmentation Diagnostic Tracking' },
+        icon: Zap,
+        color: 'blue',
+        footer: { fr: 'Gestion de l\'efficience opérationnelle', en: 'Operational Efficiency Management' },
+        badge: { fr: 'Mode Efficience actif', en: 'Efficiency Mode active' },
+      };
+
+  const IconComponent = pageConfig.icon;
+
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Background Grid */}
@@ -50,10 +76,9 @@ export default function CohortPage() {
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-            `,
+            backgroundImage: isPSEMode
+              ? `linear-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.3) 1px, transparent 1px)`
+              : `linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)`,
             backgroundSize: '60px 60px',
           }}
         />
@@ -65,15 +90,19 @@ export default function CohortPage() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                isPSEMode 
+                  ? 'bg-gradient-to-br from-emerald-500 to-teal-500'
+                  : 'bg-gradient-to-br from-blue-500 to-indigo-500'
+              }`}>
+                <IconComponent className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-serif text-white">
-                  {l === 'fr' ? 'Cellule de Reclassement' : 'Outplacement Cell'}
+                  {pageConfig.title[l]}
                 </h1>
                 <p className="text-xs text-slate-500">
-                  {l === 'fr' ? 'Audit de transition collective' : 'Collective transition audit'}
+                  {pageConfig.subtitle[l]}
                 </p>
               </div>
             </div>
@@ -100,10 +129,10 @@ export default function CohortPage() {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-sm border-t border-slate-800/50 py-4">
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center text-xs text-slate-500">
-          <p>APEX Cohort Manager • {l === 'fr' ? 'Gestion des reclassements stratégiques' : 'Strategic Outplacement Management'}</p>
+          <p>APEX Cohort Manager • {pageConfig.footer[l]}</p>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
-            {l === 'fr' ? 'Mode Reclassement actif' : 'Outplacement Mode active'}
+            <div className={`w-2 h-2 rounded-full animate-pulse ${isPSEMode ? 'bg-emerald-500' : 'bg-blue-500'}`} />
+            {pageConfig.badge[l]}
           </div>
         </div>
       </footer>

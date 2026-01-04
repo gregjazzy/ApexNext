@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
-import { Building2 } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 import { useAuditStore } from '@/lib/store';
 import { EnterpriseTarget } from '@/components/EnterpriseTarget';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -21,19 +21,19 @@ export default function GPECPage() {
   const { context } = useAuditStore();
   const [isClient, setIsClient] = useState(false);
 
-  // GPEC accessible en mode Reclassement OU (Leader + Pivot)
-  const isGPECAllowed = context.goal === 'reclassement' || 
+  // Job Designer accessible en mode Reclassement OU (Leader + Pivot)
+  const isJobDesignerAllowed = context.goal === 'reclassement' || 
     (context.goal === 'pivot' && context.persona === 'leader');
 
   useEffect(() => {
     setIsClient(true);
-    // Vérifier que l'utilisateur a accès au mode GPEC
-    if (!isGPECAllowed) {
+    // Vérifier que l'utilisateur a accès au Job Designer
+    if (!isJobDesignerAllowed) {
       router.push('/hub');
     }
-  }, [isGPECAllowed, router]);
+  }, [isJobDesignerAllowed, router]);
 
-  if (!isClient || !isGPECAllowed) {
+  if (!isClient || !isJobDesignerAllowed) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
@@ -54,8 +54,8 @@ export default function GPECPage() {
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(16, 185, 129, 0.3) 1px, transparent 1px)
+              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
             `,
             backgroundSize: '60px 60px',
           }}
@@ -68,15 +68,15 @@ export default function GPECPage() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+                <Wand2 className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-serif text-white">
-                  {l === 'fr' ? 'Module GPEC' : 'GPEC Module'}
+                  {l === 'fr' ? 'Job Designer' : 'Job Designer'}
                 </h1>
                 <p className="text-xs text-slate-500">
-                  {l === 'fr' ? 'Exigences Stratégiques Entreprise' : 'Enterprise Strategic Requirements'}
+                  {l === 'fr' ? 'Architecture des Postes de Demain' : 'Tomorrow\'s Position Architecture'}
                 </p>
               </div>
             </div>
@@ -102,10 +102,10 @@ export default function GPECPage() {
       {/* Footer */}
       <footer className="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-sm border-t border-slate-800/50 py-4">
         <div className="max-w-6xl mx-auto px-4 flex justify-between items-center text-xs text-slate-500">
-          <p>APEX GPEC Manager • {l === 'fr' ? 'Gestion Prévisionnelle des Emplois et Compétences' : 'Workforce & Skills Planning'}</p>
+          <p>APEX Job Designer • {l === 'fr' ? 'Concevez les postes résilients de demain' : 'Design tomorrow\'s resilient positions'}</p>
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            {l === 'fr' ? 'Mode GPEC actif' : 'GPEC Mode active'}
+            <div className="w-2 h-2 rounded-full bg-violet-500 animate-pulse" />
+            {l === 'fr' ? 'Mode Job Designer actif' : 'Job Designer Mode active'}
           </div>
         </div>
       </footer>

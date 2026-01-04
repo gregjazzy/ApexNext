@@ -1,0 +1,346 @@
+================================================================================
+                         APEX NEXT — OBJECTIFS PRODUIT
+                         Document de référence v1.0
+================================================================================
+
+
+================================================================================
+                           L'ESPRIT APEX
+================================================================================
+
+APEX répond à UNE ANGOISSE RÉELLE :
+"L'IA va-t-elle me remplacer ? Qu'est-ce que je vais devenir ?"
+
+APEX ne répond PAS avec :
+  ✗ Du bullshit corporate
+  ✗ Des conseils vagues ("soyez agile", "formez-vous")
+  ✗ Des platitudes motivationnelles
+  ✗ Des frameworks théoriques
+
+APEX répond avec DU CONCRET :
+  ✓ Voici exactement ce que l'IA peut faire de ton job (chiffré)
+  ✓ Voici exactement ce qu'elle ne peut PAS faire (et pourquoi)
+  ✓ Voici ton nouveau métier (redéfini, pas optimisé)
+  ✓ Voici les actions précises pour y arriver
+  ✓ Voici les outils spécifiques à utiliser
+  ✓ Voici le planning avec les étapes concrètes
+
+================================================================================
+
+APEX n'est pas un outil d'optimisation. C'est un outil de TRANSFORMATION.
+
+La question n'est pas : "Comment garder mon job ?"
+La question est : "Comment REDÉFINIR ce que je suis professionnellement ?"
+
+OBJECTIF : Devenir simultanément :
+  → VENDABLE      : J'ai une valeur claire sur le marché
+  → SOUHAITABLE   : On me VEUT, pas juste on m'accepte
+  → NON REMPLAÇABLE : L'IA ne peut pas faire ce que je fais
+
+Cela peut aller jusqu'à REDÉFINIR LE MÉTIER lui-même.
+
+--------------------------------------------------------------------------------
+EXEMPLE : LE COMPTABLE
+--------------------------------------------------------------------------------
+
+AVANT APEX : "Je suis comptable"
+  • Saisie de factures
+  • Rapprochements bancaires  
+  • Reporting mensuel
+  • Déclarations fiscales
+  → 80% automatisable = VULNÉRABLE, REMPLAÇABLE, COMMODITÉ
+
+APRÈS APEX : "Je suis conseiller financier stratégique augmenté"
+  • L'IA fait : saisie, rapprochements, reporting
+  • MOI je fais :
+    - Conseil stratégique au dirigeant
+    - Anticipation des risques (lecture humaine)
+    - Relation de confiance avec les clients
+    - Décisions dans l'incertitude
+  → NON REMPLAÇABLE, SOUHAITABLE, VENDABLE
+
+APEX ne dit pas : "Automatise ta saisie pour gagner du temps"
+APEX dit : "Tu n'es plus comptable. Tu es le cerveau stratégique 
+           qui pilote une IA comptable. Voici comment y arriver."
+
+--------------------------------------------------------------------------------
+
+
+================================================================================
+NIVEAU 1 : AUGMENTATION (Redéfinir son métier)
+================================================================================
+
+QUESTION CENTRALE DE L'UTILISATEUR :
+"L'IA va-t-elle remplacer mon boulot ? Comment devenir irremplaçable ?"
+
+RÉPONSE APEX :
+"Ton métier tel qu'il existe va disparaître. Voici comment le REDÉFINIR
+pour devenir VENDABLE, SOUHAITABLE et NON REMPLAÇABLE."
+
+--------------------------------------------------------------------------------
+ÉTAPE 1 : ANALYSE FINE
+--------------------------------------------------------------------------------
+Ce que APEX doit faire :
+  • Analyser finement ce que fait la personne (tâches réelles, pas génériques)
+  • Mesurer le temps passé sur chaque tâche
+  • Évaluer le niveau de complexité, créativité, relationnel de chaque tâche
+  • Comprendre le contexte : secteur, taille entreprise, niveau hiérarchique
+
+--------------------------------------------------------------------------------
+ÉTAPE 2 : COMPARAISON AUX STANDARDS
+--------------------------------------------------------------------------------
+Ce que APEX doit faire :
+  • Comparer par rapport au SECTEUR (Finance ≠ Luxe ≠ Industrie ≠ Tech)
+  • Comparer par rapport au TYPE DE MÉTIER (même métier = profils différents)
+  • Comparer par rapport à ce que l'IA SAIT DÉJÀ FAIRE aujourd'hui
+  • Identifier les écarts (positifs et négatifs)
+
+--------------------------------------------------------------------------------
+ÉTAPE 3 : REDÉFINITION DU MÉTIER EN 3 AXES
+--------------------------------------------------------------------------------
+
+AXE A — CE QUE TU DÉLÈGUES À L'IA (L'ancien métier)
+  • Identifier TOUT ce que l'IA peut faire mieux/plus vite que toi
+  • Ne pas s'accrocher : ces tâches ne sont plus TON métier
+  • Les automatiser = libérer du temps pour ce qui compte
+  → "Ce n'est plus ton travail, c'est celui de ton assistant IA"
+
+AXE B — CE QUI TE REND NON REMPLAÇABLE (Le cœur du nouveau métier)
+  • Identifier ce que l'IA NE PEUT PAS faire :
+    - Décisions dans l'incertitude
+    - Relations humaines profondes
+    - Jugement éthique et contextuel
+    - Gestes techniques complexes (haptique)
+    - Créativité authentique
+  • C'est ça ton VRAI métier maintenant
+  → "L'IA est ton outil, pas ton remplaçant"
+
+AXE C — CE QUI TE REND SOUHAITABLE ET VENDABLE (L'avantage compétitif)
+  • Comment te différencier des AUTRES humains (pas juste de l'IA)
+  • Quelle expertise unique peux-tu développer ?
+  • Quelle combinaison "métier + IA + humain" te rend rare ?
+  • Comment devenir celui/celle qu'on VEUT recruter ?
+  → "Tu n'es pas juste non-remplaçable, tu es DÉSIRABLE"
+
+--------------------------------------------------------------------------------
+RÉSULTAT : TON NOUVEAU MÉTIER
+--------------------------------------------------------------------------------
+
+APEX doit produire une REDÉFINITION claire :
+
+  "Avant, tu étais [ANCIEN MÉTIER] qui faisait [TÂCHES VULNÉRABLES].
+   
+   Demain, tu es [NOUVEAU MÉTIER AUGMENTÉ] qui :
+   - Pilote l'IA pour [TÂCHES DÉLÉGUÉES]
+   - Apporte une valeur unique sur [TÂCHES NON REMPLAÇABLES]
+   - Se différencie par [EXPERTISE RARE]
+   
+   Voici comment y arriver : [PLAN D'ACTION]"
+
+--------------------------------------------------------------------------------
+ÉTAPE 4 : PLAN D'ACTION CONCRET
+--------------------------------------------------------------------------------
+Pour chaque axe (Déléguer, Renforcer, Différencier) :
+  • Actions précises et spécifiques au profil
+  • Micro-actions quand nécessaire (étapes détaillées)
+  • Outils spécifiques recommandés (noms, pas catégories)
+  • Durées réalistes basées sur le temps disponible
+  • KPIs mesurables (temps gagné, compétence acquise, etc.)
+
+
+================================================================================
+NIVEAU 2 : PIVOT (Changer de métier)
+================================================================================
+
+QUESTION CENTRALE DE L'UTILISATEUR :
+"Je veux/dois changer de métier. Vers quoi ? Comment y arriver concrètement ?"
+
+RÉPONSE APEX :
+"Basé sur QUI TU ES (pas juste ce que tu dis vouloir), voici les métiers
+où tu seras VENDABLE, SOUHAITABLE et NON REMPLAÇABLE. Et voici le chemin."
+
+--------------------------------------------------------------------------------
+ÉTAPE 1 : AUDIT COMPLET (Obligatoire, même base que Augmentation)
+--------------------------------------------------------------------------------
+Ce que APEX analyse :
+  • Où tu es aujourd'hui (poste, tâches, secteur)
+  • Tes compétences actuelles (techniques et soft skills)
+  • Tes talents naturels (ce qui te différencie)
+  • Ton niveau de vulnérabilité IA actuel
+
+--------------------------------------------------------------------------------
+ÉTAPE 2 : PROFIL HUMAIN (Portrait de Mutation)
+--------------------------------------------------------------------------------
+Ce que APEX recueille :
+  • Ce que tu aimes faire (passions, motivations profondes)
+  • Ce que tu ne veux plus faire (zone de rejet)
+  • Tes contraintes (géographie, salaire, temps disponible)
+  • Tes aspirations (même vagues ou irréalistes)
+
+--------------------------------------------------------------------------------
+ÉTAPE 3 : PROPOSITION DE MÉTIERS PAR L'IA (Force de proposition)
+--------------------------------------------------------------------------------
+
+⚠️ POINTS CRITIQUES :
+
+1. L'IA NE SUIT PAS AVEUGLÉMENT ce que la personne dit vouloir
+2. L'IA PROPOSE UNIQUEMENT des métiers RÉSILIENTS à l'IA
+
+--------------------------------------------------------------------------------
+LOGIQUE DE PROPOSITION :
+--------------------------------------------------------------------------------
+
+ÉTAPE 3.1 : Analyser les données utilisateur
+  • Talents naturels (ce qui le différencie)
+  • Compétences transférables (ce qu'il sait déjà faire)
+  • Expérience sectorielle (où il a de la crédibilité)
+  • Motivations profondes (ce qui le fait vibrer)
+  • Contraintes (géo, salaire, temps)
+
+ÉTAPE 3.2 : Filtrer par RÉSILIENCE IA
+  ⚠️ Ne proposer QUE des métiers que l'IA ne remplacera pas demain :
+  
+  MÉTIERS RÉSILIENTS (à privilégier) :
+    • Métiers à forte composante RELATIONNELLE (négociation, soin, éducation)
+    • Métiers à forte composante HAPTIQUE (artisanat, chirurgie, terrain)
+    • Métiers de DÉCISION COMPLEXE (stratégie, arbitrage éthique, gestion de crise)
+    • Métiers de CRÉATION AUTHENTIQUE (art, design d'expérience, innovation)
+    • Métiers de SUPERVISION IA (pilotage, audit, formation)
+  
+  MÉTIERS À ÉVITER (même si l'utilisateur les veut) :
+    • Métiers purement analytiques/data (sauf supervision)
+    • Métiers de production de contenu standardisé
+    • Métiers de traitement d'information répétitive
+    • Métiers de support technique niveau 1-2
+
+ÉTAPE 3.3 : Matcher et proposer 2-3 métiers
+  • Croiser profil utilisateur × métiers résilients
+  • Proposer les meilleures correspondances
+  • Expliquer POURQUOI (double justification : profil + résilience IA)
+
+--------------------------------------------------------------------------------
+EXEMPLE COMPLET :
+--------------------------------------------------------------------------------
+
+DONNÉES UTILISATEUR :
+  • Métier actuel : Analyste financier
+  • Talents : Relationnel fort, pédagogie, synthèse
+  • Envie déclarée : "Data Scientist"
+  • Contrainte : Pas de code complexe
+
+ANALYSE APEX :
+  "Data Scientist" = métier partiellement vulnérable (analyse pure → IA)
+  Mais les talents de l'utilisateur pointent vers autre chose...
+
+PROPOSITIONS APEX :
+
+  1. DIRECTEUR FINANCIER / CFO adjoint
+     Pourquoi votre profil : Expertise finance + talents relationnels + synthèse
+     Pourquoi résilient : Décisions stratégiques, négociation avec investisseurs,
+                          gestion d'équipe = NON automatisable
+     
+  2. CONSULTANT EN TRANSFORMATION FINANCIÈRE
+     Pourquoi votre profil : Analyse + pédagogie + relationnel client
+     Pourquoi résilient : Accompagnement humain du changement,
+                          confiance client = NON automatisable
+  
+  3. FORMATEUR / COACH FINANCE + IA
+     Pourquoi votre profil : Pédagogie + expertise métier + adaptabilité
+     Pourquoi résilient : Transmission humaine, mentoring = NON automatisable
+
+  ❌ Data Scientist (votre souhait initial) :
+     "Ce métier correspond partiellement à vos compétences analytiques,
+      mais sa composante technique pure est de plus en plus automatisée.
+      Les 3 propositions ci-dessus exploitent mieux vos talents relationnels
+      ET sont plus résilientes à long terme."
+
+--------------------------------------------------------------------------------
+ÉTAPE 4 : GAP ANALYSIS (Écart compétences)
+--------------------------------------------------------------------------------
+Pour chaque métier proposé :
+  • Compétences requises (référentiel métier)
+  • Compétences déjà acquises (transférables)
+  • Compétences à acquérir (le GAP)
+  • Niveau d'effort estimé (facile / moyen / difficile)
+
+--------------------------------------------------------------------------------
+ÉTAPE 5 : PLAN DE TRANSITION (Planning + Actions + Micro-actions)
+--------------------------------------------------------------------------------
+
+STRUCTURE DU PLAN :
+
+Phase 1 : LIBÉRATION (Mois 1-2)
+├── Action 1.1 : Automatiser tâche X pour libérer Yh/semaine
+│   ├── Micro-action : Créer compte outil Z
+│   ├── Micro-action : Configurer workflow
+│   └── Micro-action : Tester et ajuster
+├── Action 1.2 : ...
+└── KPI Phase 1 : X heures/semaine libérées pour la formation
+
+Phase 2 : ACQUISITION (Mois 3-5)
+├── Action 2.1 : Acquérir compétence A
+│   ├── Micro-action : S'inscrire formation X
+│   ├── Micro-action : Compléter module 1
+│   ├── Micro-action : Exercice pratique
+│   └── Micro-action : Validation/certification
+├── Action 2.2 : Acquérir compétence B
+│   └── ...
+└── KPI Phase 2 : Compétences A, B, C validées
+
+Phase 3 : TRANSITION (Mois 6+)
+├── Action 3.1 : Première mission/projet dans nouveau domaine
+├── Action 3.2 : Construire preuve de compétence
+└── KPI Phase 3 : Première opportunité concrète
+
+
+================================================================================
+RÉSUMÉ DES LIVRABLES APEX
+================================================================================
+
+Pour AUGMENTATION :
+  □ Diagnostic de vulnérabilité IA (score + détail par tâche)
+  □ Cartographie des tâches (Automatisables / Différenciantes / À développer)
+  □ Recommandations outils IA spécifiques
+  □ Plan d'action avec micro-actions
+  □ KPIs de suivi (temps gagné, compétences renforcées)
+
+Pour PIVOT :
+  □ Audit complet (même base qu'Augmentation)
+  □ Portrait humain (motivations, rejets, aspirations)
+  □ Proposition de 2-3 métiers cibles (force de proposition IA)
+  □ Gap analysis par métier cible
+  □ Plan de transition phasé avec actions et micro-actions
+  □ Timeline réaliste basée sur le temps disponible
+
+
+================================================================================
+DONNÉES DE RÉFÉRENCE NÉCESSAIRES
+================================================================================
+
+Pour que ces analyses soient RÉELLES et pas du blabla :
+
+1. IMPACT IA PAR TYPE DE TÂCHE
+   → Savoir si "Reporting" est automatisable à 30% ou 90%
+   → Source : LLM + base de connaissances actualisée
+
+2. STANDARDS PAR SECTEUR
+   → Un comptable en Finance ≠ un comptable en Startup
+   → Source : Référentiels sectoriels + LLM
+
+3. RÉFÉRENTIEL MÉTIERS
+   → Compétences requises pour chaque métier cible
+   → Source : ROME, LinkedIn, enquêtes métiers + LLM
+
+4. BASE D'OUTILS IA
+   → Quel outil pour automatiser quoi (noms spécifiques)
+   → Source : Base de données maintenue + LLM
+
+5. PARCOURS DE TRANSITION TYPES
+   → De "Comptable" vers "Controller" = quel chemin
+   → Source : Templates + personnalisation LLM
+
+
+================================================================================
+                              FIN DU DOCUMENT
+================================================================================
+

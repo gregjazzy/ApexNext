@@ -62,7 +62,47 @@ export function Step1Matrix() {
 
   // Goals with dynamic titles AND descriptions based on persona
   const getGoals = (): GoalOption[] => {
-    const baseGoals: GoalOption[] = [
+    // Options spécifiques pour Leader/RH
+    if (persona === 'leader') {
+      return [
+        {
+          id: 'augmentation',
+          title: l === 'fr' 
+            ? "Audit d'Efficience" 
+            : "Efficiency Audit",
+          description: l === 'fr'
+            ? "Invitez vos équipes à optimiser leur poste. Suivez leur progression et agrégez les résultats."
+            : "Invite your teams to optimize their position. Track progress and aggregate results.",
+          icon: <Zap className="w-6 h-6" />,
+          accentColor: 'blue',
+        },
+        {
+          id: 'pivot',
+          title: l === 'fr' 
+            ? "PSE & Reclassement — Cohorte Pivot" 
+            : "Restructuring & Outplacement — Pivot Cohort",
+          description: l === 'fr'
+            ? "Pilotez la transition de vos collaborateurs. Préparez les dossiers avec leur diagnostic Pivot."
+            : "Manage your employees' transition. Prepare documentation with their Pivot diagnostic.",
+          icon: <Shuffle className="w-6 h-6" />,
+          accentColor: 'emerald',
+        },
+        {
+          id: 'reclassement',
+          title: l === 'fr' 
+            ? "Job Designer — Architecture de Poste" 
+            : "Job Designer — Position Architecture",
+          description: l === 'fr'
+            ? "Concevez les postes résilients de demain. Définissez les compétences clés indépendamment des profils actuels."
+            : "Design tomorrow's resilient positions. Define key competencies independently of current profiles.",
+          icon: <UserCog className="w-6 h-6" />,
+          accentColor: 'violet',
+        },
+      ];
+    }
+
+    // Options standard pour Salarié et Freelance
+    return [
       {
         id: 'augmentation',
         title: persona 
@@ -86,23 +126,6 @@ export function Step1Matrix() {
         accentColor: 'emerald',
       },
     ];
-
-    // Option Reclassement/PSE uniquement pour Leader/RH
-    if (persona === 'leader') {
-      baseGoals.push({
-        id: 'reclassement',
-        title: l === 'fr' 
-          ? "Cellule de Reclassement Stratégique" 
-          : "Strategic Outplacement Cell",
-        description: l === 'fr'
-          ? "Piloter un Plan de Reclassement (Mutation de Masse) — Audit de transition collective pour vos équipes."
-          : "Lead a Redeployment Plan (Mass Transition) — Collective transition audit for your teams.",
-        icon: <UserCog className="w-6 h-6" />,
-        accentColor: 'violet',
-      });
-    }
-
-    return baseGoals;
   };
 
   return (

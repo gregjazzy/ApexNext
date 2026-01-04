@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Clock, Trash2, ChevronDown, ChevronUp, Cpu, Users, Lightbulb, Brain, Cog, Timer, Sparkles, Loader2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuditStore, Temporality, Task } from '@/lib/store';
 import { ResilienceSlider } from '@/components/ui/ResilienceSlider';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
+import { PhantomChargeScanner } from '@/components/PhantomChargeScanner';
+import { TaskSelector } from '@/components/TaskSelector';
 import { cn, getResilienceColor } from '@/lib/utils';
 import { tasksLexicon, getLexiconValue, personaLabels } from '@/lib/lexicon';
 
@@ -24,7 +26,28 @@ export function Step3Tasks() {
 
   const canProceed = tasks.length > 0;
   const persona = context.persona || 'salarie';
+  const goal = context.goal;
   const l = locale === 'en' ? 'en' : 'fr';
+  
+  // ===============================================
+  // LOGIQUE D'AFFICHAGE DU SCANNER DE CHARGE FANTÔME
+  // ===============================================
+  // Obligatoire : salarie, freelance, ou leader + augmentation
+  // Toggle (optionnel) : leader + pivot ou reclassement
+  const showPhantomScanner = useMemo(() => {
+    if (persona === 'salarie' || persona === 'freelance') {
+      return { show: true, isToggle: false };
+    }
+    if (persona === 'leader') {
+      if (goal === 'augmentation') {
+        return { show: true, isToggle: false };
+      }
+      if (goal === 'pivot' || goal === 'reclassement') {
+        return { show: true, isToggle: true };
+      }
+    }
+    return { show: false, isToggle: false };
+  }, [persona, goal]);
 
   const temporalityLabels: Record<Temporality, string> = {
     quotidien: t('temporality.daily'),
@@ -154,8 +177,37 @@ export function Step3Tasks() {
         </motion.p>
       </div>
 
-      {/* AI Analysis Button */}
-      {context.jobDescription && (
+      {/* =============================================== */}
+      {/* SCANNER DE CHARGE FANTÔME (Emails & Flux) */}
+      {/* Quantification de la charge administrative invisible */}
+      {/* =============================================== */}
+      {showPhantomScanner.show && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <PhantomChargeScanner isToggleMode={showPhantomScanner.isToggle} />
+        </motion.div>
+      )}
+
+      {/* =============================================== */}
+      {/* SÉLECTEUR DE TÂCHES (via LLM) */}
+      {/* Génération automatique des tâches typiques du métier/secteur */}
+      {/* =============================================== */}
+      {context.jobTitle && context.industry && tasks.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="apex-card p-6"
+        >
+          <TaskSelector />
+        </motion.div>
+      )}
+
+      {/* AI Analysis Button (legacy - pour fiche de poste uploadée) */}
+      {context.jobDescription && tasks.length === 0 && (
         <motion.div
           className="apex-card p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
           initial={{ opacity: 0, y: 20 }}

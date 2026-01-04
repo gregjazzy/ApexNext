@@ -1,0 +1,349 @@
+================================================================================
+                    APEX — PACKS MÉTIERS / SECTEURS
+                    Base de connaissances de référence
+================================================================================
+
+Pour répondre CONCRÈTEMENT (pas du bullshit), APEX a besoin de données 
+de référence par métier et par secteur.
+
+================================================================================
+STRUCTURE D'UN PACK MÉTIER
+================================================================================
+
+Exemple : COMPTABLE
+
+--------------------------------------------------------------------------------
+IDENTITÉ MÉTIER
+--------------------------------------------------------------------------------
+nom: "Comptable"
+variantes: ["Aide-comptable", "Comptable général", "Comptable fournisseurs", 
+            "Comptable clients", "Chef comptable"]
+secteurs_principaux: ["Finance", "Cabinet comptable", "Industrie", "PME"]
+niveau_études_moyen: "Bac+2 à Bac+5"
+salaire_médian: "35-55K€"
+
+--------------------------------------------------------------------------------
+TÂCHES TYPES ET VULNÉRABILITÉ IA
+--------------------------------------------------------------------------------
+taches:
+  - nom: "Saisie des écritures comptables"
+    temps_moyen: 25%
+    vulnerabilite_ia: 95%
+    outils_automatisation: ["Dext", "Pennylane", "Indy", "Sage Automatisation"]
+    
+  - nom: "Rapprochements bancaires"
+    temps_moyen: 15%
+    vulnerabilite_ia: 90%
+    outils_automatisation: ["Pennylane", "Qonto", "Agicap"]
+    
+  - nom: "Reporting mensuel"
+    temps_moyen: 20%
+    vulnerabilite_ia: 70%
+    outils_automatisation: ["Power BI", "Tableau", "Excel + ChatGPT"]
+    
+  - nom: "Déclarations fiscales"
+    temps_moyen: 15%
+    vulnerabilite_ia: 60%
+    outils_automatisation: ["Sage", "Cegid", "EBP"]
+    
+  - nom: "Conseil au dirigeant"
+    temps_moyen: 10%
+    vulnerabilite_ia: 15%
+    outils_automatisation: []  # Non automatisable
+    
+  - nom: "Relation clients/fournisseurs"
+    temps_moyen: 10%
+    vulnerabilite_ia: 20%
+    outils_automatisation: []  # Non automatisable
+    
+  - nom: "Gestion des litiges"
+    temps_moyen: 5%
+    vulnerabilite_ia: 10%
+    outils_automatisation: []  # Non automatisable
+
+--------------------------------------------------------------------------------
+SCORE GLOBAL MÉTIER
+--------------------------------------------------------------------------------
+vulnerabilite_moyenne: 65%
+temps_libereable_ia: 60%  # % du temps automatisable
+metier_en_transformation: true
+
+--------------------------------------------------------------------------------
+REDÉFINITION DU MÉTIER (APEX)
+--------------------------------------------------------------------------------
+ancien_metier: "Comptable = Saisie + Reporting + Déclarations"
+nouveau_metier: "Conseiller Financier Stratégique Augmenté"
+nouveau_role:
+  - "Pilote une IA qui fait saisie/rapprochements/reporting"
+  - "Conseille le dirigeant sur les décisions financières"
+  - "Anticipe les risques grâce à la lecture humaine des données"
+  - "Gère la relation de confiance avec clients/fournisseurs"
+  - "Arbitre les situations complexes et litiges"
+
+--------------------------------------------------------------------------------
+COMPÉTENCES À RENFORCER
+--------------------------------------------------------------------------------
+competences_resilientes:
+  - nom: "Conseil stratégique"
+    niveau_requis: 4/5
+    formations: ["Formation CFO", "Executive MBA Finance"]
+    
+  - nom: "Communication / Pédagogie"
+    niveau_requis: 4/5
+    formations: ["Prise de parole", "Storytelling financier"]
+    
+  - nom: "Négociation"
+    niveau_requis: 3/5
+    formations: ["Négociation Harvard", "Gestion des conflits"]
+
+competences_ia_a_acquerir:
+  - nom: "Pilotage d'outils IA comptables"
+    outils: ["Dext", "Pennylane", "ChatGPT pour Excel"]
+    temps_formation: "2-4 semaines"
+    
+  - nom: "Data visualisation"
+    outils: ["Power BI", "Tableau"]
+    temps_formation: "4-8 semaines"
+
+--------------------------------------------------------------------------------
+MÉTIERS DE PIVOT RECOMMANDÉS
+--------------------------------------------------------------------------------
+pivots_resilients:
+  - nom: "Directeur Financier / CFO"
+    compatibilite: 85%
+    gap_competences: ["Management", "Stratégie d'entreprise"]
+    resilience_ia: 90%
+    
+  - nom: "Consultant en transformation financière"
+    compatibilite: 80%
+    gap_competences: ["Consulting", "Gestion de projet"]
+    resilience_ia: 85%
+    
+  - nom: "Formateur / Enseignant comptabilité"
+    compatibilite: 75%
+    gap_competences: ["Pédagogie", "Animation"]
+    resilience_ia: 95%
+
+pivots_a_eviter:
+  - nom: "Data Analyst Finance"
+    raison: "Composante analytique pure de plus en plus automatisée"
+    resilience_ia: 40%
+
+
+================================================================================
+STRUCTURE D'UN PACK SECTEUR
+================================================================================
+
+Exemple : FINANCE / BANQUE
+
+--------------------------------------------------------------------------------
+IDENTITÉ SECTEUR
+--------------------------------------------------------------------------------
+nom: "Finance / Banque"
+sous_secteurs: ["Banque de détail", "Banque d'investissement", "Assurance", 
+                "Gestion d'actifs", "Fintech"]
+specificites: 
+  - "Forte régulation (compliance)"
+  - "Transformation digitale avancée"
+  - "Pression sur les coûts"
+
+--------------------------------------------------------------------------------
+IMPACT IA GLOBAL SECTEUR
+--------------------------------------------------------------------------------
+niveau_automatisation_actuel: "Élevé"
+tendance: "Accélération"
+metiers_les_plus_impactes:
+  - "Back-office / Opérations"
+  - "Analystes junior"
+  - "Conseillers clientèle standard"
+  
+metiers_resilients_secteur:
+  - "Gestion de patrimoine haut de gamme"
+  - "Risk management senior"
+  - "Compliance / Éthique"
+  - "Relation client grands comptes"
+
+--------------------------------------------------------------------------------
+OUTILS IA DOMINANTS SECTEUR
+--------------------------------------------------------------------------------
+outils_courants:
+  - categorie: "Automatisation back-office"
+    outils: ["UiPath", "Blue Prism", "Automation Anywhere"]
+    
+  - categorie: "Analyse de données"
+    outils: ["SAS", "Python/R", "Dataiku", "Alteryx"]
+    
+  - categorie: "Relation client"
+    outils: ["Salesforce Einstein", "Chatbots", "Analyse de sentiment"]
+    
+  - categorie: "Compliance"
+    outils: ["Regtech", "Suade", "ComplyAdvantage"]
+
+--------------------------------------------------------------------------------
+MODIFICATEURS SECTORIELS
+--------------------------------------------------------------------------------
+# Ces coefficients ajustent les scores de vulnérabilité par métier
+# selon les spécificités du secteur
+
+modificateur_vulnerabilite:
+  taches_administratives: +15%  # Plus automatisé que moyenne
+  taches_relationnelles: -10%   # Relation client reste clé
+  taches_analytiques: +20%      # Très outillé en analyse
+  taches_decision: -15%         # Régulation = besoin humain
+
+formations_valorisees_secteur:
+  - "CFA"
+  - "FRM"
+  - "Certifications Fintech"
+  - "Data Science for Finance"
+
+
+================================================================================
+LISTE DES PACKS À CRÉER (PRIORITÉ)
+================================================================================
+
+PACKS MÉTIERS (Top 20) :
+--------------------------------------------------------------------------------
+□ Comptable / Expert-comptable
+□ Contrôleur de gestion
+□ Assistant administratif
+□ Chargé de clientèle
+□ Commercial / Business Developer
+□ Chef de projet
+□ Développeur informatique
+□ Data Analyst
+□ Responsable RH
+□ Juriste d'entreprise
+□ Responsable marketing
+□ Graphiste / Designer
+□ Rédacteur / Content Manager
+□ Acheteur
+□ Responsable logistique
+□ Technicien maintenance
+□ Infirmier / Aide-soignant
+□ Enseignant / Formateur
+□ Consultant
+□ Manager opérationnel
+
+PACKS SECTEURS (Top 15) :
+--------------------------------------------------------------------------------
+□ Finance / Banque / Assurance
+□ Industrie / Manufacturing
+□ Tech / IT / Digital
+□ Retail / Commerce
+□ Santé / Pharma
+□ Luxe / Mode
+□ Immobilier / Construction
+□ Transport / Logistique
+□ Énergie / Utilities
+□ Conseil / Audit
+□ Médias / Communication
+□ Hôtellerie / Restauration
+□ Secteur public / Administration
+□ Éducation / Formation
+□ Agriculture / Agroalimentaire
+
+
+================================================================================
+FORMAT DE STOCKAGE
+================================================================================
+
+Option A : Fichiers JSON statiques
+  /data/packs/metiers/comptable.json
+  /data/packs/metiers/commercial.json
+  /data/packs/secteurs/finance.json
+  ...
+
+Option B : Base de données (Supabase)
+  Table: metier_packs
+  Table: secteur_packs
+  Table: taches_reference
+  Table: outils_ia
+
+Option C : Hybride (recommandé)
+  - JSON statiques pour la base
+  - LLM pour personnaliser/enrichir selon le contexte exact
+  - Supabase pour les mises à jour et analytics
+
+
+================================================================================
+RÈGLE CRITIQUE : PARLER LE LANGAGE DU MÉTIER
+================================================================================
+
+Les recommandations APEX doivent utiliser le JARGON du métier et du secteur.
+C'est ce qui fait la différence entre bullshit générique et conseil crédible.
+
+--------------------------------------------------------------------------------
+EXEMPLE : COMPTABLE
+--------------------------------------------------------------------------------
+
+❌ GÉNÉRIQUE (bullshit) :
+   "Automatisez vos tâches administratives avec des outils IA"
+   "Optimisez vos flux de travail"
+   "Gagnez en productivité"
+
+✅ JARGON MÉTIER (crédible) :
+   "Automatisez le lettrage des écritures comptables et la réconciliation 
+    des comptes tiers avec Dext. Gain : 3h/semaine sur la clôture mensuelle."
+   
+   "Déléguez la saisie des factures fournisseurs (compte 401) à Pennylane.
+    L'OCR extrait automatiquement les montants HT/TVA et impute sur le 
+    bon compte de charge."
+   
+   "Utilisez ChatGPT pour générer vos analyses d'écarts budgétaires.
+    Prompt : 'Compare le réalisé vs budget sur les comptes 6XX, 
+    identifie les dérives > 10%'."
+
+--------------------------------------------------------------------------------
+EXEMPLE : COMMERCIAL B2B
+--------------------------------------------------------------------------------
+
+❌ GÉNÉRIQUE (bullshit) :
+   "Améliorez votre prospection avec l'IA"
+
+✅ JARGON MÉTIER (crédible) :
+   "Automatisez la qualification de vos leads entrants avec Clay.
+    Enrichissement automatique : SIREN, effectif, CA, tech stack.
+    Score de maturité calculé avant le premier call."
+   
+   "Générez vos proposals avec Tome ou Beautiful.ai.
+    Input : compte-rendu de discovery call.
+    Output : deck personnalisé avec cas clients secteur."
+   
+   "Réduisez votre cycle de closing : utilisez Modjo pour analyser
+    vos calls et identifier les objections non traitées."
+
+--------------------------------------------------------------------------------
+DANS CHAQUE PACK MÉTIER
+--------------------------------------------------------------------------------
+
+Chaque pack doit inclure :
+
+1. VOCABULAIRE_METIER : Liste des termes spécifiques
+   - Comptable : "lettrage", "rapprochement", "écritures", "clôture", "FEC"
+   - Commercial : "pipe", "closing", "discovery", "proposal", "ARR", "churn"
+   - RH : "GPEC", "entretien annuel", "mobilité interne", "référentiel compétences"
+
+2. EXEMPLES_PROMPTS_METIER : Prompts ChatGPT/Claude adaptés au jargon
+   - Formulés comme un professionnel du métier les écrirait
+
+3. CAS_USAGE_CONCRETS : Situations réelles du quotidien
+   - Pas "optimiser le reporting" mais "préparer la revue mensuelle du CODIR"
+
+
+================================================================================
+UTILISATION DANS APEX
+================================================================================
+
+1. L'utilisateur entre son métier + secteur
+2. APEX charge le pack métier + pack secteur correspondants
+3. APEX applique les modificateurs sectoriels aux scores du métier
+4. APEX génère les recommandations CONCRÈTES basées sur ces données
+5. Le LLM personnalise selon le contexte exact de l'utilisateur
+6. ⚠️ Le LLM utilise le VOCABULAIRE_METIER pour parler comme un pro du secteur
+
+
+================================================================================
+                              FIN DU DOCUMENT
+================================================================================
+

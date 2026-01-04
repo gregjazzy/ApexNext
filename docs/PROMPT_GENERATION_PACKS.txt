@@ -1,0 +1,177 @@
+================================================================================
+PROMPT DE GÉNÉRATION DES PACKS MÉTIER/SECTEUR
+================================================================================
+
+À utiliser avec GPT-4, Claude, ou autre LLM pour générer les données des packs.
+
+================================================================================
+PROMPT
+================================================================================
+
+Instructions de rôle :
+
+Agis en tant qu'Expert en Ingénierie RH (GPEC) et Consultant en Stratégie de Transformation IA. Ta mission est de générer des données structurées pour une plateforme de "Job Design" nommée APEX.
+
+Contexte : Nous sommes en 2026. L'IA (Agents autonomes, Vision, LLM) a atteint une maturité totale sur les tâches de traitement d'information.
+
+Secteur cible : [INSERER LE SECTEUR EX: BTP]
+Métiers à générer : [INSERER LA LISTE DES METIERS EX: Conducteur de travaux, Chef de chantier]
+
+Objectif : Pour chaque métier, génère un objet JSON qui servira à :
+
+1. Auditer ce que le salarié fait aujourd'hui (Tâches standards).
+2. Nettoyer le poste (Identifier le gisement de temps via la porosité IA).
+3. Étoffer le métier (Proposer des axes stratégiques pour utiliser le temps libéré).
+
+Structure JSON impérative :
+
+{
+  "job_title": "Nom du poste",
+  "sector": "Nom du secteur",
+  "current_standard_tasks": [
+    {
+      "task_name": "Nom de la tâche actuelle",
+      "porosity_score": 0.0,
+      "category": "DATA | HUMAIN | OBJET",
+      "human_value_description": "Pourquoi l'humain reste indispensable ici."
+    }
+  ],
+  "strategic_mutation_axes": [
+    {
+      "axis_title": "Nom de la nouvelle responsabilité de haut niveau",
+      "strategic_impact": "Bénéfice business pour l'entreprise",
+      "concrete_missions": ["Mission 1", "Mission 2"],
+      "required_talent": "Talent du Carré d'As nécessaire"
+    }
+  ],
+  "future_augmented_title": "Nouveau titre de poste en 2026"
+}
+
+Contraintes de rédaction :
+
+- Porosité Chirurgicale : Les tâches DATA (reporting, planning, tri) doivent avoir un score > 0.80. Les tâches HUMAIN (négociation, gestion de crise) ou OBJET (geste technique) doivent rester < 0.30.
+
+- Étoffement Réel : Les axes stratégiques ne doivent pas être des tâches de bureau. Ils doivent représenter une montée en gamme (Expertise, Conseil, Leadership, Qualité).
+
+- Réalisme 2026 : Propose des missions qui exploitent l'IA comme un assistant pour permettre à l'humain de faire ce qu'il ne pouvait pas faire par manque de temps.
+
+Génère maintenant les JSON pour les métiers demandés.
+
+
+================================================================================
+EXEMPLE DE SORTIE ATTENDUE
+================================================================================
+
+{
+  "job_title": "Comptable",
+  "sector": "Finance / Banque",
+  "current_standard_tasks": [
+    {
+      "task_name": "Saisie des écritures comptables",
+      "porosity_score": 0.95,
+      "category": "DATA",
+      "human_value_description": "Validation finale et contrôle de cohérence restent humains pour la responsabilité légale."
+    },
+    {
+      "task_name": "Rapprochements bancaires",
+      "porosity_score": 0.92,
+      "category": "DATA",
+      "human_value_description": "L'humain intervient sur les écarts inexpliqués nécessitant du jugement."
+    },
+    {
+      "task_name": "Reporting et clôture mensuelle",
+      "porosity_score": 0.70,
+      "category": "DATA",
+      "human_value_description": "L'analyse des écarts et le commentaire de gestion restent une expertise humaine."
+    },
+    {
+      "task_name": "Déclarations fiscales",
+      "porosity_score": 0.60,
+      "category": "DATA",
+      "human_value_description": "Responsabilité légale et arbitrages fiscaux complexes nécessitent l'humain."
+    },
+    {
+      "task_name": "Conseil stratégique au dirigeant",
+      "porosity_score": 0.15,
+      "category": "HUMAIN",
+      "human_value_description": "La relation de confiance, la compréhension du contexte business et l'accompagnement dans la décision sont irremplaçables."
+    },
+    {
+      "task_name": "Relation avec le CAC et les banques",
+      "porosity_score": 0.18,
+      "category": "HUMAIN",
+      "human_value_description": "Négociation, gestion de la relation de confiance, diplomatie dans les échanges."
+    },
+    {
+      "task_name": "Gestion des litiges fournisseurs",
+      "porosity_score": 0.12,
+      "category": "HUMAIN",
+      "human_value_description": "Arbitrage, négociation, compréhension des enjeux relationnels."
+    }
+  ],
+  "strategic_mutation_axes": [
+    {
+      "axis_title": "Business Partner Finance",
+      "strategic_impact": "Amélioration de la prise de décision stratégique grâce à des insights financiers proactifs",
+      "concrete_missions": [
+        "Analyser les KPIs métier et proposer des optimisations",
+        "Challenger les budgets des opérationnels",
+        "Produire des scénarios de simulation financière"
+      ],
+      "required_talent": "Vision systémique"
+    },
+    {
+      "axis_title": "Pilote de la Performance",
+      "strategic_impact": "Gain de marge opérationnelle via l'identification des leviers de rentabilité",
+      "concrete_missions": [
+        "Mettre en place des tableaux de bord prédictifs",
+        "Animer les revues de performance avec les managers",
+        "Proposer des plans d'économies chiffrés"
+      ],
+      "required_talent": "Relationnel complexe"
+    },
+    {
+      "axis_title": "Garant de la Conformité Augmentée",
+      "strategic_impact": "Réduction du risque légal et fiscal, sécurisation de l'entreprise",
+      "concrete_missions": [
+        "Superviser l'IA comptable et valider ses outputs",
+        "Anticiper les évolutions réglementaires",
+        "Former les équipes aux bonnes pratiques"
+      ],
+      "required_talent": "Rigueur éthique"
+    }
+  ],
+  "future_augmented_title": "Conseiller Financier Stratégique Augmenté"
+}
+
+
+================================================================================
+SECTEURS ET MÉTIERS À GÉNÉRER (PRIORITÉ)
+================================================================================
+
+1. Finance / Banque
+   - Comptable, Contrôleur de gestion, Analyste financier, Trésorier
+
+2. Industrie / Manufacturing
+   - Responsable production, Responsable qualité, Acheteur industriel, Planificateur
+
+3. Tech / IT
+   - Développeur, Chef de projet IT, Support technique, Admin système
+
+4. Commerce / Retail
+   - Commercial B2B, Responsable de magasin, Category manager, Acheteur retail
+
+5. RH / Administration
+   - Responsable RH, Chargé de recrutement, Gestionnaire paie, Assistant administratif
+
+6. Santé
+   - Infirmier, Aide-soignant, Secrétaire médical, Cadre de santé
+
+7. BTP / Construction
+   - Conducteur de travaux, Chef de chantier, Métreur, Chargé d'affaires
+
+8. Logistique / Supply Chain
+   - Responsable logistique, Gestionnaire de stock, Planificateur transport
+
+... (à compléter)
+
