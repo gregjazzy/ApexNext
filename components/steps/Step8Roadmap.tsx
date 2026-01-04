@@ -8,6 +8,7 @@ import { useAuditStore, CompetenceCategory } from '@/lib/store';
 import { NavigationButtons } from '@/components/ui/NavigationButtons';
 import { generatePDFReport } from '@/lib/reportGenerator';
 import { LLMPivotSuggestions } from '@/components/LLMPivotSuggestions';
+import { LLMActionPlan } from '@/components/LLMActionPlan';
 
 // Configuration couleurs catégories de compétences
 const COMPETENCE_COLORS: Record<CompetenceCategory, { bg: string; text: string; border: string }> = {
@@ -795,6 +796,11 @@ export function Step8Roadmap() {
           </div>
         </motion.div>
       )}
+
+      {/* =============================================== */}
+      {/* PLAN D'ACTION OPÉRATIONNEL - TOUS MODES (LLM #3) */}
+      {/* =============================================== */}
+      <LLMActionPlan />
 
       {/* =============================================== */}
       {/* SUGGESTIONS MÉTIERS IA - PIVOT ONLY (LLM #4) */}
